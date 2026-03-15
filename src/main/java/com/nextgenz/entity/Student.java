@@ -1,3 +1,4 @@
+/*
 
 package com.nextgenz.entity;
 
@@ -55,3 +56,4 @@ public class Student {
         this.email = email;
     }
 }
+*/
