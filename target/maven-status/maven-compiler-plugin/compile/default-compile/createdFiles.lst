@@ -1,4 +1,2 @@
-com\nextgenz\repository\StudentRepository.class
-com\nextgenz\entity\Student.class
 com\nextgenz\NextgenzApplication.class
 com\nextgenz\controller\HomeController.class
