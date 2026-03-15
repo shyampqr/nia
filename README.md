@@ -1,2 +1,0 @@
-# nia
-nextgenz international academy
