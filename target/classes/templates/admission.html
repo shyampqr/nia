@@ -1,24 +1,147 @@
-
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Admission</title>
+    <meta charset="UTF-8">
+    <title>Admission Form - Nextgenz Academy</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #f9e79f, #f1c40f, #d4ac0d);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .form-card {
+            background: #fffbea;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #d4ac0d;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-header h2 {
+            font-weight: bold;
+            color: #b7950b;
+        }
+        .section-title {
+            font-weight: 600;
+            color: #7d6608;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #f1c40f, #d4ac0d);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #d4ac0d, #f1c40f);
+        }
+        .form-label {
+            font-weight: 500;
+            color: #7d6608;
+        }
+    </style>
 </head>
-
 <body>
+<div class="container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Nextgenz International Academy</h2>
+            <p class="text-muted">Admission Application Form</p>
+        </div>
+        <form th:action="@{/admission}" method="post" novalidate>
 
-<h2>Admission Form</h2>
+            <!-- Personal Information -->
+            <h5 class="section-title">👤 Personal Information</h5>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" name="firstName" class="form-control" required minlength="2" pattern="[A-Za-z]+" title="Only letters allowed">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Middle Name</label>
+                    <input type="text" name="middleName" class="form-control" pattern="[A-Za-z]*" title="Only letters allowed">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" name="lastName" class="form-control" required minlength="2" pattern="[A-Za-z]+" title="Only letters allowed">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Date of Birth *</label>
+                    <input type="date" name="dob" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Gender *</label>
+                    <select name="gender" class="form-select" required>
+                        <option value="">Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
 
-<form>
-<input type="text" placeholder="Student Name"><br><br>
-<input type="text" placeholder="Class"><br><br>
-<input type="text" placeholder="Phone"><br><br>
-<input type="email" placeholder="Email"><br><br>
+            <!-- Contact Information -->
+            <h5 class="section-title">📞 Contact Information</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone Number *</label>
+                    <input type="tel" name="phone" class="form-control" required pattern="[0-9]{10}" title="Enter a valid 10-digit phone number">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address *</label>
+                <textarea name="address" class="form-control" rows="2" required minlength="10"></textarea>
+            </div>
 
-<button type="submit">Apply</button>
-</form>
+            <!-- Academic Information -->
+            <h5 class="section-title">📚 Academic Information</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Previous School/College</label>
+                    <input type="text" name="previousSchool" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Grade/Qualification *</label>
+                    <select name="qualification" class="form-select" required>
+                        <option value="">Select Qualification</option>
+                        <option>High School (10th)</option>
+                        <option>Intermediate (12th)</option>
+                        <option>Diploma</option>
+                        <option>Bachelor’s Degree</option>
+                        <option>Master’s Degree</option>
+                        <option>Ph.D.</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Course Applying For *</label>
+                <select name="course" class="form-select" required>
+                    <option value="">Select Course</option>
+                    <option>B.Tech Computer Science</option>
+                    <option>AI & Robotics</option>
+                    <option>Cloud Computing</option>
+                    <option>Data Science</option>
+                    <option>Business Management</option>
+                </select>
+            </div>
 
-<a href="/">Back to Home</a>
-
+            <!-- Submit -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary w-50">Submit Application</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>
