@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admission Form - Step 4</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #f9e79f, #f1c40f, #d4ac0d);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .form-card {
+            background: #fffbea;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #d4ac0d;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-header h2 {
+            font-weight: bold;
+            color: #b7950b;
+        }
+        .section-title {
+            font-weight: 600;
+            color: #7d6608;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #28a745, #218838);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #218838, #28a745);
+        }
+        .form-label {
+            font-weight: 500;
+            color: #7d6608;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Nextgenz International Academy</h2>
+            <p class="text-muted">Admission Application Form - Step 4 of 6</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress mb-4" style="height: 25px; border-radius: 12px; background-color: #f5f5f5;">
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                 role="progressbar"
+                 style="width: 66%; font-weight: bold; font-size: 1rem;"
+                 aria-valuenow="4" aria-valuemin="0" aria-valuemax="6">
+                Step 4 of 6
+            </div>
+        </div>
+
+        <form th:action="@{/admission/step4}" method="post">
+
+            <!-- Address Details -->
+            <h5 class="section-title">🏠 Address Details</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nearest Locality (Google) *</label>
+                    <input type="text" name="nearestLocality" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Pincode *</label>
+                    <input type="text" name="pincode" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Address in India *</label>
+                <textarea name="addressIndia" class="form-control" required></textarea>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">District</label>
+                    <input type="text" name="district" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Street Address 1 *</label>
+                    <input type="text" name="street1" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Street Address 2</label>
+                    <input type="text" name="street2" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">City *</label>
+                    <select name="city" class="form-select" required>
+                        <option value="">Select City</option>
+                        <option>Lucknow</option>
+                        <option>Delhi</option>
+                        <option>Mumbai</option>
+                        <option>Kolkata</option>
+                        <option>Chennai</option>
+                        <option>Bengaluru</option>
+                        <option>Hyderabad</option>
+                        <option>Pune</option>
+                        <option>Jaipur</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">H.No / Flat No *</label>
+                    <input type="text" name="houseNo" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Country *</label>
+                    <select name="country" class="form-select" required>
+                        <option value="India" selected>India</option>
+                        <option>USA</option>
+                        <option>UK</option>
+                        <option>Canada</option>
+                        <option>Australia</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">State *</label>
+                    <select name="state" class="form-select" required>
+                        <option value="">Select State</option>
+                        <option>Uttar Pradesh</option>
+                        <option>Maharashtra</option>
+                        <option>Delhi</option>
+                        <option>Karnataka</option>
+                        <option>Tamil Nadu</option>
+                        <option>West Bengal</option>
+                        <option>Punjab</option>
+                        <option>Rajasthan</option>
+                        <option>Kerala</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Address Outside India</label>
+                    <textarea name="addressOutsideIndia" class="form-control"></textarea>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Country Outside India</label>
+                <input type="text" name="countryOutsideIndia" class="form-control">
+            </div>
+
+            <!-- Other Details -->
+            <h5 class="section-title">📌 Other Details</h5>
+            <!-- Conveyance Options in Single Row -->
+            <div class="mb-3">
+                <label class="form-label">Conveyance from home to school *</label>
+                <div class="d-flex justify-content-start gap-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="conveyance" value="By Person" required>
+                        <label class="form-check-label">By Person</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="conveyance" value="By School Transport">
+                        <label class="form-check-label">By School Transport</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="conveyance" value="By Other Transport">
+                        <label class="form-check-label">By Other Transport</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Whom to contact (If Parents not Available)</label>
+                    <input type="text" name="emergencyContact" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Relationship</label>
+                    <input type="text" name="relationship" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="tel" name="emergencyMobile" class="form-control">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Medical Illness / Allergies / Physiological Conditions (If any)</label>
+                <textarea name="medicalConditions" class="form-control"></textarea>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary">Previous</button>
+                <button type="submit" class="btn btn-primary">Save & Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
