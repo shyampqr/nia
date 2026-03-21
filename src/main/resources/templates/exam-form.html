@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Exam Portal – Class 5-10 | Nextgenz International Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold-accent: #B8860B;
+    --gold-light:  #D4A017;
+    --gold-strip:  #F0C040;
+    --bg-page:     #F7F4EF;
+    --bg-card:     #FFFFFF;
+    --bg-option:   #FAFAF8;
+    --border:      #E5DDD0;
+    --text-primary:   #1A1A1A;
+    --text-secondary: #5A5047;
+    --text-muted:     #8A7E72;
+    --correct:     #1E6B45;
+    --wrong:       #B02020;
+    --correct-bg:  #EAF7F0;
+    --wrong-bg:    #FDF0F0;
+    --shadow:      rgba(0,0,0,0.07);
+    --subject-color: #B8860B;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background: var(--bg-page);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 5rem;
+    color: var(--text-primary);
+  }
+
+  /* ── Header ── */
+  .exam-header { text-align: center; margin-bottom: 1.8rem; animation: fadeDown .5s ease both; }
+  .exam-header .school {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gold-accent); border: 1.5px solid var(--gold-strip); background: #fff;
+    padding: .28rem 1rem; border-radius: 20px; display: inline-block; margin-bottom: .65rem;
+  }
+  .exam-header h1 {
+    font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3.5vw, 2.1rem);
+    color: var(--text-primary); font-weight: 700; line-height: 1.2;
+  }
+  .exam-header .meta { font-size: .84rem; color: var(--text-muted); margin-top: .35rem; font-weight: 500; }
+
+  /* ── Card ── */
+  .exam-card {
+    width: 100%; max-width: 720px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: 0 2px 16px var(--shadow), 0 1px 4px rgba(0,0,0,0.04);
+    overflow: hidden; animation: fadeUp .6s ease both .1s;
+  }
+
+  /* ── Top bar ── */
+  .card-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .9rem 1.5rem;
+    background: var(--subject-color);
+    color: #fff; border-bottom: 3px solid var(--gold-strip);
+    transition: background .4s ease;
+  }
+  .bar-dots { display: flex; gap: .4rem; }
+  .bar-dot  { width: 10px; height: 10px; border-radius: 50%; opacity: .75; }
+  .bar-dot:nth-child(1){ background:#ff8a80; }
+  .bar-dot:nth-child(2){ background:#ffe082; }
+  .bar-dot:nth-child(3){ background:#a5d6a7; }
+  .bar-title { font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 600; letter-spacing: .04em; }
+  .timer-wrap {
+    display: flex; align-items: center; gap: .45rem; background: rgba(0,0,0,0.18);
+    padding: .3rem .75rem; border-radius: 20px; font-size: .86rem; font-weight: 700; letter-spacing: .05em;
+  }
+  #timer { font-variant-numeric: tabular-nums; }
+  #timer.warning { color: #ff8a80; animation: pulse 1s infinite; }
+
+  /* ── Progress ── */
+  .progress-wrap { padding: .75rem 1.5rem .25rem; background: #FDFCFA; border-bottom: 1px solid var(--border); }
+  .progress-track { height: 6px; background: #EDE8E0; border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--subject-color), var(--gold-strip)); border-radius: 99px; transition: width .4s ease; }
+  .progress-label { font-size: .73rem; color: var(--text-muted); font-weight: 600; margin-top: .35rem; letter-spacing: .04em; }
+
+  /* ── Screens ── */
+  .screen { display: none; padding: 2rem 2rem 1.6rem; }
+  .screen.active { display: block; }
+
+  /* ── Start screen ── */
+  .start-box { text-align: center; }
+  .start-box h2 { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: var(--text-primary); margin-bottom: .5rem; }
+  .start-box > p { color: var(--text-secondary); font-size: .93rem; line-height: 1.75; max-width: 480px; margin: 0 auto .5rem; }
+
+  /* Subject selector */
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .75rem;
+    margin: 1.2rem 0 1.4rem;
+  }
+  .subject-card {
+    background: var(--bg-option);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: .85rem .6rem;
+    cursor: pointer;
+    transition: border-color .18s, background .18s, transform .12s, box-shadow .18s;
+    text-align: center;
+    user-select: none;
+  }
+  .subject-card:hover { background: #FDF6E3; border-color: var(--gold-strip); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(184,134,11,0.12); }
+  .subject-card.selected { border-color: var(--subject-color); background: #FDF3CC; box-shadow: 0 0 0 3px rgba(184,134,11,0.15); }
+  .subject-card .s-icon { font-size: 1.6rem; margin-bottom: .3rem; }
+  .subject-card .s-name { font-size: .82rem; font-weight: 700; color: var(--text-primary); letter-spacing: .02em; }
+  .subject-card .s-count { font-size: .68rem; color: var(--text-muted); margin-top: .15rem; }
+
+  .form-row {
+    display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.2rem;
+  }
+  .name-input, .class-select {
+    padding: .72rem 1.1rem; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--bg-option); font-family: 'DM Sans', sans-serif;
+    font-size: .95rem; color: var(--text-primary); outline: none; transition: border-color .2s;
+  }
+  .name-input { width: 220px; }
+  .class-select { width: 160px; cursor: pointer; }
+  .name-input:focus, .class-select:focus { border-color: var(--gold-light); }
+  .name-input::placeholder { color: var(--text-muted); }
+
+  .info-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 0 0 1.4rem; }
+  .info-tile { background: #FDFAF4; border: 1.5px solid #EAE0C8; border-radius: 12px; padding: 1rem .75rem; text-align: center; }
+  .info-tile .val { font-size: 1.5rem; font-weight: 700; color: var(--subject-color); transition: color .3s; }
+  .info-tile .lbl { font-size: .71rem; color: var(--text-muted); font-weight: 600; letter-spacing: .07em; text-transform: uppercase; margin-top: .2rem; }
+
+  /* ── Question screen ── */
+  .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .q-number {
+    font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--subject-color); background: #FDF6E3; border: 1px solid #EAD89A;
+    padding: .25rem .75rem; border-radius: 20px;
+  }
+  .q-topic { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+  .q-text {
+    font-size: 1.1rem; font-weight: 500; color: var(--text-primary); line-height: 1.7;
+    margin-bottom: 1.4rem; padding: 1rem 1.1rem; background: #FDFAF5;
+    border-left: 3px solid var(--gold-strip); border-radius: 0 8px 8px 0;
+  }
+  .options { display: flex; flex-direction: column; gap: .7rem; }
+  .option {
+    display: flex; align-items: center; gap: 1rem; padding: .85rem 1.1rem;
+    background: var(--bg-option); border: 1.5px solid var(--border); border-radius: 10px;
+    cursor: pointer; transition: background .15s, border-color .15s, box-shadow .15s;
+    font-size: .95rem; color: var(--text-primary); line-height: 1.5;
+  }
+  .option:hover { background: #FDF6E3; border-color: var(--gold-light); box-shadow: 0 2px 8px rgba(180,130,0,0.1); }
+  .option.selected { background: #FDF3CC; border-color: var(--gold-light); font-weight: 600; }
+  .option.correct  { background: var(--correct-bg) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 600; }
+  .option.wrong    { background: var(--wrong-bg) !important; border-color: var(--wrong) !important; color: var(--wrong); font-weight: 600; }
+  .option.disabled { pointer-events: none; }
+  .option-badge {
+    width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px;
+    background: #EDE8E0; color: var(--text-secondary);
+    font-size: .78rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+  }
+  .option:hover .option-badge, .option.selected .option-badge { background: var(--subject-color); color: #fff; }
+  .option.correct .option-badge { background: var(--correct); color: #fff; }
+  .option.wrong   .option-badge { background: var(--wrong);   color: #fff; }
+
+  .q-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 1.6rem; padding-top: 1.1rem; border-top: 1px solid var(--border);
+  }
+  .ans-status { font-size: .82rem; font-weight: 600; color: var(--text-muted); }
+  .ans-status.ok  { color: var(--correct); }
+  .ans-status.bad { color: var(--wrong); }
+
+  /* ── Result screen ── */
+  .result-box { text-align: center; }
+  .result-box h2 { font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--text-primary); margin-bottom: .5rem; }
+  .score-ring {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: conic-gradient(var(--subject-color) var(--pct), #EDE8E0 0);
+    display: flex; align-items: center; justify-content: center;
+    margin: 1.5rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: relative;
+  }
+  .score-ring::after { content: ''; width: 104px; height: 104px; border-radius: 50%; background: #fff; position: absolute; }
+  .score-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--subject-color); position: relative; z-index: 1; }
+  .result-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: .8rem; margin: 1.2rem 0; }
+  .stat-tile { background: var(--bg-option); border: 1.5px solid var(--border); border-radius: 12px; padding: .9rem .6rem; }
+  .stat-tile .sv { font-size: 1.5rem; font-weight: 700; }
+  .stat-tile .sl { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); font-weight: 600; margin-top: .15rem; }
+  .sv.green { color: var(--correct); } .sv.red { color: var(--wrong); } .sv.gold { color: var(--gold-accent); }
+  .grade-badge {
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; color: #fff;
+    background: var(--subject-color); border-radius: 20px; padding: .45rem 1.5rem;
+    display: inline-block; margin-bottom: 1.2rem; letter-spacing: .04em;
+  }
+  .review-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--text-primary); text-align: left; margin: 1.4rem 0 .7rem; padding-bottom: .4rem; border-bottom: 2px solid var(--border); }
+  .review-item { background: var(--bg-option); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1.1rem; text-align: left; margin-bottom: .6rem; font-size: .88rem; line-height: 1.6; }
+  .review-item .rq { font-weight: 600; color: var(--text-primary); margin-bottom: .4rem; }
+  .review-item .ra { color: var(--correct); font-weight: 500; }
+  .review-item .rw { color: var(--wrong); font-weight: 500; }
+  .review-item .rc { color: var(--text-muted); font-size: .81rem; margin-top: .25rem; }
+
+  /* ── Buttons ── */
+  .btn {
+    font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+    letter-spacing: .04em; border: none; border-radius: 10px; padding: .65rem 1.6rem;
+    cursor: pointer; transition: background .18s, box-shadow .18s, transform .12s;
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-gold { background: var(--subject-color); color: #fff; box-shadow: 0 2px 10px rgba(184,134,11,0.25); }
+  .btn-gold:hover { filter: brightness(1.1); box-shadow: 0 4px 14px rgba(184,134,11,0.35); }
+  .btn-ghost { background: #fff; color: var(--text-secondary); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { background: #F5F0E8; border-color: #C8B98A; }
+  .btn-ghost:disabled { opacity: .38; cursor: not-allowed; }
+
+  /* ── Divider ── */
+  .or-divider { display: flex; align-items: center; gap: .75rem; margin: .5rem 0 1rem; color: var(--text-muted); font-size: .78rem; font-weight: 600; letter-spacing: .06em; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.45} }
+  @keyframes popIn    { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+  .q-anim { animation: popIn .25s ease both; }
+
+  @media(max-width:540px) {
+    .screen { padding: 1.4rem 1rem; }
+    .subject-grid { grid-template-columns: repeat(2,1fr); }
+    .form-row { flex-direction: column; align-items: center; }
+    .name-input, .class-select { width: 100%; max-width: 320px; }
+    .q-text { font-size: 1rem; }
+    .info-grid, .result-stats { gap:.55rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="exam-header">
+  <div class="school">Nextgenz International Academy</div>
+  <h1>Online Exam Portal</h1>
+  <p class="meta">Class 5–10 &nbsp;|&nbsp; 20 Questions &nbsp;|&nbsp; 30 Minutes</p>
+</div>
+
+<div class="exam-card">
+
+  <!-- Top bar -->
+  <div class="card-bar" id="cardBar">
+    <div class="bar-dots"><div class="bar-dot"></div><div class="bar-dot"></div><div class="bar-dot"></div></div>
+    <div class="bar-title" id="barTitle">Select Your Subject</div>
+    <div class="timer-wrap"><span>⏱</span><span id="timer">30:00</span></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="progressWrap" style="display:none;">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:5%"></div></div>
+    <div class="progress-label" id="progressLabel">Question 1 of 20</div>
+  </div>
+
+  <!-- ══ START SCREEN ══ -->
+  <div class="screen active" id="startScreen">
+    <div class="start-box">
+      <h2>Choose Your Subject ✏️</h2>
+      <p>Select a subject below, enter your details, and begin your timed exam.</p>
+
+      <div class="subject-grid" id="subjectGrid">
+        <div class="subject-card" data-subject="mathematics" onclick="selectSubject(this)">
+          <div class="s-icon">📐</div>
+          <div class="s-name">Mathematics</div>
+          <div class="s-count">20 Questions</div>
+        </div>
+        <div class="subject-card" data-subject="science" onclick="selectSubject(this)">
+          <div class="s-icon">🔬</div>
+          <div class="s-name">Science</div>
+          <div class="s-count">20 Questions</div>
+        </div>
+        <div class="subject-card" data-subject="english" onclick="selectSubject(this)">
+          <div class="s-icon">📖</div>
+          <div class="s-name">English</div>
+          <div class="s-count">20 Questions</div>
+        </div>
+        <div class="subject-card" data-subject="hindi" onclick="selectSubject(this)">
+          <div class="s-icon">🇮🇳</div>
+          <div class="s-name">Hindi</div>
+          <div class="s-count">20 Questions</div>
+        </div>
+        <div class="subject-card" data-subject="gk" onclick="selectSubject(this)">
+          <div class="s-icon">🌍</div>
+          <div class="s-name">General Knowledge</div>
+          <div class="s-count">20 Questions</div>
+        </div>
+        <div class="subject-card" data-subject="social" onclick="selectSubject(this)">
+          <div class="s-icon">🏛️</div>
+          <div class="s-name">Social Science</div>
+          <div class="s-count">20 Questions</div>
+        </div>
+      </div>
+
+      <div class="info-grid" id="infoGrid">
+        <div class="info-tile"><div class="val" id="infoQ">20</div><div class="lbl">Questions</div></div>
+        <div class="info-tile"><div class="val">30</div><div class="lbl">Minutes</div></div>
+        <div class="info-tile"><div class="val">1</div><div class="lbl">Mark Each</div></div>
+      </div>
+
+      <div class="form-row">
+        <input type="text" id="studentName" placeholder="Your full name" class="name-input">
+        <select id="classSelect" class="class-select">
+          <option value="">Select Class</option>
+          <option value="Class 9">Class 9</option>
+          <option value="Class 10">Class 10</option>
+        </select>
+      </div>
+
+      <button class="btn btn-gold" onclick="startExam()">Start Exam &nbsp;→</button>
+    </div>
+  </div>
+
+  <!-- ══ QUESTION SCREEN ══ -->
+  <div class="screen" id="questionScreen">
+    <div class="q-anim" id="qBlock">
+      <div class="q-header">
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-topic"  id="qTopic"></div>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="optionsList"></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="prevQ()" disabled>← Prev</button>
+      <span class="ans-status" id="ansStatus"></span>
+      <button class="btn btn-gold"  id="nextBtn" onclick="nextQ()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT SCREEN ══ -->
+  <div class="screen" id="resultScreen">
+    <div class="result-box">
+      <h2 id="resultTitle">Exam Complete! 🎉</h2>
+      <div class="score-ring" id="scoreRing">
+        <span class="score-num" id="scoreNum">0/20</span>
+      </div>
+      <div class="grade-badge" id="gradeBadge">Grade: A</div>
+      <div class="result-stats">
+        <div class="stat-tile"><div class="sv green" id="correctCount">0</div><div class="sl">Correct</div></div>
+        <div class="stat-tile"><div class="sv red"   id="wrongCount">0</div><div class="sl">Wrong</div></div>
+        <div class="stat-tile"><div class="sv gold"  id="skipCount">0</div><div class="sl">Skipped</div></div>
+      </div>
+      <button class="btn btn-gold" onclick="toggleReview()" id="reviewBtn">📋 View Answers</button>
+      &nbsp;
+      <button class="btn btn-ghost" onclick="restartExam()">↺ Try Another Subject</button>
+      <div id="reviewSection" style="display:none;text-align:left;">
+        <div class="review-title">Answer Review</div>
+        <div id="reviewList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════
+   QUESTION BANKS — 20 Qs per subject
+════════════════════════════════════ */
+const QUESTION_BANKS = {
+
+  mathematics: [
+    {q:"Which of the following is an irrational number?", opts:["√4","√9","√7","√16"], ans:2, topic:"Number Systems"},
+    {q:"The decimal expansion of a rational number is:", opts:["Always terminating","Always non-terminating","Terminating or repeating non-terminating","Always non-repeating"], ans:2, topic:"Number Systems"},
+    {q:"Which of the following is NOT a real number?", opts:["√−1","√2","0.333...","−7"], ans:0, topic:"Number Systems"},
+    {q:"If x² − 5x + 6 = 0, what are the values of x?", opts:["2 and 3","1 and 6","−2 and −3","2 and −3"], ans:0, topic:"Algebra"},
+    {q:"The value of (a + b)² − (a − b)² is:", opts:["4ab","2ab","a² − b²","4a²"], ans:0, topic:"Algebra"},
+    {q:"If 2x + 3 = 11, then x =", opts:["3","4","5","6"], ans:1, topic:"Algebra"},
+    {q:"Factorize: x² − 9", opts:["(x+3)(x−3)","(x+9)(x−1)","(x−3)²","(x+3)²"], ans:0, topic:"Algebra"},
+    {q:"The sum of roots of ax² + bx + c = 0 is:", opts:["b/a","−b/a","c/a","−c/a"], ans:1, topic:"Algebra"},
+    {q:"The angle sum of a triangle is always:", opts:["90°","180°","270°","360°"], ans:1, topic:"Geometry"},
+    {q:"The side opposite to the right angle in a right triangle is called:", opts:["Base","Altitude","Hypotenuse","Median"], ans:2, topic:"Geometry"},
+    {q:"Two triangles are similar if their corresponding angles are:", opts:["Supplementary","Complementary","Equal","Proportional"], ans:2, topic:"Geometry"},
+    {q:"The area of a circle with radius r is:", opts:["2πr","πr²","πd","2πr²"], ans:1, topic:"Geometry"},
+    {q:"The value of sin 30° is:", opts:["1","√3/2","1/2","1/√2"], ans:2, topic:"Trigonometry"},
+    {q:"cos 0° equals:", opts:["0","1","−1","Undefined"], ans:1, topic:"Trigonometry"},
+    {q:"Which identity is correct?", opts:["sin²θ + cos²θ = 2","sin²θ − cos²θ = 1","sin²θ + cos²θ = 1","tan²θ + 1 = sin²θ"], ans:2, topic:"Trigonometry"},
+    {q:"The value of tan 45° is:", opts:["0","√3","1/√3","1"], ans:3, topic:"Trigonometry"},
+    {q:"The mean of 5, 10, 15, 20, 25 is:", opts:["12","13","15","17"], ans:2, topic:"Statistics"},
+    {q:"The probability of an impossible event is:", opts:["0","1","0.5","−1"], ans:0, topic:"Statistics"},
+    {q:"The median of 3, 7, 8, 10, 14 is:", opts:["7","8","10","9"], ans:1, topic:"Statistics"},
+    {q:"Which measure is most affected by extreme values?", opts:["Median","Mode","Mean","Range"], ans:2, topic:"Statistics"},
+  ],
+
+  science: [
+    {q:"Which organelle is known as the powerhouse of the cell?", opts:["Nucleus","Mitochondria","Ribosome","Golgi body"], ans:1, topic:"Biology"},
+    {q:"The chemical formula of water is:", opts:["H₂O₂","HO","H₂O","H₃O"], ans:2, topic:"Chemistry"},
+    {q:"Which gas is produced during photosynthesis?", opts:["CO₂","N₂","O₂","H₂"], ans:2, topic:"Biology"},
+    {q:"Newton's second law of motion states F =", opts:["mv","ma","m/a","v/t"], ans:1, topic:"Physics"},
+    {q:"The SI unit of electric current is:", opts:["Volt","Watt","Ampere","Ohm"], ans:2, topic:"Physics"},
+    {q:"Which acid is present in vinegar?", opts:["Hydrochloric acid","Acetic acid","Citric acid","Sulphuric acid"], ans:1, topic:"Chemistry"},
+    {q:"The process by which plants make their own food is:", opts:["Respiration","Digestion","Photosynthesis","Excretion"], ans:2, topic:"Biology"},
+    {q:"Sound travels fastest in:", opts:["Air","Water","Vacuum","Steel"], ans:3, topic:"Physics"},
+    {q:"The atomic number of Carbon is:", opts:["6","8","12","14"], ans:0, topic:"Chemistry"},
+    {q:"Which part of the brain controls balance?", opts:["Cerebrum","Medulla","Cerebellum","Hypothalamus"], ans:2, topic:"Biology"},
+    {q:"Ohm's law relates:", opts:["Mass and velocity","Voltage, current, resistance","Force and acceleration","Heat and temperature"], ans:1, topic:"Physics"},
+    {q:"The symbol for Gold is:", opts:["Go","Gd","Au","Ag"], ans:2, topic:"Chemistry"},
+    {q:"Which blood group is the universal donor?", opts:["A","B","AB","O"], ans:3, topic:"Biology"},
+    {q:"The unit of resistance is:", opts:["Ampere","Volt","Ohm","Watt"], ans:2, topic:"Physics"},
+    {q:"DNA stands for:", opts:["Deoxyribonucleic Acid","Diribonucleic Acid","Deoxyribonitric Acid","Dioxynucleic Acid"], ans:0, topic:"Biology"},
+    {q:"Which gas causes the greenhouse effect?", opts:["O₂","N₂","CO₂","H₂"], ans:2, topic:"Environment"},
+    {q:"The chemical symbol of Sodium is:", opts:["So","Na","S","Sn"], ans:1, topic:"Chemistry"},
+    {q:"The speed of light is approximately:", opts:["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"], ans:1, topic:"Physics"},
+    {q:"Chromosomes are made of:", opts:["Protein only","DNA and Protein","RNA only","Lipids"], ans:1, topic:"Biology"},
+    {q:"Which mirror is used in vehicle rear-view mirrors?", opts:["Plane","Concave","Convex","Parabolic"], ans:2, topic:"Physics"},
+  ],
+
+  english: [
+    {q:"Choose the correct synonym for 'Benevolent':", opts:["Cruel","Kind","Angry","Lazy"], ans:1, topic:"Vocabulary"},
+    {q:"Which sentence is in the Passive Voice?", opts:["She reads a book","He wrote a letter","The letter was written by him","They are playing"], ans:2, topic:"Grammar"},
+    {q:"The plural of 'Leaf' is:", opts:["Leafs","Leaves","Leafes","Leavs"], ans:1, topic:"Grammar"},
+    {q:"Choose the correct antonym for 'Ancient':", opts:["Old","Modern","Historic","Classic"], ans:1, topic:"Vocabulary"},
+    {q:"'She is good at singing.' — The underlined word is a:", opts:["Noun","Verb","Gerund","Adjective"], ans:2, topic:"Grammar"},
+    {q:"Which part of speech is the word 'Quickly'?", opts:["Adjective","Noun","Adverb","Conjunction"], ans:2, topic:"Grammar"},
+    {q:"Choose the correctly spelled word:", opts:["Accomodation","Accommodation","Acommodation","Acomodation"], ans:1, topic:"Spelling"},
+    {q:"The figure of speech in 'The wind whispered' is:", opts:["Simile","Metaphor","Personification","Alliteration"], ans:2, topic:"Literature"},
+    {q:"'Neither he nor I __ present.' — Fill in the blank:", opts:["was","were","are","is"], ans:0, topic:"Grammar"},
+    {q:"What is the meaning of the idiom 'Bite the bullet'?", opts:["To eat fast","To face a painful situation bravely","To argue","To quit"], ans:1, topic:"Idioms"},
+    {q:"Identify the type: 'How beautiful the sunset is!'", opts:["Declarative","Interrogative","Imperative","Exclamatory"], ans:3, topic:"Grammar"},
+    {q:"The past tense of 'Ring' is:", opts:["Ringed","Rang","Rung","Ring"], ans:1, topic:"Grammar"},
+    {q:"Which of the following is a compound sentence?", opts:["She sang","He ran fast","It rained and the streets flooded","Because he was tired"], ans:2, topic:"Grammar"},
+    {q:"'A person who cannot read or write' — One word substitution:", opts:["Illiterate","Ignorant","Mute","Blind"], ans:0, topic:"Vocabulary"},
+    {q:"Choose the correct preposition: 'She is afraid __ dogs.'", opts:["from","of","by","with"], ans:1, topic:"Grammar"},
+    {q:"The literary device in 'Peter Piper picked a peck' is:", opts:["Simile","Onomatopoeia","Alliteration","Assonance"], ans:2, topic:"Literature"},
+    {q:"'He has been working since morning.' — The tense is:", opts:["Simple Past","Past Perfect","Present Perfect Continuous","Future Perfect"], ans:2, topic:"Grammar"},
+    {q:"Which punctuation ends an imperative sentence?", opts:[".","?","!","Both . and !"], ans:3, topic:"Grammar"},
+    {q:"Choose the correctly used article: ___ apple a day keeps the doctor away.", opts:["A","An","The","No article"], ans:1, topic:"Grammar"},
+    {q:"'Enormous' is closest in meaning to:", opts:["Tiny","Huge","Fast","Bright"], ans:1, topic:"Vocabulary"},
+  ],
+
+  hindi: [
+    {q:"'पुस्तक' का बहुवचन क्या है?", opts:["पुस्तकें","पुस्तकों","पुस्तकों को","पुस्तक"], ans:0, topic:"व्याकरण"},
+    {q:"'आना' क्रिया का सामान्य भूतकाल रूप क्या है?", opts:["आता है","आया","आएगा","आ रहा है"], ans:1, topic:"व्याकरण"},
+    {q:"'सुंदर' शब्द में कौन-सा प्रत्यय लगाने से भाववाचक संज्ञा बनती है?", opts:["ता","पन","आई","त्व"], ans:2, topic:"व्याकरण"},
+    {q:"'वह पढ़ रहा है' — यह कौन-सा काल है?", opts:["भूतकाल","वर्तमानकाल","भविष्यकाल","संदिग्ध काल"], ans:1, topic:"व्याकरण"},
+    {q:"'रात-दिन' में कौन-सा समास है?", opts:["तत्पुरुष","द्वंद्व","कर्मधारय","बहुव्रीहि"], ans:1, topic:"समास"},
+    {q:"'निर्जन' शब्द का सही संधि-विच्छेद है:", opts:["निर + जन","निः + जन","नि + रजन","निर् + जन"], ans:1, topic:"संधि"},
+    {q:"'पंकज' का पर्यायवाची शब्द है:", opts:["पत्थर","कमल","नदी","बादल"], ans:1, topic:"पर्यायवाची"},
+    {q:"'अंधेरा' का विलोम शब्द क्या है?", opts:["काला","उजाला","रात","धुंधला"], ans:1, topic:"विलोम"},
+    {q:"'गंगा' किस भाषा का शब्द है?", opts:["संस्कृत","फारसी","अरबी","तुर्की"], ans:0, topic:"शब्द-ज्ञान"},
+    {q:"'मोहन ने रोटी खाई' — इसमें 'ने' कौन-सी विभक्ति है?", opts:["कर्म कारक","करण कारक","कर्ता कारक","सम्प्रदान कारक"], ans:2, topic:"कारक"},
+    {q:"हिंदी वर्णमाला में कितने स्वर होते हैं?", opts:["11","13","16","10"], ans:0, topic:"वर्णमाला"},
+    {q:"'आकाश' का तत्सम शब्द है:", opts:["आसमान","गगन","अम्बर","आकाश"], ans:3, topic:"तत्सम-तद्भव"},
+    {q:"'चिड़िया' शब्द है:", opts:["तत्सम","तद्भव","देशज","विदेशज"], ans:2, topic:"शब्द-ज्ञान"},
+    {q:"रस के कितने प्रकार होते हैं?", opts:["7","8","9","10"], ans:2, topic:"काव्य"},
+    {q:"'श्रृंगार रस' का स्थायी भाव है:", opts:["हास","रति","शोक","भय"], ans:1, topic:"काव्य"},
+    {q:"'जो कभी न मरे' — इस वाक्यांश के लिए एक शब्द है:", opts:["अनश्वर","अमर","अजर","नश्वर"], ans:1, topic:"वाक्यांश"},
+    {q:"'यमक अलंकार' में क्या होता है?", opts:["शब्द की आवृत्ति अलग अर्थों में","उपमा देना","रूपक","अनुप्रास"], ans:0, topic:"अलंकार"},
+    {q:"'पेड़' का बहुवचन है:", opts:["पेड़े","पेड़ें","पेड़ों","पेड़"], ans:2, topic:"व्याकरण"},
+    {q:"'सरस्वती' किसकी देवी हैं?", opts:["धन","शक्ति","विद्या","प्रकृति"], ans:2, topic:"सामान्य ज्ञान"},
+    {q:"'कवि' शब्द का स्त्रीलिंग है:", opts:["कवियत्री","कवयित्री","कवित्री","कविनी"], ans:1, topic:"व्याकरण"},
+  ],
+
+  gk: [
+    {q:"Who is known as the Father of the Indian Constitution?", opts:["Mahatma Gandhi","Jawaharlal Nehru","B.R. Ambedkar","Sardar Patel"], ans:2, topic:"Indian History"},
+    {q:"Which is the largest planet in the Solar System?", opts:["Earth","Saturn","Jupiter","Neptune"], ans:2, topic:"Science & Space"},
+    {q:"The capital of Australia is:", opts:["Sydney","Melbourne","Brisbane","Canberra"], ans:3, topic:"World Geography"},
+    {q:"Who wrote the national anthem of India?", opts:["Bankim Chandra","Rabindranath Tagore","Sarojini Naidu","Subhash Bose"], ans:1, topic:"Indian Culture"},
+    {q:"Which river is the longest in the world?", opts:["Amazon","Nile","Yangtze","Mississippi"], ans:1, topic:"World Geography"},
+    {q:"The first Indian to go to space was:", opts:["Sunita Williams","Kalpana Chawla","Rakesh Sharma","A.P.J. Abdul Kalam"], ans:2, topic:"Indian Science"},
+    {q:"The headquarters of the United Nations is in:", opts:["Geneva","London","New York","Washington D.C."], ans:2, topic:"World Affairs"},
+    {q:"Which gas makes up most of Earth's atmosphere?", opts:["Oxygen","Carbon Dioxide","Nitrogen","Argon"], ans:2, topic:"Science"},
+    {q:"How many states are in India (as of 2024)?", opts:["28","29","30","31"], ans:0, topic:"Indian Geography"},
+    {q:"The Olympic Games are held every:", opts:["2 years","3 years","4 years","5 years"], ans:2, topic:"Sports"},
+    {q:"Who invented the telephone?", opts:["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Guglielmo Marconi"], ans:2, topic:"Inventions"},
+    {q:"Which is the smallest country in the world?", opts:["Monaco","San Marino","Vatican City","Liechtenstein"], ans:2, topic:"World Geography"},
+    {q:"The currency of Japan is:", opts:["Yuan","Won","Yen","Baht"], ans:2, topic:"World Affairs"},
+    {q:"'Satyameva Jayate' is taken from which scripture?", opts:["Rigveda","Mundaka Upanishad","Bhagavad Gita","Mahabharata"], ans:1, topic:"Indian Culture"},
+    {q:"Which planet is called the Red Planet?", opts:["Venus","Mars","Jupiter","Mercury"], ans:1, topic:"Science & Space"},
+    {q:"The Great Wall of China was built to protect against:", opts:["Floods","Mongol invasions","Earthquakes","Pirates"], ans:1, topic:"World History"},
+    {q:"Who painted the Mona Lisa?", opts:["Michelangelo","Raphael","Leonardo da Vinci","Vincent van Gogh"], ans:2, topic:"Art & Culture"},
+    {q:"National Science Day is celebrated on:", opts:["January 28","February 28","March 28","April 28"], ans:1, topic:"Indian Science"},
+    {q:"Which country is the largest by area?", opts:["China","USA","Canada","Russia"], ans:3, topic:"World Geography"},
+    {q:"The instrument used to measure blood pressure is:", opts:["Thermometer","Stethoscope","Sphygmomanometer","ECG"], ans:2, topic:"Health & Science"},
+  ],
+
+  social: [
+    {q:"The French Revolution began in the year:", opts:["1776","1789","1800","1815"], ans:1, topic:"World History"},
+    {q:"The Tropic of Cancer passes through how many Indian states?", opts:["6","7","8","9"], ans:2, topic:"Indian Geography"},
+    {q:"The Preamble to the Indian Constitution begins with:", opts:["We the Citizens","We the People","We the Indians","We the Nation"], ans:1, topic:"Civics"},
+    {q:"Which amendment of the Indian Constitution added Fundamental Duties?", opts:["40th","42nd","44th","46th"], ans:1, topic:"Civics"},
+    {q:"The term 'Black Soil' is associated with growing:", opts:["Rice","Cotton","Wheat","Jute"], ans:1, topic:"Indian Geography"},
+    {q:"Who gave the slogan 'Do or Die'?", opts:["Nehru","Gandhi","Bose","Tilak"], ans:1, topic:"Indian History"},
+    {q:"Which is the highest peak in the world?", opts:["K2","Kangchenjunga","Mount Everest","Lhotse"], ans:2, topic:"World Geography"},
+    {q:"The Permanent Settlement of 1793 was introduced by:", opts:["Dalhousie","Cornwallis","Clive","Wellesley"], ans:1, topic:"Indian History"},
+    {q:"Fundamental Rights are enshrined in which part of the Constitution?", opts:["Part I","Part II","Part III","Part IV"], ans:2, topic:"Civics"},
+    {q:"Which type of farming involves growing two or more crops simultaneously?", opts:["Shifting","Mixed","Crop Rotation","Organic"], ans:1, topic:"Agriculture"},
+    {q:"The Dandi March was related to:", opts:["Non-Cooperation","Salt Tax","Partition","Rowlatt Act"], ans:1, topic:"Indian History"},
+    {q:"Which ocean is the largest?", opts:["Atlantic","Indian","Arctic","Pacific"], ans:3, topic:"World Geography"},
+    {q:"The concept of Directive Principles was borrowed from:", opts:["USA","Ireland","UK","Australia"], ans:1, topic:"Civics"},
+    {q:"Which is the longest National Highway in India?", opts:["NH 44","NH 1","NH 27","NH 48"], ans:0, topic:"Indian Geography"},
+    {q:"The Berlin Wall fell in:", opts:["1985","1987","1989","1991"], ans:2, topic:"World History"},
+    {q:"Panchayati Raj was first introduced in India in:", opts:["1952","1955","1959","1962"], ans:2, topic:"Civics"},
+    {q:"Which river forms the Sundarbans delta?", opts:["Indus","Ganga-Brahmaputra","Mahanadi","Krishna"], ans:1, topic:"Indian Geography"},
+    {q:"Who wrote 'Discovery of India'?", opts:["Gandhi","Ambedkar","Nehru","Tagore"], ans:2, topic:"Indian History"},
+    {q:"The Right to Education (RTE) Act was passed in:", opts:["2005","2007","2009","2011"], ans:2, topic:"Civics"},
+    {q:"Which climate type does the Thar Desert have?", opts:["Tropical","Arid","Mediterranean","Continental"], ans:1, topic:"Indian Geography"},
+  ],
+};
+
+/* ══ Subject color themes ══ */
+const SUBJECT_THEMES = {
+  mathematics: { color: '#B8860B', strip: '#F0C040' },
+  science:     { color: '#1A6B3A', strip: '#5CB85C' },
+  english:     { color: '#1A4A8A', strip: '#5B9BD5' },
+  hindi:       { color: '#8B1A1A', strip: '#D96A3A' },
+  gk:          { color: '#5A1A8A', strip: '#9B59B6' },
+  social:      { color: '#1A5A6B', strip: '#3AABCA' },
+};
+
+const SUBJECT_LABELS = {
+  mathematics: 'Mathematics', science: 'Science', english: 'English',
+  hindi: 'Hindi', gk: 'General Knowledge', social: 'Social Science',
+};
+
+let current = 0;
+let answers = [];
+let QUESTIONS = [];
+let timerInterval;
+let timeLeft = 30 * 60;
+let studentName = "";
+let selectedSubject = "";
+
+function selectSubject(card) {
+  document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedSubject = card.dataset.subject;
+  const theme = SUBJECT_THEMES[selectedSubject];
+  // Apply color theme
+  document.documentElement.style.setProperty('--subject-color', theme.color);
+  document.documentElement.style.setProperty('--gold-strip', theme.strip);
+  document.getElementById('cardBar').style.background = theme.color;
+  document.getElementById('barTitle').textContent = SUBJECT_LABELS[selectedSubject] + ' Exam';
+}
+
+function startExam() {
+  const name = document.getElementById('studentName').value.trim();
+  const cls  = document.getElementById('classSelect').value;
+  if (!selectedSubject) { alert("Please select a subject first."); return; }
+  if (!name)            { alert("Please enter your name.");        return; }
+  if (!cls)             { alert("Please select your class.");      return; }
+  studentName = name + ' (' + cls + ')';
+  QUESTIONS = QUESTION_BANKS[selectedSubject];
+  answers   = new Array(QUESTIONS.length).fill(-1);
+  current   = 0;
+  timeLeft  = 30 * 60;
+  showScreen('questionScreen');
+  document.getElementById('progressWrap').style.display = 'block';
+  renderQuestion();
+  startTimer();
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(timeLeft / 60)).padStart(2,'0');
+  const s = String(timeLeft % 60).padStart(2,'0');
+  const el = document.getElementById('timer');
+  el.textContent = `${m}:${s}`;
+  el.className = timeLeft <= 120 ? 'warning' : '';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('qNumber').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
+  document.getElementById('qText').textContent   = q.q;
+  document.getElementById('qTopic').textContent  = q.topic || '';
+
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  ['A','B','C','D'].forEach((lbl, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[current] === i ? ' selected disabled' : '');
+    div.innerHTML = `<div class="option-badge">${lbl}</div><span>${q.opts[i]}</span>`;
+    if (answers[current] !== -1) {
+      div.classList.add('disabled');
+      if (i === q.ans) div.classList.add('correct');
+      else if (i === answers[current]) div.classList.add('wrong');
+    } else {
+      div.onclick = () => selectOption(i);
+    }
+    list.appendChild(div);
+  });
+
+  const block = document.getElementById('qBlock');
+  block.classList.remove('q-anim');
+  void block.offsetWidth;
+  block.classList.add('q-anim');
+
+  const pct = ((current + 1) / QUESTIONS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').textContent = current === QUESTIONS.length - 1 ? 'Submit ✓' : 'Next →';
+
+  const st = document.getElementById('ansStatus');
+  if (answers[current] !== -1) {
+    const ok = answers[current] === q.ans;
+    st.textContent = ok ? '✔ Correct!' : '✘ Incorrect';
+    st.className = 'ans-status ' + (ok ? 'ok' : 'bad');
+  } else {
+    st.textContent = ''; st.className = 'ans-status';
+  }
+}
+
+function selectOption(i) {
+  if (answers[current] !== -1) return;
+  answers[current] = i;
+  renderQuestion();
+}
+
+function nextQ() {
+  if (current < QUESTIONS.length - 1) { current++; renderQuestion(); }
+  else submitExam();
+}
+
+function prevQ() {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function submitExam() {
+  clearInterval(timerInterval);
+  let correct = 0, wrong = 0, skip = 0;
+  answers.forEach((a, i) => {
+    if (a === -1) skip++;
+    else if (a === QUESTIONS[i].ans) correct++;
+    else wrong++;
+  });
+
+  const total = QUESTIONS.length;
+  const pct   = Math.round((correct / total) * 100);
+  const grade = pct >= 90 ? 'A+' : pct >= 75 ? 'A' : pct >= 60 ? 'B' : pct >= 45 ? 'C' : 'D';
+  const msg   = pct >= 75 ? '🎉 Excellent Work!' : pct >= 50 ? '👍 Good Effort!' : '📚 Keep Practicing!';
+
+  document.getElementById('resultTitle').textContent    = `${msg}, ${studentName}`;
+  document.getElementById('scoreNum').textContent       = `${correct}/${total}`;
+  document.getElementById('scoreRing').style.setProperty('--pct', `${pct}%`);
+  document.getElementById('gradeBadge').textContent     = `${SUBJECT_LABELS[selectedSubject]} — Grade ${grade} (${pct}%)`;
+  document.getElementById('correctCount').textContent   = correct;
+  document.getElementById('wrongCount').textContent     = wrong;
+  document.getElementById('skipCount').textContent      = skip;
+
+  const rl = document.getElementById('reviewList');
+  rl.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const ua = answers[i], ca = q.opts[q.ans], ua_text = ua === -1 ? 'Not answered' : q.opts[ua];
+    const ok = ua === q.ans;
+    const d = document.createElement('div');
+    d.className = 'review-item';
+    d.innerHTML = `<div class="rq">Q${i+1}. ${q.q}</div>
+      <div class="${ok ? 'ra' : 'rw'}">Your answer: ${ua_text} ${ok ? '✔' : '✘'}</div>
+      ${!ok ? `<div class="rc">✔ Correct: ${ca}</div>` : ''}`;
+    rl.appendChild(d);
+  });
+
+  document.getElementById('progressWrap').style.display = 'none';
+  showScreen('resultScreen');
+}
+
+function toggleReview() {
+  const sec = document.getElementById('reviewSection');
+  const btn = document.getElementById('reviewBtn');
+  const open = sec.style.display === 'none';
+  sec.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? '▲ Hide Answers' : '📋 View Answers';
+  if (open) sec.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function restartExam() {
+  clearInterval(timerInterval);
+  current = 0; answers = []; QUESTIONS = []; timeLeft = 30*60; selectedSubject = '';
+  document.getElementById('timer').textContent = '30:00';
+  document.getElementById('timer').className   = '';
+  document.getElementById('studentName').value = '';
+  document.getElementById('classSelect').value = '';
+  document.getElementById('reviewSection').style.display = 'none';
+  document.getElementById('reviewBtn').textContent = '📋 View Answers';
+  document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
+  // Reset theme to gold
+  document.documentElement.style.setProperty('--subject-color', '#B8860B');
+  document.documentElement.style.setProperty('--gold-strip', '#F0C040');
+  document.getElementById('cardBar').style.background = '#B8860B';
+  document.getElementById('barTitle').textContent = 'Select Your Subject';
+  document.getElementById('progressWrap').style.display = 'none';
+  showScreen('startScreen');
+}
+</script>
+</body>
+</html>

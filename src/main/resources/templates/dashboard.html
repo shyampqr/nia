@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Developer Dashboard - Nextgenz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-image: url('/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-container {
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        .header-title {
+            color: #333;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            margin-bottom: 10px;
+        }
+        .feature-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(194, 136, 19, 0.3);
+        }
+        .card-header-custom {
+            background: linear-gradient(45deg, #C9A227, #FFD700);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .btn-gold {
+            background-color: #C28813;
+            border-color: #C28813;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-gold:hover {
+            background-color: #a06d0c;
+            border-color: #a06d0c;
+            color: white;
+        }
+        .icon-large {
+            font-size: 3rem;
+            color: #C28813;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Navbar for consistency -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light opacity-90 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/" style="color: #C28813;">
+                <i class="fas fa-school me-2"></i>Nextgenz International Academy
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link fw-semibold" href="/">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container dashboard-container">
+        <div class="text-center mb-5">
+            <h1 class="header-title display-4">Application Dashboard</h1>
+            <p class="lead" style="color: #444; font-weight: 500;">Access all school management features in one place</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Main Site -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-card shadow-sm">
+                    <div class="card-header-custom">
+                        <i class="fas fa-home me-2"></i>Main Website
+                    </div>
+                    <div class="card-body d-flex flex-column text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-laptop-house icon-large"></i>
+                        </div>
+                        <p class="card-text text-muted">The public-facing homepage of the school with all information.</p>
+                        <a href="/" class="btn btn-gold mt-auto rounded-pill">Go to Home</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admission Form -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-card shadow-sm">
+                    <div class="card-header-custom">
+                        <i class="fas fa-user-graduate me-2"></i>Admissions
+                    </div>
+                    <div class="card-body d-flex flex-column text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-file-signature icon-large"></i>
+                        </div>
+                        <p class="card-text text-muted">Start or continue the multi-step student admission process.</p>
+                        <a href="/admission/step1" class="btn btn-gold mt-auto rounded-pill">Start Admission</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chatbot -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-card shadow-sm">
+                    <div class="card-header-custom">
+                        <i class="fas fa-robot me-2"></i>AI Assistant
+                    </div>
+                    <div class="card-body d-flex flex-column text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-comments icon-large"></i>
+                        </div>
+                        <p class="card-text text-muted">Chat with our Gemini AI assistant for queries and help.</p>
+                        <a href="/login" class="btn btn-gold mt-auto rounded-pill">Chat Login</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Online Exam -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-card shadow-sm">
+                    <div class="card-header-custom">
+                        <i class="fas fa-pen-alt me-2"></i>Online Exam
+                    </div>
+                    <div class="card-body d-flex flex-column text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-laptop-code icon-large"></i>
+                        </div>
+                        <p class="card-text text-muted">Take MCQ-based exams for Mathematics and Science.</p>
+                        <a href="/exam" class="btn btn-gold mt-auto rounded-pill">Start Exam</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="text-muted small">&copy; 2026 Nextgenz International Academy | Innovate. Learn. Lead.</p>
+        </div>
+    </div>
+</body>
+</html>
