@@ -1,711 +1,833 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Online Exam Portal – Class 5-10 | Nextgenz International Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --gold-accent: #B8860B;
-    --gold-light:  #D4A017;
-    --gold-strip:  #F0C040;
-    --bg-page:     #F7F4EF;
-    --bg-card:     #FFFFFF;
-    --bg-option:   #FAFAF8;
-    --border:      #E5DDD0;
-    --text-primary:   #1A1A1A;
-    --text-secondary: #5A5047;
-    --text-muted:     #8A7E72;
-    --correct:     #1E6B45;
-    --wrong:       #B02020;
-    --correct-bg:  #EAF7F0;
-    --wrong-bg:    #FDF0F0;
-    --shadow:      rgba(0,0,0,0.07);
-    --subject-color: #B8860B;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Exam Portal – Class 2-10 | Nextgenz International Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --acc:#B8860B;--strp:#F0C040;--bg:#F7F4EF;--card:#FFFFFF;--opt:#FAFAF8;
+      --bdr:#E5DDD0;--tp:#1A1A1A;--ts:#5A5047;--tm:#8A7E72;
+      --ok:#1E6B45;--bad:#B02020;--okbg:#EAF7F0;--bdbg:#FDF0F0;--sh:rgba(0,0,0,.07);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 5rem;color:var(--tp)}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .hdr{text-align:center;margin-bottom:1.6rem;animation:fadeDown .5s ease both}
+    .hdr .school{font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);border:1.5px solid var(--strp);background:#fff;padding:.25rem 1rem;border-radius:20px;display:inline-block;margin-bottom:.55rem}
+    .hdr h1{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3.5vw,2rem);font-weight:700;color:var(--tp)}
+    .hdr .meta{font-size:.82rem;color:var(--tm);margin-top:.3rem}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    background: var(--bg-page);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2.5rem 1rem 5rem;
-    color: var(--text-primary);
-  }
+    .card{width:100%;max-width:740px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;box-shadow:0 2px 16px var(--sh);overflow:hidden;animation:fadeUp .6s ease both .1s}
+    .bar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.4rem;background:var(--acc);color:#fff;border-bottom:3px solid var(--strp);transition:background .35s}
+    .dots{display:flex;gap:.4rem}
+    .dot{width:10px;height:10px;border-radius:50%;opacity:.8}
+    .dot:nth-child(1){background:#ff8a80}.dot:nth-child(2){background:#ffe082}.dot:nth-child(3){background:#a5d6a7}
+    .bar-title{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:600;letter-spacing:.04em}
+    .timer-pill{display:flex;align-items:center;gap:.4rem;background:rgba(0,0,0,.2);padding:.28rem .7rem;border-radius:20px;font-size:.84rem;font-weight:700;letter-spacing:.05em}
+    #timer{font-variant-numeric:tabular-nums}
+    #timer.warn{color:#ff8a80;animation:pulse 1s infinite}
 
-  /* ── Header ── */
-  .exam-header { text-align: center; margin-bottom: 1.8rem; animation: fadeDown .5s ease both; }
-  .exam-header .school {
-    font-size: 0.7rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
-    color: var(--gold-accent); border: 1.5px solid var(--gold-strip); background: #fff;
-    padding: .28rem 1rem; border-radius: 20px; display: inline-block; margin-bottom: .65rem;
-  }
-  .exam-header h1 {
-    font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3.5vw, 2.1rem);
-    color: var(--text-primary); font-weight: 700; line-height: 1.2;
-  }
-  .exam-header .meta { font-size: .84rem; color: var(--text-muted); margin-top: .35rem; font-weight: 500; }
+    .prog-wrap{padding:.7rem 1.4rem .2rem;background:#FDFCFA;border-bottom:1px solid var(--bdr);display:none}
+    .prog-track{height:6px;background:#EDE8E0;border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--strp));border-radius:99px;transition:width .4s ease}
+    .prog-lbl{font-size:.71rem;color:var(--tm);font-weight:600;margin-top:.3rem;letter-spacing:.04em}
 
-  /* ── Card ── */
-  .exam-card {
-    width: 100%; max-width: 720px; background: var(--bg-card);
-    border: 1px solid var(--border); border-radius: 16px;
-    box-shadow: 0 2px 16px var(--shadow), 0 1px 4px rgba(0,0,0,0.04);
-    overflow: hidden; animation: fadeUp .6s ease both .1s;
-  }
+    .screen{display:none;padding:1.8rem 1.8rem 1.5rem}
+    .screen.active{display:block}
 
-  /* ── Top bar ── */
-  .card-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: .9rem 1.5rem;
-    background: var(--subject-color);
-    color: #fff; border-bottom: 3px solid var(--gold-strip);
-    transition: background .4s ease;
-  }
-  .bar-dots { display: flex; gap: .4rem; }
-  .bar-dot  { width: 10px; height: 10px; border-radius: 50%; opacity: .75; }
-  .bar-dot:nth-child(1){ background:#ff8a80; }
-  .bar-dot:nth-child(2){ background:#ffe082; }
-  .bar-dot:nth-child(3){ background:#a5d6a7; }
-  .bar-title { font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 600; letter-spacing: .04em; }
-  .timer-wrap {
-    display: flex; align-items: center; gap: .45rem; background: rgba(0,0,0,0.18);
-    padding: .3rem .75rem; border-radius: 20px; font-size: .86rem; font-weight: 700; letter-spacing: .05em;
-  }
-  #timer { font-variant-numeric: tabular-nums; }
-  #timer.warning { color: #ff8a80; animation: pulse 1s infinite; }
+    /* breadcrumb */
+    .bc{display:flex;align-items:center;gap:.5rem;font-size:.74rem;font-weight:600;color:var(--tm);margin-bottom:1.2rem;flex-wrap:wrap}
+    .bcs{padding:.22rem .65rem;border-radius:20px;background:var(--opt);border:1px solid var(--bdr)}
+    .bcs.done{background:#FDF3CC;border-color:var(--strp);color:var(--acc);cursor:pointer}
+    .bcs.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+    .bca{color:var(--bdr)}
 
-  /* ── Progress ── */
-  .progress-wrap { padding: .75rem 1.5rem .25rem; background: #FDFCFA; border-bottom: 1px solid var(--border); }
-  .progress-track { height: 6px; background: #EDE8E0; border-radius: 99px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--subject-color), var(--gold-strip)); border-radius: 99px; transition: width .4s ease; }
-  .progress-label { font-size: .73rem; color: var(--text-muted); font-weight: 600; margin-top: .35rem; letter-spacing: .04em; }
+    .step-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--tp);text-align:center;margin-bottom:.4rem}
+    .step-sub{font-size:.88rem;color:var(--ts);text-align:center;margin-bottom:1.3rem;line-height:1.6}
 
-  /* ── Screens ── */
-  .screen { display: none; padding: 2rem 2rem 1.6rem; }
-  .screen.active { display: block; }
+    /* class grid */
+    .class-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.6rem}
+    .cls-tile{
+      background:#fff;border:2px solid var(--bdr);border-radius:14px;
+      padding:.9rem .5rem .75rem;text-align:center;cursor:pointer;
+      transition:all .2s;user-select:none;position:relative;overflow:hidden;
+    }
+    .cls-tile::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:4px;
+      background:var(--cls-color,var(--acc));border-radius:14px 14px 0 0;
+    }
+    .cls-tile:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.1);border-color:var(--cls-color,var(--acc))}
+    .cls-tile.sel{
+      border-color:var(--cls-color,var(--acc));
+      background:var(--cls-bg,#FDF3CC);
+      box-shadow:0 0 0 3px color-mix(in srgb,var(--cls-color,var(--acc)) 20%,transparent),0 4px 14px rgba(0,0,0,.08);
+      transform:translateY(-3px);
+    }
+    .cls-tile .c-emoji{font-size:1.6rem;margin-bottom:.3rem;display:block;line-height:1}
+    .cls-tile .c-num{
+      font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;
+      color:var(--cls-color,var(--acc));line-height:1;
+    }
+    .cls-tile .c-ord{font-size:.7rem;font-weight:700;color:var(--cls-color,var(--acc));opacity:.7}
+    .cls-tile .c-lbl{font-size:.62rem;color:var(--tm);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-top:.25rem}
+    .cls-tile .c-tag{
+      font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+      background:var(--cls-color,var(--acc));color:#fff;
+      padding:.1rem .45rem;border-radius:20px;display:inline-block;margin-top:.3rem;opacity:.85;
+    }
 
-  /* ── Start screen ── */
-  .start-box { text-align: center; }
-  .start-box h2 { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: var(--text-primary); margin-bottom: .5rem; }
-  .start-box > p { color: var(--text-secondary); font-size: .93rem; line-height: 1.75; max-width: 480px; margin: 0 auto .5rem; }
+    /* subject grid */
+    .subj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-bottom:1.5rem}
+    .subj-tile{background:var(--opt);border:2px solid var(--bdr);border-radius:12px;padding:.88rem .5rem;text-align:center;cursor:pointer;transition:all .18s;user-select:none}
+    .subj-tile:hover{background:#FDF6E3;border-color:var(--strp);transform:translateY(-2px);box-shadow:0 4px 12px rgba(184,134,11,.12)}
+    .subj-tile.sel{border-color:var(--acc);background:#FDF3CC;box-shadow:0 0 0 3px rgba(184,134,11,.15)}
+    .subj-tile .si{font-size:1.5rem;margin-bottom:.25rem}
+    .subj-tile .sn{font-size:.78rem;font-weight:700;color:var(--tp)}
+    .subj-tile .sq{font-size:.64rem;color:var(--tm);margin-top:.12rem}
 
-  /* Subject selector */
-  .subject-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: .75rem;
-    margin: 1.2rem 0 1.4rem;
-  }
-  .subject-card {
-    background: var(--bg-option);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: .85rem .6rem;
-    cursor: pointer;
-    transition: border-color .18s, background .18s, transform .12s, box-shadow .18s;
-    text-align: center;
-    user-select: none;
-  }
-  .subject-card:hover { background: #FDF6E3; border-color: var(--gold-strip); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(184,134,11,0.12); }
-  .subject-card.selected { border-color: var(--subject-color); background: #FDF3CC; box-shadow: 0 0 0 3px rgba(184,134,11,0.15); }
-  .subject-card .s-icon { font-size: 1.6rem; margin-bottom: .3rem; }
-  .subject-card .s-name { font-size: .82rem; font-weight: 700; color: var(--text-primary); letter-spacing: .02em; }
-  .subject-card .s-count { font-size: .68rem; color: var(--text-muted); margin-top: .15rem; }
+    /* details */
+    .detail-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.3rem}
+    .inp{padding:.7rem 1rem;border-radius:10px;border:1.5px solid var(--bdr);background:var(--opt);font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--tp);outline:none;transition:border-color .2s}
+    .inp:focus{border-color:var(--acc)}.inp::placeholder{color:var(--tm)}
+    .inp-name{width:220px}.inp-roll{width:130px}
 
-  .form-row {
-    display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.2rem;
-  }
-  .name-input, .class-select {
-    padding: .72rem 1.1rem; border-radius: 10px; border: 1.5px solid var(--border);
-    background: var(--bg-option); font-family: 'DM Sans', sans-serif;
-    font-size: .95rem; color: var(--text-primary); outline: none; transition: border-color .2s;
-  }
-  .name-input { width: 220px; }
-  .class-select { width: 160px; cursor: pointer; }
-  .name-input:focus, .class-select:focus { border-color: var(--gold-light); }
-  .name-input::placeholder { color: var(--text-muted); }
+    .info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.4rem}
+    .info-t{background:#FDFAF4;border:1.5px solid #EAE0C8;border-radius:12px;padding:.9rem .6rem;text-align:center}
+    .info-t .iv{font-size:1.4rem;font-weight:700;color:var(--acc)}
+    .info-t .il{font-size:.68rem;color:var(--tm);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:.18rem}
 
-  .info-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 0 0 1.4rem; }
-  .info-tile { background: #FDFAF4; border: 1.5px solid #EAE0C8; border-radius: 12px; padding: 1rem .75rem; text-align: center; }
-  .info-tile .val { font-size: 1.5rem; font-weight: 700; color: var(--subject-color); transition: color .3s; }
-  .info-tile .lbl { font-size: .71rem; color: var(--text-muted); font-weight: 600; letter-spacing: .07em; text-transform: uppercase; margin-top: .2rem; }
+    /* question */
+    .qhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+    .q-num{font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);background:#FDF6E3;border:1px solid #EAD89A;padding:.22rem .7rem;border-radius:20px}
+    .q-top{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tm)}
+    .q-txt{font-size:1.08rem;font-weight:500;color:var(--tp);line-height:1.7;margin-bottom:1.3rem;padding:.95rem 1.1rem;background:#FDFAF5;border-left:3px solid var(--strp);border-radius:0 8px 8px 0}
+    .opts{display:flex;flex-direction:column;gap:.65rem}
+    .opt{display:flex;align-items:center;gap:.9rem;padding:.82rem 1rem;background:var(--opt);border:1.5px solid var(--bdr);border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s;font-size:.93rem;color:var(--tp);line-height:1.5}
+    .opt:hover{background:#FDF6E3;border-color:#D4A017;box-shadow:0 2px 8px rgba(180,130,0,.1)}
+    .opt.ok{background:var(--okbg)!important;border-color:var(--ok)!important;color:var(--ok);font-weight:600}
+    .opt.bad{background:var(--bdbg)!important;border-color:var(--bad)!important;color:var(--bad);font-weight:600}
+    .opt.dis{pointer-events:none}
+    .obadge{width:30px;height:30px;flex-shrink:0;border-radius:8px;background:#EDE8E0;color:var(--ts);font-size:.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+    .opt:hover .obadge{background:var(--acc);color:#fff}
+    .opt.ok .obadge{background:var(--ok);color:#fff}
+    .opt.bad .obadge{background:var(--bad);color:#fff}
+    .qnav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--bdr)}
+    .ans-st{font-size:.8rem;font-weight:600;color:var(--tm)}
+    .ans-st.ok{color:var(--ok)}.ans-st.bad{color:var(--bad)}
 
-  /* ── Question screen ── */
-  .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-  .q-number {
-    font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--subject-color); background: #FDF6E3; border: 1px solid #EAD89A;
-    padding: .25rem .75rem; border-radius: 20px;
-  }
-  .q-topic { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
-  .q-text {
-    font-size: 1.1rem; font-weight: 500; color: var(--text-primary); line-height: 1.7;
-    margin-bottom: 1.4rem; padding: 1rem 1.1rem; background: #FDFAF5;
-    border-left: 3px solid var(--gold-strip); border-radius: 0 8px 8px 0;
-  }
-  .options { display: flex; flex-direction: column; gap: .7rem; }
-  .option {
-    display: flex; align-items: center; gap: 1rem; padding: .85rem 1.1rem;
-    background: var(--bg-option); border: 1.5px solid var(--border); border-radius: 10px;
-    cursor: pointer; transition: background .15s, border-color .15s, box-shadow .15s;
-    font-size: .95rem; color: var(--text-primary); line-height: 1.5;
-  }
-  .option:hover { background: #FDF6E3; border-color: var(--gold-light); box-shadow: 0 2px 8px rgba(180,130,0,0.1); }
-  .option.selected { background: #FDF3CC; border-color: var(--gold-light); font-weight: 600; }
-  .option.correct  { background: var(--correct-bg) !important; border-color: var(--correct) !important; color: var(--correct); font-weight: 600; }
-  .option.wrong    { background: var(--wrong-bg) !important; border-color: var(--wrong) !important; color: var(--wrong); font-weight: 600; }
-  .option.disabled { pointer-events: none; }
-  .option-badge {
-    width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px;
-    background: #EDE8E0; color: var(--text-secondary);
-    font-size: .78rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
-    transition: background .15s, color .15s;
-  }
-  .option:hover .option-badge, .option.selected .option-badge { background: var(--subject-color); color: #fff; }
-  .option.correct .option-badge { background: var(--correct); color: #fff; }
-  .option.wrong   .option-badge { background: var(--wrong);   color: #fff; }
+    /* result */
+    .res-box{text-align:center}
+    .res-box h2{font-family:'Playfair Display',serif;font-size:1.55rem;color:var(--tp);margin-bottom:.4rem}
+    .ring{width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--acc) var(--pct),#EDE8E0 0);display:flex;align-items:center;justify-content:center;margin:1.4rem auto;box-shadow:0 4px 20px rgba(0,0,0,.1);position:relative}
+    .ring::after{content:'';width:104px;height:104px;border-radius:50%;background:#fff;position:absolute}
+    .ring-num{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;color:var(--acc);position:relative;z-index:1}
+    .res-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1.1rem 0}
+    .st-t{background:var(--opt);border:1.5px solid var(--bdr);border-radius:12px;padding:.85rem .5rem}
+    .st-t .sv{font-size:1.4rem;font-weight:700}
+    .st-t .sl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);font-weight:600;margin-top:.12rem}
+    .sv.g{color:var(--ok)}.sv.r{color:var(--bad)}.sv.au{color:var(--acc)}
+    .gbadge{font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;color:#fff;background:var(--acc);border-radius:20px;padding:.42rem 1.4rem;display:inline-block;margin-bottom:1.1rem;letter-spacing:.04em}
+    .rev-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--tp);text-align:left;margin:1.3rem 0 .65rem;padding-bottom:.35rem;border-bottom:2px solid var(--bdr)}
+    .rev-item{background:var(--opt);border:1px solid var(--bdr);border-radius:10px;padding:.85rem 1rem;text-align:left;margin-bottom:.55rem;font-size:.86rem;line-height:1.6}
+    .rev-item .rq{font-weight:600;color:var(--tp);margin-bottom:.35rem}
+    .rev-item .ra{color:var(--ok);font-weight:500}
+    .rev-item .rw{color:var(--bad);font-weight:500}
+    .rev-item .rc{color:var(--tm);font-size:.79rem;margin-top:.22rem}
 
-  .q-nav {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 1.6rem; padding-top: 1.1rem; border-top: 1px solid var(--border);
-  }
-  .ans-status { font-size: .82rem; font-weight: 600; color: var(--text-muted); }
-  .ans-status.ok  { color: var(--correct); }
-  .ans-status.bad { color: var(--wrong); }
+    .btn{font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;letter-spacing:.04em;border:none;border-radius:10px;padding:.62rem 1.5rem;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.4rem}
+    .btn:active{transform:scale(.97)}
+    .btn-g{background:var(--acc);color:#fff;box-shadow:0 2px 10px rgba(184,134,11,.25)}
+    .btn-g:hover{filter:brightness(1.1)}
+    .btn-o{background:#fff;color:var(--ts);border:1.5px solid var(--bdr)}
+    .btn-o:hover{background:#F5F0E8;border-color:#C8B98A}
+    .btn-o:disabled{opacity:.38;cursor:not-allowed}
 
-  /* ── Result screen ── */
-  .result-box { text-align: center; }
-  .result-box h2 { font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--text-primary); margin-bottom: .5rem; }
-  .score-ring {
-    width: 140px; height: 140px; border-radius: 50%;
-    background: conic-gradient(var(--subject-color) var(--pct), #EDE8E0 0);
-    display: flex; align-items: center; justify-content: center;
-    margin: 1.5rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: relative;
-  }
-  .score-ring::after { content: ''; width: 104px; height: 104px; border-radius: 50%; background: #fff; position: absolute; }
-  .score-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--subject-color); position: relative; z-index: 1; }
-  .result-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: .8rem; margin: 1.2rem 0; }
-  .stat-tile { background: var(--bg-option); border: 1.5px solid var(--border); border-radius: 12px; padding: .9rem .6rem; }
-  .stat-tile .sv { font-size: 1.5rem; font-weight: 700; }
-  .stat-tile .sl { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); font-weight: 600; margin-top: .15rem; }
-  .sv.green { color: var(--correct); } .sv.red { color: var(--wrong); } .sv.gold { color: var(--gold-accent); }
-  .grade-badge {
-    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; color: #fff;
-    background: var(--subject-color); border-radius: 20px; padding: .45rem 1.5rem;
-    display: inline-block; margin-bottom: 1.2rem; letter-spacing: .04em;
-  }
-  .review-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--text-primary); text-align: left; margin: 1.4rem 0 .7rem; padding-bottom: .4rem; border-bottom: 2px solid var(--border); }
-  .review-item { background: var(--bg-option); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1.1rem; text-align: left; margin-bottom: .6rem; font-size: .88rem; line-height: 1.6; }
-  .review-item .rq { font-weight: 600; color: var(--text-primary); margin-bottom: .4rem; }
-  .review-item .ra { color: var(--correct); font-weight: 500; }
-  .review-item .rw { color: var(--wrong); font-weight: 500; }
-  .review-item .rc { color: var(--text-muted); font-size: .81rem; margin-top: .25rem; }
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+    @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    .qanim{animation:popIn .25s ease both}
 
-  /* ── Buttons ── */
-  .btn {
-    font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
-    letter-spacing: .04em; border: none; border-radius: 10px; padding: .65rem 1.6rem;
-    cursor: pointer; transition: background .18s, box-shadow .18s, transform .12s;
-    display: inline-flex; align-items: center; gap: .4rem;
-  }
-  .btn:active { transform: scale(.97); }
-  .btn-gold { background: var(--subject-color); color: #fff; box-shadow: 0 2px 10px rgba(184,134,11,0.25); }
-  .btn-gold:hover { filter: brightness(1.1); box-shadow: 0 4px 14px rgba(184,134,11,0.35); }
-  .btn-ghost { background: #fff; color: var(--text-secondary); border: 1.5px solid var(--border); }
-  .btn-ghost:hover { background: #F5F0E8; border-color: #C8B98A; }
-  .btn-ghost:disabled { opacity: .38; cursor: not-allowed; }
-
-  /* ── Divider ── */
-  .or-divider { display: flex; align-items: center; gap: .75rem; margin: .5rem 0 1rem; color: var(--text-muted); font-size: .78rem; font-weight: 600; letter-spacing: .06em; }
-  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
-  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.45} }
-  @keyframes popIn    { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
-  .q-anim { animation: popIn .25s ease both; }
-
-  @media(max-width:540px) {
-    .screen { padding: 1.4rem 1rem; }
-    .subject-grid { grid-template-columns: repeat(2,1fr); }
-    .form-row { flex-direction: column; align-items: center; }
-    .name-input, .class-select { width: 100%; max-width: 320px; }
-    .q-text { font-size: 1rem; }
-    .info-grid, .result-stats { gap:.55rem; }
-  }
-</style>
+    @media(max-width:520px){
+      .screen{padding:1.3rem 1rem}.class-grid{grid-template-columns:repeat(3,1fr)}
+      .subj-grid{grid-template-columns:repeat(2,1fr)}.q-txt{font-size:.98rem}
+      .detail-row{flex-direction:column;align-items:center}.inp-name,.inp-roll{width:100%;max-width:300px}
+    }
+  </style>
 </head>
 <body>
 
-<div class="exam-header">
+<div class="hdr">
   <div class="school">Nextgenz International Academy</div>
   <h1>Online Exam Portal</h1>
-  <p class="meta">Class 5–10 &nbsp;|&nbsp; 20 Questions &nbsp;|&nbsp; 30 Minutes</p>
+  <p class="meta">Classes 2–10 &nbsp;|&nbsp; Multiple Subjects &nbsp;|&nbsp; 25 Questions | 30 Min</p>
 </div>
 
-<div class="exam-card">
-
-  <!-- Top bar -->
-  <div class="card-bar" id="cardBar">
-    <div class="bar-dots"><div class="bar-dot"></div><div class="bar-dot"></div><div class="bar-dot"></div></div>
-    <div class="bar-title" id="barTitle">Select Your Subject</div>
-    <div class="timer-wrap"><span>⏱</span><span id="timer">30:00</span></div>
+<div class="card">
+  <div class="bar" id="topBar">
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="bar-title" id="barTitle">Select Class &amp; Subject</div>
+    <div class="timer-pill"><span>⏱</span><span id="timer">30:00</span></div>
+  </div>
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:5%"></div></div>
+    <div class="prog-lbl" id="progLbl">Question 1 of 20</div>
   </div>
 
-  <!-- Progress -->
-  <div class="progress-wrap" id="progressWrap" style="display:none;">
-    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:5%"></div></div>
-    <div class="progress-label" id="progressLabel">Question 1 of 20</div>
+  <!-- STEP 1: Class -->
+  <div class="screen active" id="s1">
+    <div class="step-title">Step 1 — Select Your Class</div>
+    <div class="step-sub">Tap the class you are currently studying in.</div>
+    <div class="class-grid" id="classGrid"></div>
+    <div style="text-align:center"><button class="btn btn-g" onclick="goStep2()">Next — Choose Subject →</button></div>
   </div>
 
-  <!-- ══ START SCREEN ══ -->
-  <div class="screen active" id="startScreen">
-    <div class="start-box">
-      <h2>Choose Your Subject ✏️</h2>
-      <p>Select a subject below, enter your details, and begin your timed exam.</p>
-
-      <div class="subject-grid" id="subjectGrid">
-        <div class="subject-card" data-subject="mathematics" onclick="selectSubject(this)">
-          <div class="s-icon">📐</div>
-          <div class="s-name">Mathematics</div>
-          <div class="s-count">20 Questions</div>
-        </div>
-        <div class="subject-card" data-subject="science" onclick="selectSubject(this)">
-          <div class="s-icon">🔬</div>
-          <div class="s-name">Science</div>
-          <div class="s-count">20 Questions</div>
-        </div>
-        <div class="subject-card" data-subject="english" onclick="selectSubject(this)">
-          <div class="s-icon">📖</div>
-          <div class="s-name">English</div>
-          <div class="s-count">20 Questions</div>
-        </div>
-        <div class="subject-card" data-subject="hindi" onclick="selectSubject(this)">
-          <div class="s-icon">🇮🇳</div>
-          <div class="s-name">Hindi</div>
-          <div class="s-count">20 Questions</div>
-        </div>
-        <div class="subject-card" data-subject="gk" onclick="selectSubject(this)">
-          <div class="s-icon">🌍</div>
-          <div class="s-name">General Knowledge</div>
-          <div class="s-count">20 Questions</div>
-        </div>
-        <div class="subject-card" data-subject="social" onclick="selectSubject(this)">
-          <div class="s-icon">🏛️</div>
-          <div class="s-name">Social Science</div>
-          <div class="s-count">20 Questions</div>
-        </div>
-      </div>
-
-      <div class="info-grid" id="infoGrid">
-        <div class="info-tile"><div class="val" id="infoQ">20</div><div class="lbl">Questions</div></div>
-        <div class="info-tile"><div class="val">30</div><div class="lbl">Minutes</div></div>
-        <div class="info-tile"><div class="val">1</div><div class="lbl">Mark Each</div></div>
-      </div>
-
-      <div class="form-row">
-        <input type="text" id="studentName" placeholder="Your full name" class="name-input">
-        <select id="classSelect" class="class-select">
-          <option value="">Select Class</option>
-          <option value="Class 9">Class 9</option>
-          <option value="Class 10">Class 10</option>
-        </select>
-      </div>
-
-      <button class="btn btn-gold" onclick="startExam()">Start Exam &nbsp;→</button>
+  <!-- STEP 2: Subject -->
+  <div class="screen" id="s2">
+    <div class="bc">
+      <span class="bcs done" id="bc1" onclick="goStep1()">Class</span>
+      <span class="bca">›</span><span class="bcs active">Subject</span>
+      <span class="bca">›</span><span class="bcs">Details</span>
+    </div>
+    <div class="step-title" id="s2Title">Step 2 — Select Subject</div>
+    <div class="step-sub">Choose a subject available for your class.</div>
+    <div class="subj-grid" id="subjGrid"></div>
+    <div style="text-align:center">
+      <button class="btn btn-o" onclick="goStep1()" style="margin-right:.6rem">← Back</button>
+      <button class="btn btn-g" onclick="goStep3()">Next — Enter Details →</button>
     </div>
   </div>
 
-  <!-- ══ QUESTION SCREEN ══ -->
-  <div class="screen" id="questionScreen">
-    <div class="q-anim" id="qBlock">
-      <div class="q-header">
-        <div class="q-number" id="qNumber">Question 1 of 20</div>
-        <div class="q-topic"  id="qTopic"></div>
-      </div>
-      <div class="q-text" id="qText"></div>
-      <div class="options" id="optionsList"></div>
+  <!-- STEP 3: Details -->
+  <div class="screen" id="s3">
+    <div class="bc">
+      <span class="bcs done" onclick="goStep1()">Class</span>
+      <span class="bca">›</span><span class="bcs done" onclick="goStep2()">Subject</span>
+      <span class="bca">›</span><span class="bcs active">Details</span>
     </div>
-    <div class="q-nav">
-      <button class="btn btn-ghost" id="prevBtn" onclick="prevQ()" disabled>← Prev</button>
-      <span class="ans-status" id="ansStatus"></span>
-      <button class="btn btn-gold"  id="nextBtn" onclick="nextQ()">Next →</button>
+    <div class="step-title" id="s3Title">Step 3 — Enter Details</div>
+    <div class="step-sub">Confirm your info and start the exam.</div>
+    <div class="info-row">
+      <div class="info-t"><div class="iv" id="iClass">—</div><div class="il">Class</div></div>
+      <div class="info-t"><div class="iv" id="iSubj">—</div><div class="il">Subject</div></div>
+      <div class="info-t"><div class="iv">25</div><div class="il">Questions</div></div>
     </div>
-  </div>
-
-  <!-- ══ RESULT SCREEN ══ -->
-  <div class="screen" id="resultScreen">
-    <div class="result-box">
-      <h2 id="resultTitle">Exam Complete! 🎉</h2>
-      <div class="score-ring" id="scoreRing">
-        <span class="score-num" id="scoreNum">0/20</span>
-      </div>
-      <div class="grade-badge" id="gradeBadge">Grade: A</div>
-      <div class="result-stats">
-        <div class="stat-tile"><div class="sv green" id="correctCount">0</div><div class="sl">Correct</div></div>
-        <div class="stat-tile"><div class="sv red"   id="wrongCount">0</div><div class="sl">Wrong</div></div>
-        <div class="stat-tile"><div class="sv gold"  id="skipCount">0</div><div class="sl">Skipped</div></div>
-      </div>
-      <button class="btn btn-gold" onclick="toggleReview()" id="reviewBtn">📋 View Answers</button>
-      &nbsp;
-      <button class="btn btn-ghost" onclick="restartExam()">↺ Try Another Subject</button>
-      <div id="reviewSection" style="display:none;text-align:left;">
-        <div class="review-title">Answer Review</div>
-        <div id="reviewList"></div>
-      </div>
+    <div class="detail-row">
+      <input type="text" id="stuName" placeholder="Full Name" class="inp inp-name">
+      <input type="text" id="stuRoll" placeholder="Roll No. (optional)" class="inp inp-roll">
+    </div>
+    <div style="text-align:center">
+      <button class="btn btn-o" onclick="goStep2()" style="margin-right:.6rem">← Back</button>
+      <button class="btn btn-g" onclick="startExam()">🚀 Start Exam</button>
     </div>
   </div>
 
+  <!-- STEP 4: Question -->
+  <div class="screen" id="s4">
+    <div class="qanim" id="qBlock">
+      <div class="qhdr"><div class="q-num" id="qNum">Q 1/20</div><div class="q-top" id="qTop"></div></div>
+      <div class="q-txt" id="qTxt"></div>
+      <div class="opts" id="optList"></div>
+    </div>
+    <div class="qnav">
+      <button class="btn btn-o" id="prevBtn" onclick="prevQ()" disabled>← Prev</button>
+      <span class="ans-st" id="ansSt"></span>
+      <button class="btn btn-g" id="nextBtn" onclick="nextQ()">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Result -->
+  <div class="screen" id="s5">
+    <div class="res-box">
+      <h2 id="resTitle">Exam Complete!</h2>
+      <div class="ring" id="ring"><span class="ring-num" id="ringNum">0/20</span></div>
+      <div class="gbadge" id="gbadge">Grade: A</div>
+      <div class="res-stats">
+        <div class="st-t"><div class="sv g" id="cCnt">0</div><div class="sl">Correct</div></div>
+        <div class="st-t"><div class="sv r" id="wCnt">0</div><div class="sl">Wrong</div></div>
+        <div class="st-t"><div class="sv au" id="sCnt">0</div><div class="sl">Skipped</div></div>
+      </div>
+      <button class="btn btn-g" onclick="toggleReview()" id="revBtn">📋 View Answers</button>&nbsp;
+      <button class="btn btn-o" onclick="restart()">↺ New Exam</button>
+      <div id="revSec" style="display:none;text-align:left">
+        <div class="rev-title">Answer Review</div>
+        <div id="revList"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ════════════════════════════════════
-   QUESTION BANKS — 20 Qs per subject
-════════════════════════════════════ */
-const QUESTION_BANKS = {
+  /* ═══════════════════════════
+     CONFIG
+  ═══════════════════════════ */
+  const CLASS_SUBJECTS = {
+    2:['mathematics','evs','english','hindi','gk'],
+    3:['mathematics','evs','english','hindi','gk'],
+    4:['mathematics','evs','english','hindi','gk'],
+    5:['mathematics','evs','english','hindi','gk'],
+    6:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
+    7:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
+    8:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
+    9:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
+    10:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
+  };
+  const SMETA={
+    mathematics:{icon:'📐',label:'Mathematics',color:'#B8860B',strp:'#F0C040'},
+    evs:        {icon:'🌿',label:'EVS',         color:'#2E7D32',strp:'#66BB6A'},
+    science:    {icon:'🔬',label:'Science',     color:'#1A6B3A',strp:'#5CB85C'},
+    english:    {icon:'📖',label:'English',     color:'#1A4A8A',strp:'#5B9BD5'},
+    hindi:      {icon:'🇮🇳',label:'Hindi',      color:'#8B1A1A',strp:'#D96A3A'},
+    social:     {icon:'🏛️',label:'Social Science',color:'#1A5A6B',strp:'#3AABCA'},
+    sanskrit:   {icon:'📜',label:'Sanskrit',    color:'#5A3E00',strp:'#C8960C'},
+    computer:   {icon:'💻',label:'Computer',    color:'#1A1A6B',strp:'#5B5BD5'},
+    gk:         {icon:'🌍',label:'GK',          color:'#5A1A8A',strp:'#9B59B6'},
+  };
 
-  mathematics: [
-    {q:"Which of the following is an irrational number?", opts:["√4","√9","√7","√16"], ans:2, topic:"Number Systems"},
-    {q:"The decimal expansion of a rational number is:", opts:["Always terminating","Always non-terminating","Terminating or repeating non-terminating","Always non-repeating"], ans:2, topic:"Number Systems"},
-    {q:"Which of the following is NOT a real number?", opts:["√−1","√2","0.333...","−7"], ans:0, topic:"Number Systems"},
-    {q:"If x² − 5x + 6 = 0, what are the values of x?", opts:["2 and 3","1 and 6","−2 and −3","2 and −3"], ans:0, topic:"Algebra"},
-    {q:"The value of (a + b)² − (a − b)² is:", opts:["4ab","2ab","a² − b²","4a²"], ans:0, topic:"Algebra"},
-    {q:"If 2x + 3 = 11, then x =", opts:["3","4","5","6"], ans:1, topic:"Algebra"},
-    {q:"Factorize: x² − 9", opts:["(x+3)(x−3)","(x+9)(x−1)","(x−3)²","(x+3)²"], ans:0, topic:"Algebra"},
-    {q:"The sum of roots of ax² + bx + c = 0 is:", opts:["b/a","−b/a","c/a","−c/a"], ans:1, topic:"Algebra"},
-    {q:"The angle sum of a triangle is always:", opts:["90°","180°","270°","360°"], ans:1, topic:"Geometry"},
-    {q:"The side opposite to the right angle in a right triangle is called:", opts:["Base","Altitude","Hypotenuse","Median"], ans:2, topic:"Geometry"},
-    {q:"Two triangles are similar if their corresponding angles are:", opts:["Supplementary","Complementary","Equal","Proportional"], ans:2, topic:"Geometry"},
-    {q:"The area of a circle with radius r is:", opts:["2πr","πr²","πd","2πr²"], ans:1, topic:"Geometry"},
-    {q:"The value of sin 30° is:", opts:["1","√3/2","1/2","1/√2"], ans:2, topic:"Trigonometry"},
-    {q:"cos 0° equals:", opts:["0","1","−1","Undefined"], ans:1, topic:"Trigonometry"},
-    {q:"Which identity is correct?", opts:["sin²θ + cos²θ = 2","sin²θ − cos²θ = 1","sin²θ + cos²θ = 1","tan²θ + 1 = sin²θ"], ans:2, topic:"Trigonometry"},
-    {q:"The value of tan 45° is:", opts:["0","√3","1/√3","1"], ans:3, topic:"Trigonometry"},
-    {q:"The mean of 5, 10, 15, 20, 25 is:", opts:["12","13","15","17"], ans:2, topic:"Statistics"},
-    {q:"The probability of an impossible event is:", opts:["0","1","0.5","−1"], ans:0, topic:"Statistics"},
-    {q:"The median of 3, 7, 8, 10, 14 is:", opts:["7","8","10","9"], ans:1, topic:"Statistics"},
-    {q:"Which measure is most affected by extreme values?", opts:["Median","Mode","Mean","Range"], ans:2, topic:"Statistics"},
-  ],
+  /* ═══════════════════════════
+     QUESTION BANKS
+     band: 'lower'=Class2-5, 'upper'=Class6-10
+  ═══════════════════════════ */
+  const QB={};
 
-  science: [
-    {q:"Which organelle is known as the powerhouse of the cell?", opts:["Nucleus","Mitochondria","Ribosome","Golgi body"], ans:1, topic:"Biology"},
-    {q:"The chemical formula of water is:", opts:["H₂O₂","HO","H₂O","H₃O"], ans:2, topic:"Chemistry"},
-    {q:"Which gas is produced during photosynthesis?", opts:["CO₂","N₂","O₂","H₂"], ans:2, topic:"Biology"},
-    {q:"Newton's second law of motion states F =", opts:["mv","ma","m/a","v/t"], ans:1, topic:"Physics"},
-    {q:"The SI unit of electric current is:", opts:["Volt","Watt","Ampere","Ohm"], ans:2, topic:"Physics"},
-    {q:"Which acid is present in vinegar?", opts:["Hydrochloric acid","Acetic acid","Citric acid","Sulphuric acid"], ans:1, topic:"Chemistry"},
-    {q:"The process by which plants make their own food is:", opts:["Respiration","Digestion","Photosynthesis","Excretion"], ans:2, topic:"Biology"},
-    {q:"Sound travels fastest in:", opts:["Air","Water","Vacuum","Steel"], ans:3, topic:"Physics"},
-    {q:"The atomic number of Carbon is:", opts:["6","8","12","14"], ans:0, topic:"Chemistry"},
-    {q:"Which part of the brain controls balance?", opts:["Cerebrum","Medulla","Cerebellum","Hypothalamus"], ans:2, topic:"Biology"},
-    {q:"Ohm's law relates:", opts:["Mass and velocity","Voltage, current, resistance","Force and acceleration","Heat and temperature"], ans:1, topic:"Physics"},
-    {q:"The symbol for Gold is:", opts:["Go","Gd","Au","Ag"], ans:2, topic:"Chemistry"},
-    {q:"Which blood group is the universal donor?", opts:["A","B","AB","O"], ans:3, topic:"Biology"},
-    {q:"The unit of resistance is:", opts:["Ampere","Volt","Ohm","Watt"], ans:2, topic:"Physics"},
-    {q:"DNA stands for:", opts:["Deoxyribonucleic Acid","Diribonucleic Acid","Deoxyribonitric Acid","Dioxynucleic Acid"], ans:0, topic:"Biology"},
-    {q:"Which gas causes the greenhouse effect?", opts:["O₂","N₂","CO₂","H₂"], ans:2, topic:"Environment"},
-    {q:"The chemical symbol of Sodium is:", opts:["So","Na","S","Sn"], ans:1, topic:"Chemistry"},
-    {q:"The speed of light is approximately:", opts:["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"], ans:1, topic:"Physics"},
-    {q:"Chromosomes are made of:", opts:["Protein only","DNA and Protein","RNA only","Lipids"], ans:1, topic:"Biology"},
-    {q:"Which mirror is used in vehicle rear-view mirrors?", opts:["Plane","Concave","Convex","Parabolic"], ans:2, topic:"Physics"},
-  ],
+  QB.mathematics={
+    lower:[
+      {q:"What is 15 + 27?",opts:["40","42","45","38"],ans:1,t:"Addition"},
+      {q:"What is 63 − 28?",opts:["35","33","37","31"],ans:0,t:"Subtraction"},
+      {q:"What is 6 × 7?",opts:["42","48","36","54"],ans:0,t:"Multiplication"},
+      {q:"What is 48 ÷ 6?",opts:["6","7","8","9"],ans:2,t:"Division"},
+      {q:"Smallest 3-digit number?",opts:["999","100","001","010"],ans:1,t:"Number System"},
+      {q:"What comes after 99?",opts:["90","100","109","110"],ans:1,t:"Number System"},
+      {q:"Sides of a triangle?",opts:["2","3","4","5"],ans:1,t:"Geometry"},
+      {q:"Half of 80?",opts:["20","30","40","50"],ans:2,t:"Fractions"},
+      {q:"Which is even?",opts:["13","17","22","35"],ans:2,t:"Number System"},
+      {q:"9 × 9 = ?",opts:["72","81","90","63"],ans:1,t:"Multiplication"},
+      {q:"100 − 45 = ?",opts:["65","55","45","60"],ans:1,t:"Subtraction"},
+      {q:"Centimetres in 1 metre?",opts:["10","100","1000","50"],ans:1,t:"Measurement"},
+      {q:"3/4 of 40?",opts:["20","25","30","35"],ans:2,t:"Fractions"},
+      {q:"Shape with 4 equal sides?",opts:["Rectangle","Triangle","Square","Pentagon"],ans:2,t:"Geometry"},
+      {q:"5² = ?",opts:["10","15","20","25"],ans:3,t:"Powers"},
+      {q:"1000 + 250 = ?",opts:["1025","1250","1500","1200"],ans:1,t:"Addition"},
+      {q:"Hours in a day?",opts:["12","16","20","24"],ans:3,t:"Time"},
+      {q:"72 ÷ 8 = ?",opts:["7","8","9","10"],ans:2,t:"Division"},
+      {q:"Perimeter of square with side 5 cm?",opts:["10 cm","15 cm","20 cm","25 cm"],ans:2,t:"Geometry"},
+      {q:"Largest 2-digit number?",opts:["89","98","99","90"],ans:2,t:"Number System"},
+      {q:"What is 5 × 8?",opts:["35","40","45","50"],ans:1,t:"Multiplication"},
+      {q:"144 ÷ 12 = ?",opts:["10","11","12","13"],ans:2,t:"Division"},
+      {q:"3 out of 8 parts shaded — fraction:",opts:["3/5","3/8","5/8","8/3"],ans:1,t:"Fractions"},
+      {q:"Area of rectangle 6cm × 4cm:",opts:["10 cm²","20 cm²","24 cm²","18 cm²"],ans:2,t:"Geometry"},
+      {q:"Multiple of both 3 and 4:",opts:["10","14","12","9"],ans:2,t:"Number System"},
+    ],
+    upper:[
+      {q:"Which is an irrational number?",opts:["√4","√9","√7","√16"],ans:2,t:"Number Systems"},
+      {q:"Decimal expansion of rational number:",opts:["Always terminating","Always non-terminating","Terminating or repeating","Non-repeating"],ans:2,t:"Number Systems"},
+      {q:"If x²−5x+6=0, x values:",opts:["2 and 3","1 and 6","−2 and −3","2 and −3"],ans:0,t:"Algebra"},
+      {q:"(a+b)²−(a−b)² =",opts:["4ab","2ab","a²−b²","4a²"],ans:0,t:"Algebra"},
+      {q:"2x+3=11, x=?",opts:["3","4","5","6"],ans:1,t:"Algebra"},
+      {q:"Factorize: x²−9",opts:["(x+3)(x−3)","(x+9)(x−1)","(x−3)²","(x+3)²"],ans:0,t:"Algebra"},
+      {q:"Sum of roots of ax²+bx+c=0:",opts:["b/a","−b/a","c/a","−c/a"],ans:1,t:"Algebra"},
+      {q:"Angle sum of triangle:",opts:["90°","180°","270°","360°"],ans:1,t:"Geometry"},
+      {q:"Area of circle radius r:",opts:["2πr","πr²","πd","2πr²"],ans:1,t:"Geometry"},
+      {q:"sin 30° =",opts:["1","√3/2","1/2","1/√2"],ans:2,t:"Trigonometry"},
+      {q:"cos 0° =",opts:["0","1","−1","Undefined"],ans:1,t:"Trigonometry"},
+      {q:"sin²θ + cos²θ =",opts:["2","0","1","−1"],ans:2,t:"Trigonometry"},
+      {q:"tan 45° =",opts:["0","√3","1/√3","1"],ans:3,t:"Trigonometry"},
+      {q:"Mean of 5,10,15,20,25:",opts:["12","13","15","17"],ans:2,t:"Statistics"},
+      {q:"Probability of impossible event:",opts:["0","1","0.5","−1"],ans:0,t:"Statistics"},
+      {q:"Median of 3,7,8,10,14:",opts:["7","8","10","9"],ans:1,t:"Statistics"},
+      {q:"Side opposite 90° is called:",opts:["Base","Altitude","Hypotenuse","Median"],ans:2,t:"Geometry"},
+      {q:"Product of roots of ax²+bx+c=0:",opts:["b/a","−b/a","c/a","−c/a"],ans:2,t:"Algebra"},
+      {q:"Volume of cube with side a:",opts:["a²","a³","3a","6a²"],ans:1,t:"Mensuration"},
+      {q:"Measure most affected by extreme values:",opts:["Median","Mode","Mean","Range"],ans:2,t:"Statistics"},
+      {q:"Sides 3,4,5 form a ___ triangle:",opts:["Equilateral","Isosceles","Right-angled","Obtuse"],ans:2,t:"Geometry"},
+      {q:"LCM of 12 and 18:",opts:["6","36","24","72"],ans:1,t:"Number Systems"},
+      {q:"√169 =",opts:["11","12","13","14"],ans:2,t:"Algebra"},
+      {q:"Distance from (0,0) to (3,4):",opts:["3","4","5","7"],ans:2,t:"Coordinate Geometry"},
+      {q:"Surface area of sphere radius r:",opts:["4πr","2πr²","4πr²","πr²"],ans:2,t:"Mensuration"},
+    ]};
 
-  english: [
-    {q:"Choose the correct synonym for 'Benevolent':", opts:["Cruel","Kind","Angry","Lazy"], ans:1, topic:"Vocabulary"},
-    {q:"Which sentence is in the Passive Voice?", opts:["She reads a book","He wrote a letter","The letter was written by him","They are playing"], ans:2, topic:"Grammar"},
-    {q:"The plural of 'Leaf' is:", opts:["Leafs","Leaves","Leafes","Leavs"], ans:1, topic:"Grammar"},
-    {q:"Choose the correct antonym for 'Ancient':", opts:["Old","Modern","Historic","Classic"], ans:1, topic:"Vocabulary"},
-    {q:"'She is good at singing.' — The underlined word is a:", opts:["Noun","Verb","Gerund","Adjective"], ans:2, topic:"Grammar"},
-    {q:"Which part of speech is the word 'Quickly'?", opts:["Adjective","Noun","Adverb","Conjunction"], ans:2, topic:"Grammar"},
-    {q:"Choose the correctly spelled word:", opts:["Accomodation","Accommodation","Acommodation","Acomodation"], ans:1, topic:"Spelling"},
-    {q:"The figure of speech in 'The wind whispered' is:", opts:["Simile","Metaphor","Personification","Alliteration"], ans:2, topic:"Literature"},
-    {q:"'Neither he nor I __ present.' — Fill in the blank:", opts:["was","were","are","is"], ans:0, topic:"Grammar"},
-    {q:"What is the meaning of the idiom 'Bite the bullet'?", opts:["To eat fast","To face a painful situation bravely","To argue","To quit"], ans:1, topic:"Idioms"},
-    {q:"Identify the type: 'How beautiful the sunset is!'", opts:["Declarative","Interrogative","Imperative","Exclamatory"], ans:3, topic:"Grammar"},
-    {q:"The past tense of 'Ring' is:", opts:["Ringed","Rang","Rung","Ring"], ans:1, topic:"Grammar"},
-    {q:"Which of the following is a compound sentence?", opts:["She sang","He ran fast","It rained and the streets flooded","Because he was tired"], ans:2, topic:"Grammar"},
-    {q:"'A person who cannot read or write' — One word substitution:", opts:["Illiterate","Ignorant","Mute","Blind"], ans:0, topic:"Vocabulary"},
-    {q:"Choose the correct preposition: 'She is afraid __ dogs.'", opts:["from","of","by","with"], ans:1, topic:"Grammar"},
-    {q:"The literary device in 'Peter Piper picked a peck' is:", opts:["Simile","Onomatopoeia","Alliteration","Assonance"], ans:2, topic:"Literature"},
-    {q:"'He has been working since morning.' — The tense is:", opts:["Simple Past","Past Perfect","Present Perfect Continuous","Future Perfect"], ans:2, topic:"Grammar"},
-    {q:"Which punctuation ends an imperative sentence?", opts:[".","?","!","Both . and !"], ans:3, topic:"Grammar"},
-    {q:"Choose the correctly used article: ___ apple a day keeps the doctor away.", opts:["A","An","The","No article"], ans:1, topic:"Grammar"},
-    {q:"'Enormous' is closest in meaning to:", opts:["Tiny","Huge","Fast","Bright"], ans:1, topic:"Vocabulary"},
-  ],
+  QB.evs={lower:[
+      {q:"Gas plants take in during photosynthesis?",opts:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"],ans:2,t:"Plants"},
+      {q:"Top layer of the Earth?",opts:["Mantle","Crust","Core","Magma"],ans:1,t:"Earth"},
+      {q:"Animal that gives us milk?",opts:["Dog","Cow","Cat","Parrot"],ans:1,t:"Animals"},
+      {q:"Plants need ___ to make food:",opts:["Moonlight","Sunlight","Only water","Only soil"],ans:1,t:"Plants"},
+      {q:"Sense organ to hear:",opts:["Eyes","Nose","Ears","Tongue"],ans:2,t:"Human Body"},
+      {q:"Main source of energy for Earth:",opts:["Moon","Stars","Sun","Wind"],ans:2,t:"Environment"},
+      {q:"Which is a water body?",opts:["Mountain","Desert","River","Forest"],ans:2,t:"Geography"},
+      {q:"Number of continents on Earth:",opts:["5","6","7","8"],ans:2,t:"Geography"},
+      {q:"Which is a natural disaster?",opts:["Picnic","Earthquake","Reading","Cycling"],ans:1,t:"Environment"},
+      {q:"We breathe in:",opts:["Carbon dioxide","Nitrogen","Oxygen","Hydrogen"],ans:2,t:"Human Body"},
+      {q:"Non-renewable resource:",opts:["Solar energy","Wind","Coal","Water"],ans:2,t:"Resources"},
+      {q:"Fish live in:",opts:["Land","Air","Water","Desert"],ans:2,t:"Animals"},
+      {q:"Season after summer:",opts:["Spring","Winter","Monsoon","Autumn"],ans:2,t:"Seasons"},
+      {q:"Animals that eat only plants are:",opts:["Carnivores","Herbivores","Omnivores","Decomposers"],ans:1,t:"Animals"},
+      {q:"Tallest animal:",opts:["Elephant","Giraffe","Horse","Camel"],ans:1,t:"Animals"},
+      {q:"Part of plant that absorbs water:",opts:["Leaf","Stem","Root","Flower"],ans:2,t:"Plants"},
+      {q:"Days in a leap year:",opts:["365","366","364","360"],ans:1,t:"Time"},
+      {q:"Source of light:",opts:["Mirror","Table","Sun","Book"],ans:2,t:"Environment"},
+      {q:"Which is a fruit?",opts:["Carrot","Potato","Mango","Spinach"],ans:2,t:"Plants"},
+      {q:"Animals that eat both plants and animals:",opts:["Herbivores","Carnivores","Omnivores","Decomposers"],ans:2,t:"Animals"},
+      {q:"Which is solid waste?",opts:["Smoke","Plastic bag","Sewage","Steam"],ans:1,t:"Environment"},
+      {q:"Planet closest to the Sun:",opts:["Earth","Venus","Mercury","Mars"],ans:2,t:"Space"},
+      {q:"Bones in an adult human body:",opts:["196","206","216","226"],ans:1,t:"Human Body"},
+      {q:"Organ that purifies blood:",opts:["Heart","Lungs","Kidney","Liver"],ans:2,t:"Human Body"},
+      {q:"Water turning into vapour is called:",opts:["Condensation","Precipitation","Evaporation","Transpiration"],ans:2,t:"Water"},
+    ],upper:[]};
 
-  hindi: [
-    {q:"'पुस्तक' का बहुवचन क्या है?", opts:["पुस्तकें","पुस्तकों","पुस्तकों को","पुस्तक"], ans:0, topic:"व्याकरण"},
-    {q:"'आना' क्रिया का सामान्य भूतकाल रूप क्या है?", opts:["आता है","आया","आएगा","आ रहा है"], ans:1, topic:"व्याकरण"},
-    {q:"'सुंदर' शब्द में कौन-सा प्रत्यय लगाने से भाववाचक संज्ञा बनती है?", opts:["ता","पन","आई","त्व"], ans:2, topic:"व्याकरण"},
-    {q:"'वह पढ़ रहा है' — यह कौन-सा काल है?", opts:["भूतकाल","वर्तमानकाल","भविष्यकाल","संदिग्ध काल"], ans:1, topic:"व्याकरण"},
-    {q:"'रात-दिन' में कौन-सा समास है?", opts:["तत्पुरुष","द्वंद्व","कर्मधारय","बहुव्रीहि"], ans:1, topic:"समास"},
-    {q:"'निर्जन' शब्द का सही संधि-विच्छेद है:", opts:["निर + जन","निः + जन","नि + रजन","निर् + जन"], ans:1, topic:"संधि"},
-    {q:"'पंकज' का पर्यायवाची शब्द है:", opts:["पत्थर","कमल","नदी","बादल"], ans:1, topic:"पर्यायवाची"},
-    {q:"'अंधेरा' का विलोम शब्द क्या है?", opts:["काला","उजाला","रात","धुंधला"], ans:1, topic:"विलोम"},
-    {q:"'गंगा' किस भाषा का शब्द है?", opts:["संस्कृत","फारसी","अरबी","तुर्की"], ans:0, topic:"शब्द-ज्ञान"},
-    {q:"'मोहन ने रोटी खाई' — इसमें 'ने' कौन-सी विभक्ति है?", opts:["कर्म कारक","करण कारक","कर्ता कारक","सम्प्रदान कारक"], ans:2, topic:"कारक"},
-    {q:"हिंदी वर्णमाला में कितने स्वर होते हैं?", opts:["11","13","16","10"], ans:0, topic:"वर्णमाला"},
-    {q:"'आकाश' का तत्सम शब्द है:", opts:["आसमान","गगन","अम्बर","आकाश"], ans:3, topic:"तत्सम-तद्भव"},
-    {q:"'चिड़िया' शब्द है:", opts:["तत्सम","तद्भव","देशज","विदेशज"], ans:2, topic:"शब्द-ज्ञान"},
-    {q:"रस के कितने प्रकार होते हैं?", opts:["7","8","9","10"], ans:2, topic:"काव्य"},
-    {q:"'श्रृंगार रस' का स्थायी भाव है:", opts:["हास","रति","शोक","भय"], ans:1, topic:"काव्य"},
-    {q:"'जो कभी न मरे' — इस वाक्यांश के लिए एक शब्द है:", opts:["अनश्वर","अमर","अजर","नश्वर"], ans:1, topic:"वाक्यांश"},
-    {q:"'यमक अलंकार' में क्या होता है?", opts:["शब्द की आवृत्ति अलग अर्थों में","उपमा देना","रूपक","अनुप्रास"], ans:0, topic:"अलंकार"},
-    {q:"'पेड़' का बहुवचन है:", opts:["पेड़े","पेड़ें","पेड़ों","पेड़"], ans:2, topic:"व्याकरण"},
-    {q:"'सरस्वती' किसकी देवी हैं?", opts:["धन","शक्ति","विद्या","प्रकृति"], ans:2, topic:"सामान्य ज्ञान"},
-    {q:"'कवि' शब्द का स्त्रीलिंग है:", opts:["कवियत्री","कवयित्री","कवित्री","कविनी"], ans:1, topic:"व्याकरण"},
-  ],
+  QB.science={lower:[],upper:[
+      {q:"Powerhouse of the cell?",opts:["Nucleus","Mitochondria","Ribosome","Golgi body"],ans:1,t:"Biology"},
+      {q:"Chemical formula of water:",opts:["H₂O₂","HO","H₂O","H₃O"],ans:2,t:"Chemistry"},
+      {q:"Gas produced during photosynthesis:",opts:["CO₂","N₂","O₂","H₂"],ans:2,t:"Biology"},
+      {q:"Newton's 2nd law: F =",opts:["mv","ma","m/a","v/t"],ans:1,t:"Physics"},
+      {q:"SI unit of electric current:",opts:["Volt","Watt","Ampere","Ohm"],ans:2,t:"Physics"},
+      {q:"Acid in vinegar:",opts:["HCl","Acetic acid","Citric acid","H₂SO₄"],ans:1,t:"Chemistry"},
+      {q:"Sound travels fastest in:",opts:["Air","Water","Vacuum","Steel"],ans:3,t:"Physics"},
+      {q:"Atomic number of Carbon:",opts:["6","8","12","14"],ans:0,t:"Chemistry"},
+      {q:"Brain part controlling balance:",opts:["Cerebrum","Medulla","Cerebellum","Hypothalamus"],ans:2,t:"Biology"},
+      {q:"Symbol for Gold:",opts:["Go","Gd","Au","Ag"],ans:2,t:"Chemistry"},
+      {q:"Universal blood donor group:",opts:["A","B","AB","O"],ans:3,t:"Biology"},
+      {q:"Unit of resistance:",opts:["Ampere","Volt","Ohm","Watt"],ans:2,t:"Physics"},
+      {q:"DNA stands for:",opts:["Deoxyribonucleic Acid","Diribonucleic Acid","Deoxynitronic Acid","Dioxynucleic Acid"],ans:0,t:"Biology"},
+      {q:"Gas causing greenhouse effect:",opts:["O₂","N₂","CO₂","H₂"],ans:2,t:"Environment"},
+      {q:"Chemical symbol of Sodium:",opts:["So","Na","S","Sn"],ans:1,t:"Chemistry"},
+      {q:"Speed of light approx:",opts:["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"],ans:1,t:"Physics"},
+      {q:"Chromosomes made of:",opts:["Protein only","DNA and Protein","RNA only","Lipids"],ans:1,t:"Biology"},
+      {q:"Rear-view mirror type:",opts:["Plane","Concave","Convex","Parabolic"],ans:2,t:"Physics"},
+      {q:"pH value of pure water:",opts:["0","7","14","5"],ans:1,t:"Chemistry"},
+      {q:"Hormone regulating blood sugar:",opts:["Thyroxine","Adrenaline","Insulin","Estrogen"],ans:2,t:"Biology"},
+      {q:"Velocity = Distance / ___:",opts:["Mass","Time","Force","Area"],ans:1,t:"Physics"},
+      {q:"Acid in our stomach:",opts:["Citric acid","Acetic acid","Hydrochloric acid","Sulphuric acid"],ans:2,t:"Chemistry"},
+      {q:"Rusting involves:",opts:["Only oxygen","Only water","Oxygen and water","Carbon dioxide"],ans:2,t:"Chemistry"},
+      {q:"Smallest unit of life:",opts:["Tissue","Organ","Cell","Atom"],ans:2,t:"Biology"},
+      {q:"Plant organ mainly responsible for photosynthesis:",opts:["Root","Stem","Leaf","Flower"],ans:2,t:"Biology"},
+    ]};
 
-  gk: [
-    {q:"Who is known as the Father of the Indian Constitution?", opts:["Mahatma Gandhi","Jawaharlal Nehru","B.R. Ambedkar","Sardar Patel"], ans:2, topic:"Indian History"},
-    {q:"Which is the largest planet in the Solar System?", opts:["Earth","Saturn","Jupiter","Neptune"], ans:2, topic:"Science & Space"},
-    {q:"The capital of Australia is:", opts:["Sydney","Melbourne","Brisbane","Canberra"], ans:3, topic:"World Geography"},
-    {q:"Who wrote the national anthem of India?", opts:["Bankim Chandra","Rabindranath Tagore","Sarojini Naidu","Subhash Bose"], ans:1, topic:"Indian Culture"},
-    {q:"Which river is the longest in the world?", opts:["Amazon","Nile","Yangtze","Mississippi"], ans:1, topic:"World Geography"},
-    {q:"The first Indian to go to space was:", opts:["Sunita Williams","Kalpana Chawla","Rakesh Sharma","A.P.J. Abdul Kalam"], ans:2, topic:"Indian Science"},
-    {q:"The headquarters of the United Nations is in:", opts:["Geneva","London","New York","Washington D.C."], ans:2, topic:"World Affairs"},
-    {q:"Which gas makes up most of Earth's atmosphere?", opts:["Oxygen","Carbon Dioxide","Nitrogen","Argon"], ans:2, topic:"Science"},
-    {q:"How many states are in India (as of 2024)?", opts:["28","29","30","31"], ans:0, topic:"Indian Geography"},
-    {q:"The Olympic Games are held every:", opts:["2 years","3 years","4 years","5 years"], ans:2, topic:"Sports"},
-    {q:"Who invented the telephone?", opts:["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Guglielmo Marconi"], ans:2, topic:"Inventions"},
-    {q:"Which is the smallest country in the world?", opts:["Monaco","San Marino","Vatican City","Liechtenstein"], ans:2, topic:"World Geography"},
-    {q:"The currency of Japan is:", opts:["Yuan","Won","Yen","Baht"], ans:2, topic:"World Affairs"},
-    {q:"'Satyameva Jayate' is taken from which scripture?", opts:["Rigveda","Mundaka Upanishad","Bhagavad Gita","Mahabharata"], ans:1, topic:"Indian Culture"},
-    {q:"Which planet is called the Red Planet?", opts:["Venus","Mars","Jupiter","Mercury"], ans:1, topic:"Science & Space"},
-    {q:"The Great Wall of China was built to protect against:", opts:["Floods","Mongol invasions","Earthquakes","Pirates"], ans:1, topic:"World History"},
-    {q:"Who painted the Mona Lisa?", opts:["Michelangelo","Raphael","Leonardo da Vinci","Vincent van Gogh"], ans:2, topic:"Art & Culture"},
-    {q:"National Science Day is celebrated on:", opts:["January 28","February 28","March 28","April 28"], ans:1, topic:"Indian Science"},
-    {q:"Which country is the largest by area?", opts:["China","USA","Canada","Russia"], ans:3, topic:"World Geography"},
-    {q:"The instrument used to measure blood pressure is:", opts:["Thermometer","Stethoscope","Sphygmomanometer","ECG"], ans:2, topic:"Health & Science"},
-  ],
+  QB.english={
+    lower:[
+      {q:"Which is a vowel?",opts:["B","C","A","D"],ans:2,t:"Alphabet"},
+      {q:"Plural of 'cat':",opts:["cats","cates","cat's","caties"],ans:0,t:"Grammar"},
+      {q:"Which word is a verb?",opts:["Happy","Run","Tree","Blue"],ans:1,t:"Grammar"},
+      {q:"Opposite of 'hot':",opts:["Warm","Cold","Big","Fast"],ans:1,t:"Vocabulary"},
+      {q:"'She ___ a book.' Correct form:",opts:["read","reads","reading","readed"],ans:1,t:"Grammar"},
+      {q:"Correct sentence:",opts:["He go to school.","He goes to school.","He going school.","He gone school."],ans:1,t:"Grammar"},
+      {q:"Plural of 'child':",opts:["childs","childrens","children","child"],ans:2,t:"Grammar"},
+      {q:"Naming word in 'The dog runs fast':",opts:["runs","fast","The","dog"],ans:3,t:"Grammar"},
+      {q:"Which is a colour word?",opts:["Run","Beautiful","Blue","Quickly"],ans:2,t:"Vocabulary"},
+      {q:"'Big' means:",opts:["Small","Tiny","Large","Narrow"],ans:2,t:"Vocabulary"},
+      {q:"Letters in English alphabet:",opts:["24","25","26","27"],ans:2,t:"Alphabet"},
+      {q:"Word rhyming with 'bat':",opts:["bin","but","cat","big"],ans:2,t:"Phonics"},
+      {q:"'I ___ happy today.'",opts:["am","is","are","be"],ans:0,t:"Grammar"},
+      {q:"Which is a question word?",opts:["and","but","Why","or"],ans:2,t:"Grammar"},
+      {q:"Opposite of 'day':",opts:["Evening","Morning","Night","Dusk"],ans:2,t:"Vocabulary"},
+      {q:"'and' in 'Cats and dogs' is a:",opts:["Noun","Verb","Conjunction","Adjective"],ans:2,t:"Grammar"},
+      {q:"Word meaning 'very happy':",opts:["Sad","Angry","Joyful","Tired"],ans:2,t:"Vocabulary"},
+      {q:"'She has two ___.' (book form):",opts:["book","books","bookes","booksies"],ans:1,t:"Grammar"},
+      {q:"'She sings.' — 'sings' is a:",opts:["Noun","Verb","Adjective","Adverb"],ans:1,t:"Grammar"},
+      {q:"Opposite of 'open':",opts:["Wide","Narrow","Close","Shut"],ans:3,t:"Vocabulary"},
+      {q:"Which is a describing word (adjective)?",opts:["Run","Tall","Table","Slowly"],ans:1,t:"Grammar"},
+      {q:"'The cat sat ___ the mat.'",opts:["in","at","on","by"],ans:2,t:"Grammar"},
+      {q:"Opposite of 'clean':",opts:["Fresh","Bright","Dirty","New"],ans:2,t:"Vocabulary"},
+      {q:"Vowels in 'elephant':",opts:["2","3","4","5"],ans:1,t:"Phonics"},
+      {q:"Correct punctuation:",opts:["where are you.","Where are you?","where are you?","Where are you."],ans:1,t:"Punctuation"},
+    ],
+    upper:[
+      {q:"Synonym for 'Benevolent':",opts:["Cruel","Kind","Angry","Lazy"],ans:1,t:"Vocabulary"},
+      {q:"Passive Voice:",opts:["She reads a book","He wrote a letter","The letter was written by him","They are playing"],ans:2,t:"Grammar"},
+      {q:"Plural of 'Leaf':",opts:["Leafs","Leaves","Leafes","Leavs"],ans:1,t:"Grammar"},
+      {q:"Antonym of 'Ancient':",opts:["Old","Modern","Historic","Classic"],ans:1,t:"Vocabulary"},
+      {q:"'She is good at singing.' — 'singing' is:",opts:["Noun","Verb","Gerund","Adjective"],ans:2,t:"Grammar"},
+      {q:"'Quickly' is a:",opts:["Adjective","Noun","Adverb","Conjunction"],ans:2,t:"Grammar"},
+      {q:"Correctly spelled:",opts:["Accomodation","Accommodation","Acommodation","Acomodation"],ans:1,t:"Spelling"},
+      {q:"'The wind whispered' — figure of speech:",opts:["Simile","Metaphor","Personification","Alliteration"],ans:2,t:"Literature"},
+      {q:"'Neither he nor I ___ present.'",opts:["was","were","are","is"],ans:0,t:"Grammar"},
+      {q:"'Bite the bullet' means:",opts:["Eat fast","Face pain bravely","Argue","Quit"],ans:1,t:"Idioms"},
+      {q:"'How beautiful the sunset is!' is:",opts:["Declarative","Interrogative","Imperative","Exclamatory"],ans:3,t:"Grammar"},
+      {q:"Past tense of 'Ring':",opts:["Ringed","Rang","Rung","Ring"],ans:1,t:"Grammar"},
+      {q:"Compound sentence:",opts:["She sang","He ran fast","It rained and streets flooded","Because he was tired"],ans:2,t:"Grammar"},
+      {q:"'Person who cannot read/write':",opts:["Illiterate","Ignorant","Mute","Blind"],ans:0,t:"Vocabulary"},
+      {q:"'She is afraid ___ dogs.'",opts:["from","of","by","with"],ans:1,t:"Grammar"},
+      {q:"'Peter Piper picked…' — device:",opts:["Simile","Onomatopoeia","Alliteration","Assonance"],ans:2,t:"Literature"},
+      {q:"Tense: 'He has been working since morning.'",opts:["Simple Past","Past Perfect","Present Perfect Continuous","Future Perfect"],ans:2,t:"Grammar"},
+      {q:"Correct article: ___ apple a day…",opts:["A","An","The","No article"],ans:1,t:"Grammar"},
+      {q:"'Enormous' means:",opts:["Tiny","Huge","Fast","Bright"],ans:1,t:"Vocabulary"},
+      {q:"'Ephemeral' means:",opts:["Eternal","Long-lasting","Short-lived","Ancient"],ans:2,t:"Vocabulary"},
+      {q:"Synonym for 'Candid':",opts:["Dishonest","Frank","Timid","Arrogant"],ans:1,t:"Vocabulary"},
+      {q:"'The proof of the pudding is in the eating' means:",opts:["Food matters","Results judge quality","Cooking is art","Patience"],ans:1,t:"Idioms"},
+      {q:"'She ___ to school every day.' (go):",opts:["go","went","goes","going"],ans:2,t:"Grammar"},
+      {q:"Subordinating conjunction:",opts:["And","But","Although","Or"],ans:2,t:"Grammar"},
+      {q:"'Brevity is the soul of wit' — author:",opts:["Keats","Shakespeare","Milton","Wordsworth"],ans:1,t:"Literature"},
+    ]};
 
-  social: [
-    {q:"The French Revolution began in the year:", opts:["1776","1789","1800","1815"], ans:1, topic:"World History"},
-    {q:"The Tropic of Cancer passes through how many Indian states?", opts:["6","7","8","9"], ans:2, topic:"Indian Geography"},
-    {q:"The Preamble to the Indian Constitution begins with:", opts:["We the Citizens","We the People","We the Indians","We the Nation"], ans:1, topic:"Civics"},
-    {q:"Which amendment of the Indian Constitution added Fundamental Duties?", opts:["40th","42nd","44th","46th"], ans:1, topic:"Civics"},
-    {q:"The term 'Black Soil' is associated with growing:", opts:["Rice","Cotton","Wheat","Jute"], ans:1, topic:"Indian Geography"},
-    {q:"Who gave the slogan 'Do or Die'?", opts:["Nehru","Gandhi","Bose","Tilak"], ans:1, topic:"Indian History"},
-    {q:"Which is the highest peak in the world?", opts:["K2","Kangchenjunga","Mount Everest","Lhotse"], ans:2, topic:"World Geography"},
-    {q:"The Permanent Settlement of 1793 was introduced by:", opts:["Dalhousie","Cornwallis","Clive","Wellesley"], ans:1, topic:"Indian History"},
-    {q:"Fundamental Rights are enshrined in which part of the Constitution?", opts:["Part I","Part II","Part III","Part IV"], ans:2, topic:"Civics"},
-    {q:"Which type of farming involves growing two or more crops simultaneously?", opts:["Shifting","Mixed","Crop Rotation","Organic"], ans:1, topic:"Agriculture"},
-    {q:"The Dandi March was related to:", opts:["Non-Cooperation","Salt Tax","Partition","Rowlatt Act"], ans:1, topic:"Indian History"},
-    {q:"Which ocean is the largest?", opts:["Atlantic","Indian","Arctic","Pacific"], ans:3, topic:"World Geography"},
-    {q:"The concept of Directive Principles was borrowed from:", opts:["USA","Ireland","UK","Australia"], ans:1, topic:"Civics"},
-    {q:"Which is the longest National Highway in India?", opts:["NH 44","NH 1","NH 27","NH 48"], ans:0, topic:"Indian Geography"},
-    {q:"The Berlin Wall fell in:", opts:["1985","1987","1989","1991"], ans:2, topic:"World History"},
-    {q:"Panchayati Raj was first introduced in India in:", opts:["1952","1955","1959","1962"], ans:2, topic:"Civics"},
-    {q:"Which river forms the Sundarbans delta?", opts:["Indus","Ganga-Brahmaputra","Mahanadi","Krishna"], ans:1, topic:"Indian Geography"},
-    {q:"Who wrote 'Discovery of India'?", opts:["Gandhi","Ambedkar","Nehru","Tagore"], ans:2, topic:"Indian History"},
-    {q:"The Right to Education (RTE) Act was passed in:", opts:["2005","2007","2009","2011"], ans:2, topic:"Civics"},
-    {q:"Which climate type does the Thar Desert have?", opts:["Tropical","Arid","Mediterranean","Continental"], ans:1, topic:"Indian Geography"},
-  ],
-};
+  QB.hindi={
+    lower:[
+      {q:"'किताब' का बहुवचन:",opts:["किताबें","किताबों","किताब","किताबे"],ans:0,t:"व्याकरण"},
+      {q:"'राम स्कूल जाता है।' — क्रिया:",opts:["राम","स्कूल","जाता","है"],ans:2,t:"व्याकरण"},
+      {q:"'अच्छा' का विलोम:",opts:["सुंदर","बुरा","सफेद","नया"],ans:1,t:"विलोम"},
+      {q:"'सूरज' का पर्यायवाची:",opts:["चाँद","तारा","सूर्य","आकाश"],ans:2,t:"पर्यायवाची"},
+      {q:"हिंदी वर्णमाला में स्वर:",opts:["10","11","12","13"],ans:1,t:"वर्णमाला"},
+      {q:"'पानी' का पर्यायवाची:",opts:["आग","जल","हवा","धरती"],ans:1,t:"पर्यायवाची"},
+      {q:"'लड़का' का स्त्रीलिंग:",opts:["लड़की","लड़कियाँ","बालक","बालिका"],ans:0,t:"लिंग"},
+      {q:"'बड़ा' का विलोम:",opts:["मोटा","नया","छोटा","लंबा"],ans:2,t:"विलोम"},
+      {q:"'रात' का विलोम:",opts:["शाम","सुबह","दिन","दोपहर"],ans:2,t:"विलोम"},
+      {q:"'नदी' का बहुवचन:",opts:["नदीएँ","नदियाँ","नदियों","नदीयाँ"],ans:1,t:"व्याकरण"},
+      {q:"'ठंडा' का विलोम:",opts:["बड़ा","गरम","नया","पुराना"],ans:1,t:"विलोम"},
+      {q:"'पुस्तक' का अर्थ:",opts:["कलम","किताब","थैला","मेज"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'वह खेल रहा है।' — काल:",opts:["भूतकाल","भविष्यकाल","वर्तमानकाल","सामान्य काल"],ans:2,t:"काल"},
+      {q:"'सफेद' का विलोम:",opts:["लाल","काला","नीला","पीला"],ans:1,t:"विलोम"},
+      {q:"'गाय' का बच्चा:",opts:["पिल्ला","बछड़ा","मेमना","चूज़ा"],ans:1,t:"सामान्य ज्ञान"},
+      {q:"हिंदी की लिपि:",opts:["रोमन","अरबी","देवनागरी","गुरुमुखी"],ans:2,t:"भाषा-ज्ञान"},
+      {q:"'मेरा भारत महान' — 'महान' है:",opts:["संज्ञा","सर्वनाम","विशेषण","क्रिया"],ans:2,t:"व्याकरण"},
+      {q:"'आम' किस मौसम में होता है?",opts:["सर्दी","बसंत","गर्मी","बरसात"],ans:2,t:"सामान्य ज्ञान"},
+      {q:"'म' से शुरू होने वाला फल:",opts:["सेब","आम","केला","अंगूर"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'पक्षी' का बहुवचन:",opts:["पक्षीएँ","पक्षियाँ","पक्षी","पक्षियों"],ans:1,t:"व्याकरण"},
+      {q:"'खाना' क्रिया का अर्थ:",opts:["पीना","सोना","खाना","दौड़ना"],ans:2,t:"शब्द-ज्ञान"},
+      {q:"'फूल' का बहुवचन:",opts:["फूलें","फूल","फूलों","फूले"],ans:1,t:"व्याकरण"},
+      {q:"'नीला' किस प्रकार का शब्द?",opts:["संज्ञा","क्रिया","विशेषण","सर्वनाम"],ans:2,t:"व्याकरण"},
+      {q:"मोर भारत का राष्ट्रीय क्या है?",opts:["पशु","पक्षी","फूल","वृक्ष"],ans:1,t:"सामान्य ज्ञान"},
+    ],
+    upper:[
+      {q:"'पुस्तक' का बहुवचन:",opts:["पुस्तकें","पुस्तकों","पुस्तकों को","पुस्तक"],ans:0,t:"व्याकरण"},
+      {q:"'आना' का सामान्य भूतकाल:",opts:["आता है","आया","आएगा","आ रहा है"],ans:1,t:"काल"},
+      {q:"'वह पढ़ रहा है' — काल:",opts:["भूतकाल","वर्तमानकाल","भविष्यकाल","संदिग्ध काल"],ans:1,t:"काल"},
+      {q:"'रात-दिन' में समास:",opts:["तत्पुरुष","द्वंद्व","कर्मधारय","बहुव्रीहि"],ans:1,t:"समास"},
+      {q:"'निः+जन' की संधि:",opts:["निरजन","निर्जन","नीरज","निजन"],ans:1,t:"संधि"},
+      {q:"'पंकज' का पर्यायवाची:",opts:["पत्थर","कमल","नदी","बादल"],ans:1,t:"पर्यायवाची"},
+      {q:"'अंधेरा' का विलोम:",opts:["काला","उजाला","रात","धुंधला"],ans:1,t:"विलोम"},
+      {q:"रस के प्रकार:",opts:["7","8","9","10"],ans:2,t:"काव्य"},
+      {q:"'श्रृंगार रस' का स्थायी भाव:",opts:["हास","रति","शोक","भय"],ans:1,t:"काव्य"},
+      {q:"'जो कभी न मरे' — एक शब्द:",opts:["अनश्वर","अमर","अजर","नश्वर"],ans:1,t:"वाक्यांश"},
+      {q:"'यमक अलंकार' में:",opts:["शब्द की आवृत्ति अलग अर्थों में","उपमा देना","रूपक","अनुप्रास"],ans:0,t:"अलंकार"},
+      {q:"'कवि' का स्त्रीलिंग:",opts:["कवियत्री","कवयित्री","कवित्री","कविनी"],ans:1,t:"लिंग"},
+      {q:"'मोहन ने रोटी खाई' — 'ने' विभक्ति:",opts:["कर्म","करण","कर्ता","सम्प्रदान"],ans:2,t:"कारक"},
+      {q:"'आकाश' का तत्सम:",opts:["आसमान","गगन","अम्बर","आकाश"],ans:3,t:"तत्सम-तद्भव"},
+      {q:"'सरस्वती' किसकी देवी?",opts:["धन","शक्ति","विद्या","प्रकृति"],ans:2,t:"सामान्य ज्ञान"},
+      {q:"'पेड़' का बहुवचन:",opts:["पेड़े","पेड़ें","पेड़ों","पेड़"],ans:2,t:"व्याकरण"},
+      {q:"'हिंदी दिवस' कब?",opts:["14 जनवरी","14 नवंबर","14 सितंबर","14 अगस्त"],ans:2,t:"सामान्य ज्ञान"},
+      {q:"'निराशा' में उपसर्ग:",opts:["निर","नि","निरा","निराश"],ans:0,t:"उपसर्ग"},
+      {q:"'चिड़िया' शब्द है:",opts:["तत्सम","तद्भव","देशज","विदेशज"],ans:2,t:"शब्द-ज्ञान"},
+      {q:"'कवि' शब्द में कौन-सा प्रत्यय?",opts:["इ","वि","क","None"],ans:0,t:"प्रत्यय"},
+      {q:"'राम ने सेब खाया' — कारक:",opts:["कर्म कारक","कर्ता कारक","करण कारक","अपादान कारक"],ans:1,t:"कारक"},
+      {q:"'महाभारत' के लेखक:",opts:["वाल्मीकि","तुलसीदास","वेदव्यास","कालिदास"],ans:2,t:"साहित्य"},
+      {q:"'दोहा' में कितने चरण होते हैं?",opts:["2","4","6","8"],ans:1,t:"काव्य"},
+      {q:"'विद्यालय' में कौन-सा समास?",opts:["तत्पुरुष","द्वंद्व","बहुव्रीहि","कर्मधारय"],ans:0,t:"समास"},
+    ]};
 
-/* ══ Subject color themes ══ */
-const SUBJECT_THEMES = {
-  mathematics: { color: '#B8860B', strip: '#F0C040' },
-  science:     { color: '#1A6B3A', strip: '#5CB85C' },
-  english:     { color: '#1A4A8A', strip: '#5B9BD5' },
-  hindi:       { color: '#8B1A1A', strip: '#D96A3A' },
-  gk:          { color: '#5A1A8A', strip: '#9B59B6' },
-  social:      { color: '#1A5A6B', strip: '#3AABCA' },
-};
+  QB.social={lower:[],upper:[
+      {q:"French Revolution began in:",opts:["1776","1789","1800","1815"],ans:1,t:"World History"},
+      {q:"Tropic of Cancer through how many Indian states?",opts:["6","7","8","9"],ans:2,t:"Geography"},
+      {q:"Preamble begins:",opts:["We the Citizens","We the People","We the Indians","We the Nation"],ans:1,t:"Civics"},
+      {q:"Amendment adding Fundamental Duties:",opts:["40th","42nd","44th","46th"],ans:1,t:"Civics"},
+      {q:"Black Soil grows:",opts:["Rice","Cotton","Wheat","Jute"],ans:1,t:"Geography"},
+      {q:"'Do or Die' slogan:",opts:["Nehru","Gandhi","Bose","Tilak"],ans:1,t:"Indian History"},
+      {q:"Highest peak in world:",opts:["K2","Kangchenjunga","Mount Everest","Lhotse"],ans:2,t:"Geography"},
+      {q:"Permanent Settlement 1793 by:",opts:["Dalhousie","Cornwallis","Clive","Wellesley"],ans:1,t:"Indian History"},
+      {q:"Fundamental Rights in Constitution Part:",opts:["I","II","III","IV"],ans:2,t:"Civics"},
+      {q:"Dandi March related to:",opts:["Non-Cooperation","Salt Tax","Partition","Rowlatt Act"],ans:1,t:"Indian History"},
+      {q:"Largest ocean:",opts:["Atlantic","Indian","Arctic","Pacific"],ans:3,t:"Geography"},
+      {q:"Directive Principles borrowed from:",opts:["USA","Ireland","UK","Australia"],ans:1,t:"Civics"},
+      {q:"Longest National Highway in India:",opts:["NH 44","NH 1","NH 27","NH 48"],ans:0,t:"Geography"},
+      {q:"Berlin Wall fell in:",opts:["1985","1987","1989","1991"],ans:2,t:"World History"},
+      {q:"Panchayati Raj first in:",opts:["1952","1955","1959","1962"],ans:2,t:"Civics"},
+      {q:"Sundarbans delta river:",opts:["Indus","Ganga-Brahmaputra","Mahanadi","Krishna"],ans:1,t:"Geography"},
+      {q:"'Discovery of India' author:",opts:["Gandhi","Ambedkar","Nehru","Tagore"],ans:2,t:"Indian History"},
+      {q:"RTE Act passed in:",opts:["2005","2007","2009","2011"],ans:2,t:"Civics"},
+      {q:"Thar Desert climate:",opts:["Tropical","Arid","Mediterranean","Continental"],ans:1,t:"Geography"},
+      {q:"Green Revolution is related to:",opts:["Industry","Agriculture","Space","Education"],ans:1,t:"Indian History"},
+      {q:"Article abolishing untouchability:",opts:["Article 14","Article 17","Article 21","Article 25"],ans:1,t:"Civics"},
+      {q:"Indus Valley Civilisation flourished around:",opts:["500 BCE","1500 BCE","2500 BCE","3500 BCE"],ans:2,t:"Indian History"},
+      {q:"Largest desert in the world:",opts:["Thar","Gobi","Sahara","Arabian"],ans:2,t:"Geography"},
+      {q:"WTO headquarters:",opts:["New York","Geneva","Paris","London"],ans:1,t:"World Affairs"},
+      {q:"'Laissez-faire' is related to:",opts:["Political theory","Economic policy","Military strategy","Cultural movement"],ans:1,t:"Economics"},
+    ]};
 
-const SUBJECT_LABELS = {
-  mathematics: 'Mathematics', science: 'Science', english: 'English',
-  hindi: 'Hindi', gk: 'General Knowledge', social: 'Social Science',
-};
+  QB.sanskrit={lower:[],upper:[
+      {q:"'नमस्ते' का अर्थ:",opts:["अलविदा","प्रणाम","धन्यवाद","स्वागत"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'रामः वनम् गच्छति।' में क्रिया:",opts:["रामः","वनम्","गच्छति","None"],ans:2,t:"व्याकरण"},
+      {q:"संस्कृत में 'जल' का अर्थ:",opts:["आग","पानी","हवा","मिट्टी"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'अहम्' का अर्थ:",opts:["वह","तुम","मैं","हम"],ans:2,t:"सर्वनाम"},
+      {q:"'सूर्यः' किस लिंग का?",opts:["स्त्रीलिंग","पुल्लिंग","नपुंसकलिंग","None"],ans:1,t:"लिंग"},
+      {q:"'पठति' का अर्थ:",opts:["खाता है","पढ़ता है","जाता है","लिखता है"],ans:1,t:"क्रिया"},
+      {q:"संस्कृत में 'एकः' का अर्थ:",opts:["दो","एक","तीन","शून्य"],ans:1,t:"संख्या"},
+      {q:"'गुरुः' का अर्थ:",opts:["शिष्य","माता","शिक्षक","पिता"],ans:2,t:"शब्द-ज्ञान"},
+      {q:"'त्वम्' का अर्थ:",opts:["मैं","वह","तुम","हम"],ans:2,t:"सर्वनाम"},
+      {q:"'वन्दे मातरम्' का अर्थ:",opts:["जय भारत","माँ को नमन","भारत माँ","विजयी भव"],ans:1,t:"साहित्य"},
+      {q:"'पितृ' का अर्थ:",opts:["माता","पिता","भाई","बहन"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'खादति' का अर्थ:",opts:["पीता है","खाता है","जाता है","देता है"],ans:1,t:"क्रिया"},
+      {q:"'सत्यम् शिवम् सुन्दरम्' — 'सत्यम्' का अर्थ:",opts:["ईश्वर","सत्य","सुंदर","शांति"],ans:1,t:"साहित्य"},
+      {q:"'नदी' का संस्कृत बहुवचन:",opts:["नद्यः","नदीः","नदयः","नदीनि"],ans:0,t:"वचन"},
+      {q:"'धर्मः' का अर्थ:",opts:["युद्ध","धर्म/कर्तव्य","शत्रु","भय"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'लता' शब्द किस लिंग का?",opts:["पुल्लिंग","स्त्रीलिंग","नपुंसकलिंग","None"],ans:1,t:"लिंग"},
+      {q:"'बालकः' किस विभक्ति का?",opts:["द्वितीया","प्रथमा","तृतीया","चतुर्थी"],ans:1,t:"व्याकरण"},
+      {q:"संस्कृत में 'मातृ' का अर्थ:",opts:["पिता","माता","पुत्र","पुत्री"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'विद्या' का बहुवचन:",opts:["विद्याः","विद्यानि","विद्यासु","विद्याभ्यः"],ans:0,t:"वचन"},
+      {q:"'ग्रहः' का अर्थ:",opts:["नदी","ग्रह","पर्वत","आकाश"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'देवः' का बहुवचन:",opts:["देवाः","देवानि","देवेषु","देवम्"],ans:0,t:"वचन"},
+      {q:"'रामायण' के रचयिता:",opts:["वेदव्यास","वाल्मीकि","कालिदास","तुलसीदास"],ans:1,t:"साहित्य"},
+      {q:"संस्कृत में 'पुस्तकम्' का अर्थ:",opts:["कलम","किताब","थैला","मेज"],ans:1,t:"शब्द-ज्ञान"},
+      {q:"'अहम् पठामि' का अर्थ:",opts:["मैं खाता हूँ","मैं पढ़ता हूँ","मैं जाता हूँ","मैं लिखता हूँ"],ans:1,t:"वाक्य"},
+    ]};
 
-let current = 0;
-let answers = [];
-let QUESTIONS = [];
-let timerInterval;
-let timeLeft = 30 * 60;
-let studentName = "";
-let selectedSubject = "";
+  QB.computer={lower:[],upper:[
+      {q:"CPU stands for:",opts:["Central Processing Unit","Computer Processing Unit","Central Program Unit","Control Processing Unit"],ans:0,t:"Hardware"},
+      {q:"Which is an input device?",opts:["Monitor","Printer","Speaker","Keyboard"],ans:3,t:"Hardware"},
+      {q:"Which is an output device?",opts:["Mouse","Keyboard","Printer","Scanner"],ans:2,t:"Hardware"},
+      {q:"1 Byte =",opts:["4 bits","8 bits","16 bits","32 bits"],ans:1,t:"Data"},
+      {q:"'www' stands for:",opts:["World Wide Web","World Web Wide","Wide World Web","Web Wide World"],ans:0,t:"Internet"},
+      {q:"Computer understands directly:",opts:["C++","Java","Binary Language","Python"],ans:2,t:"Programming"},
+      {q:"RAM stands for:",opts:["Random Access Memory","Read Access Memory","Run Access Memory","Random All Memory"],ans:0,t:"Hardware"},
+      {q:"NOT an operating system:",opts:["Windows","macOS","Linux","MS Word"],ans:3,t:"Software"},
+      {q:"'Brain' of a computer:",opts:["RAM","Hard Disk","CPU","Monitor"],ans:2,t:"Hardware"},
+      {q:"HTML stands for:",opts:["Hyper Text Markup Language","High Text Markup Language","Hyper Transfer Markup Language","None"],ans:0,t:"Internet"},
+      {q:"Image file extension:",opts:[".mp3",".exe",".jpg",".docx"],ans:2,t:"Files"},
+      {q:"Shortcut to copy:",opts:["Ctrl+V","Ctrl+X","Ctrl+C","Ctrl+Z"],ans:2,t:"Shortcuts"},
+      {q:"Transistors used in ___ generation computers:",opts:["1st","2nd","3rd","4th"],ans:1,t:"History"},
+      {q:"Computer virus is:",opts:["Hardware","Malicious software","Antivirus","Network"],ans:1,t:"Security"},
+      {q:"Device that stores data permanently:",opts:["RAM","Cache","Hard Disk","Register"],ans:2,t:"Hardware"},
+      {q:"Email stands for:",opts:["Electronic Mail","Electric Mail","Express Mail","Encoded Mail"],ans:0,t:"Internet"},
+      {q:"Which is a programming language?",opts:["HTTP","FTP","Python","HTML"],ans:2,t:"Programming"},
+      {q:"Binary number system uses:",opts:["0–9","0 and 1","A–F","1–8"],ans:1,t:"Data"},
+      {q:"Shortcut to undo:",opts:["Ctrl+Y","Ctrl+Z","Ctrl+U","Ctrl+A"],ans:1,t:"Shortcuts"},
+      {q:"GUI stands for:",opts:["Graphical User Interface","General User Interface","Graphical Unique Interface","None"],ans:0,t:"Software"},
+      {q:"Topology connecting all devices in a circle:",opts:["Bus","Star","Ring","Mesh"],ans:2,t:"Networking"},
+      {q:"HTTP '404' error means:",opts:["Server error","Not Found","Forbidden","Timeout"],ans:1,t:"Internet"},
+      {q:"Language used for web styling:",opts:["Java","Python","CSS","C++"],ans:2,t:"Programming"},
+      {q:"USB stands for:",opts:["Universal Serial Bus","Unique Serial Bus","Universal System Bus","None"],ans:0,t:"Hardware"},
+      {q:"Which is a search engine?",opts:["MS Word","Excel","Google","Photoshop"],ans:2,t:"Internet"},
+    ]};
 
-function selectSubject(card) {
-  document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-  selectedSubject = card.dataset.subject;
-  const theme = SUBJECT_THEMES[selectedSubject];
-  // Apply color theme
-  document.documentElement.style.setProperty('--subject-color', theme.color);
-  document.documentElement.style.setProperty('--gold-strip', theme.strip);
-  document.getElementById('cardBar').style.background = theme.color;
-  document.getElementById('barTitle').textContent = SUBJECT_LABELS[selectedSubject] + ' Exam';
-}
+  QB.gk={
+    lower:[
+      {q:"Capital of India?",opts:["Mumbai","Kolkata","New Delhi","Chennai"],ans:2,t:"India"},
+      {q:"Days in a week?",opts:["5","6","7","8"],ans:2,t:"General"},
+      {q:"Largest land animal?",opts:["Lion","Elephant","Giraffe","Rhino"],ans:1,t:"Animals"},
+      {q:"'Stop' colour in traffic lights?",opts:["Green","Yellow","Blue","Red"],ans:3,t:"Safety"},
+      {q:"Months in a year?",opts:["10","11","12","13"],ans:2,t:"General"},
+      {q:"Planet we live on?",opts:["Mars","Venus","Earth","Jupiter"],ans:2,t:"Space"},
+      {q:"Festival of Lights?",opts:["Holi","Eid","Diwali","Christmas"],ans:2,t:"India"},
+      {q:"First Prime Minister of India?",opts:["Lal Bahadur Shastri","Jawaharlal Nehru","Indira Gandhi","Rajiv Gandhi"],ans:1,t:"India"},
+      {q:"Legs of a spider?",opts:["6","8","10","4"],ans:1,t:"Animals"},
+      {q:"Tallest mountain?",opts:["K2","Everest","Alps","Andes"],ans:1,t:"Geography"},
+      {q:"Bird that can talk?",opts:["Sparrow","Eagle","Parrot","Owl"],ans:2,t:"Animals"},
+      {q:"Day after Wednesday?",opts:["Tuesday","Monday","Thursday","Friday"],ans:2,t:"General"},
+      {q:"Colour of sky on clear day?",opts:["Green","Blue","Red","Yellow"],ans:1,t:"Nature"},
+      {q:"Vehicle on railway track?",opts:["Bus","Car","Train","Bicycle"],ans:2,t:"Transport"},
+      {q:"Which is NOT a planet?",opts:["Mars","Sun","Earth","Venus"],ans:1,t:"Space"},
+      {q:"India's national animal?",opts:["Lion","Peacock","Tiger","Elephant"],ans:2,t:"India"},
+      {q:"Corners in a square?",opts:["3","4","5","6"],ans:1,t:"General"},
+      {q:"Organ used for smelling?",opts:["Eyes","Ears","Nose","Tongue"],ans:2,t:"Human Body"},
+      {q:"How many colours in a rainbow?",opts:["5","6","7","8"],ans:2,t:"Nature"},
+      {q:"India's national flower?",opts:["Rose","Lotus","Jasmine","Marigold"],ans:1,t:"India"},
+      {q:"Fastest land animal:",opts:["Lion","Leopard","Cheetah","Tiger"],ans:2,t:"Animals"},
+      {q:"Frozen rain is called:",opts:["Snow","Hail","Sleet","Frost"],ans:1,t:"Nature"},
+      {q:"India's independence year:",opts:["1942","1945","1947","1950"],ans:2,t:"India"},
+      {q:"King of fruits:",opts:["Apple","Banana","Mango","Grapes"],ans:2,t:"General"},
+    ],
+    upper:[
+      {q:"Father of Indian Constitution?",opts:["Mahatma Gandhi","Nehru","B.R. Ambedkar","Sardar Patel"],ans:2,t:"Indian History"},
+      {q:"Largest planet in Solar System?",opts:["Earth","Saturn","Jupiter","Neptune"],ans:2,t:"Space"},
+      {q:"Capital of Australia?",opts:["Sydney","Melbourne","Brisbane","Canberra"],ans:3,t:"Geography"},
+      {q:"Author of India's national anthem?",opts:["Bankim Chandra","Rabindranath Tagore","Sarojini Naidu","Subhash Bose"],ans:1,t:"India"},
+      {q:"Longest river in world?",opts:["Amazon","Nile","Yangtze","Mississippi"],ans:1,t:"Geography"},
+      {q:"First Indian in space?",opts:["Sunita Williams","Kalpana Chawla","Rakesh Sharma","APJ Abdul Kalam"],ans:2,t:"India"},
+      {q:"UN headquarters?",opts:["Geneva","London","New York","Washington D.C."],ans:2,t:"World"},
+      {q:"Most abundant gas in atmosphere?",opts:["Oxygen","CO₂","Nitrogen","Argon"],ans:2,t:"Science"},
+      {q:"Olympic Games held every:",opts:["2 years","3 years","4 years","5 years"],ans:2,t:"Sports"},
+      {q:"Who invented the telephone?",opts:["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Marconi"],ans:2,t:"Inventions"},
+      {q:"Smallest country in world?",opts:["Monaco","San Marino","Vatican City","Liechtenstein"],ans:2,t:"Geography"},
+      {q:"Currency of Japan?",opts:["Yuan","Won","Yen","Baht"],ans:2,t:"World"},
+      {q:"'Satyameva Jayate' is from?",opts:["Rigveda","Mundaka Upanishad","Bhagavad Gita","Mahabharata"],ans:1,t:"India"},
+      {q:"The Red Planet?",opts:["Venus","Mars","Jupiter","Mercury"],ans:1,t:"Space"},
+      {q:"Who painted the Mona Lisa?",opts:["Michelangelo","Raphael","Leonardo da Vinci","Van Gogh"],ans:2,t:"Art"},
+      {q:"National Science Day?",opts:["Jan 28","Feb 28","Mar 28","Apr 28"],ans:1,t:"India"},
+      {q:"Largest country by area?",opts:["China","USA","Canada","Russia"],ans:3,t:"Geography"},
+      {q:"India's national bird?",opts:["Sparrow","Pigeon","Peacock","Eagle"],ans:2,t:"India"},
+      {q:"Blood pressure measured by?",opts:["Thermometer","Stethoscope","Sphygmomanometer","ECG"],ans:2,t:"Health"},
+      {q:"States in India (2024)?",opts:["26","27","28","29"],ans:2,t:"India"},
+      {q:"Nobel Peace Prize 2014 awarded to:",opts:["Obama","Malala Yousafzai","Mother Teresa","Nelson Mandela"],ans:1,t:"World"},
+      {q:"Country with highest population (2024):",opts:["USA","India","China","Russia"],ans:1,t:"Geography"},
+      {q:"Father of the Internet:",opts:["Bill Gates","Tim Berners-Lee","Vint Cerf","Steve Jobs"],ans:2,t:"Technology"},
+      {q:"Sport using the term 'Love':",opts:["Cricket","Football","Tennis","Hockey"],ans:2,t:"Sports"},
+      {q:"India's first satellite:",opts:["INSAT","Aryabhata","Bhaskara","Rohini"],ans:1,t:"India"},
+    ]};
 
-function startExam() {
-  const name = document.getElementById('studentName').value.trim();
-  const cls  = document.getElementById('classSelect').value;
-  if (!selectedSubject) { alert("Please select a subject first."); return; }
-  if (!name)            { alert("Please enter your name.");        return; }
-  if (!cls)             { alert("Please select your class.");      return; }
-  studentName = name + ' (' + cls + ')';
-  QUESTIONS = QUESTION_BANKS[selectedSubject];
-  answers   = new Array(QUESTIONS.length).fill(-1);
-  current   = 0;
-  timeLeft  = 30 * 60;
-  showScreen('questionScreen');
-  document.getElementById('progressWrap').style.display = 'block';
-  renderQuestion();
-  startTimer();
-}
+  /* ═══ STATE ═══ */
+  let selClass=0,selSubject='',stuName='',stuRoll='';
+  let QUESTIONS=[],answers=[],current=0,timeLeft=30*60,timerInterval;
 
-function startTimer() {
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerDisplay();
-    if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(); }
-  }, 1000);
-}
-
-function updateTimerDisplay() {
-  const m = String(Math.floor(timeLeft / 60)).padStart(2,'0');
-  const s = String(timeLeft % 60).padStart(2,'0');
-  const el = document.getElementById('timer');
-  el.textContent = `${m}:${s}`;
-  el.className = timeLeft <= 120 ? 'warning' : '';
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function renderQuestion() {
-  const q = QUESTIONS[current];
-  document.getElementById('qNumber').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
-  document.getElementById('qText').textContent   = q.q;
-  document.getElementById('qTopic').textContent  = q.topic || '';
-
-  const list = document.getElementById('optionsList');
-  list.innerHTML = '';
-  ['A','B','C','D'].forEach((lbl, i) => {
-    const div = document.createElement('div');
-    div.className = 'option' + (answers[current] === i ? ' selected disabled' : '');
-    div.innerHTML = `<div class="option-badge">${lbl}</div><span>${q.opts[i]}</span>`;
-    if (answers[current] !== -1) {
-      div.classList.add('disabled');
-      if (i === q.ans) div.classList.add('correct');
-      else if (i === answers[current]) div.classList.add('wrong');
-    } else {
-      div.onclick = () => selectOption(i);
+  /* ═══ BUILD GRIDS ═══ */
+  function buildClassGrid(){
+    const CLASS_DATA = {
+      2:  {emoji:'🌱', ord:'2nd', color:'#E67E22', bg:'#FEF0E3', tag:'Primary'},
+      3:  {emoji:'🌻', ord:'3rd', color:'#F39C12', bg:'#FEF9E7', tag:'Primary'},
+      4:  {emoji:'📚', ord:'4th', color:'#27AE60', bg:'#EAFAF1', tag:'Primary'},
+      5:  {emoji:'🔭', ord:'5th', color:'#16A085', bg:'#E8F8F5', tag:'Primary'},
+      6:  {emoji:'⚗️',  ord:'6th', color:'#2980B9', bg:'#EBF5FB', tag:'Middle'},
+      7:  {emoji:'🧮', ord:'7th', color:'#8E44AD', bg:'#F5EEF8', tag:'Middle'},
+      8:  {emoji:'🌐', ord:'8th', color:'#C0392B', bg:'#FDEDEC', tag:'Middle'},
+      9:  {emoji:'🎯', ord:'9th', color:'#B8860B', bg:'#FDF3CC', tag:'Secondary'},
+      10: {emoji:'🏆', ord:'10th',color:'#1A252F', bg:'#EAECEE', tag:'Secondary'},
+    };
+    const g=document.getElementById('classGrid'); g.innerHTML='';
+    for(let c=2;c<=10;c++){
+      const d=CLASS_DATA[c];
+      const el=document.createElement('div');
+      el.className='cls-tile'+(selClass===c?' sel':'');
+      el.style.setProperty('--cls-color', d.color);
+      el.style.setProperty('--cls-bg', d.bg);
+      el.innerHTML=`
+      <span class="c-emoji">${d.emoji}</span>
+      <div class="c-num">${d.ord}</div>
+      <div class="c-lbl">Class</div>
+      <div class="c-tag">${d.tag}</div>
+    `;
+      el.onclick=()=>{selClass=c;buildClassGrid();};
+      g.appendChild(el);
     }
-    list.appendChild(div);
-  });
-
-  const block = document.getElementById('qBlock');
-  block.classList.remove('q-anim');
-  void block.offsetWidth;
-  block.classList.add('q-anim');
-
-  const pct = ((current + 1) / QUESTIONS.length) * 100;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
-  document.getElementById('prevBtn').disabled = current === 0;
-  document.getElementById('nextBtn').textContent = current === QUESTIONS.length - 1 ? 'Submit ✓' : 'Next →';
-
-  const st = document.getElementById('ansStatus');
-  if (answers[current] !== -1) {
-    const ok = answers[current] === q.ans;
-    st.textContent = ok ? '✔ Correct!' : '✘ Incorrect';
-    st.className = 'ans-status ' + (ok ? 'ok' : 'bad');
-  } else {
-    st.textContent = ''; st.className = 'ans-status';
   }
-}
+  function buildSubjGrid(){
+    const g=document.getElementById('subjGrid'); g.innerHTML='';
+    (CLASS_SUBJECTS[selClass]||[]).forEach(s=>{
+      const m=SMETA[s],d=document.createElement('div');
+      d.className='subj-tile'+(selSubject===s?' sel':'');
+      d.innerHTML=`<div class="si">${m.icon}</div><div class="sn">${m.label}</div><div class="sq">20 Qs</div>`;
+      d.onclick=()=>{selSubject=s;buildSubjGrid();applyTheme(s);};
+      g.appendChild(d);
+    });
+  }
+  function applyTheme(s){
+    const t=SMETA[s]||SMETA.mathematics;
+    document.documentElement.style.setProperty('--acc',t.color);
+    document.documentElement.style.setProperty('--strp',t.strp);
+    document.getElementById('topBar').style.background=t.color;
+  }
 
-function selectOption(i) {
-  if (answers[current] !== -1) return;
-  answers[current] = i;
-  renderQuestion();
-}
+  /* ═══ NAVIGATION ═══ */
+  function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+  function goStep1(){showScr('s1');}
+  function goStep2(){
+    if(!selClass){alert('Please select a class first.');return;}
+    buildSubjGrid();
+    document.getElementById('s2Title').textContent=`Step 2 — Select Subject for Class ${selClass}`;
+    const ords={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
+    document.getElementById('bc1').textContent=`${ords[selClass]} Class`;
+    showScr('s2');
+  }
+  function goStep3(){
+    if(!selSubject){alert('Please select a subject.');return;}
+    const m=SMETA[selSubject];
+    const ords2={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
+    document.getElementById('iClass').textContent=`${ords2[selClass]} Class`;
+    document.getElementById('iSubj').textContent=m.icon+' '+m.label;
+    document.getElementById('s3Title').textContent=`${m.label} Exam — ${ords2[selClass]} Class`;
+    showScr('s3');
+  }
 
-function nextQ() {
-  if (current < QUESTIONS.length - 1) { current++; renderQuestion(); }
-  else submitExam();
-}
+  /* ═══ START ═══ */
+  function startExam(){
+    const n=document.getElementById('stuName').value.trim();
+    const r=document.getElementById('stuRoll').value.trim();
+    if(!n){alert('Please enter your name.');return;}
+    stuName=n; stuRoll=r;
+    const band=selClass<=5?'lower':'upper';
+    const pool=QB[selSubject]?.[band];
+    if(!pool||pool.length===0){alert('Question bank not available for this class/subject yet. We\'re adding it soon!');return;}
+    QUESTIONS=pool.slice(0,25);
+    answers=new Array(QUESTIONS.length).fill(-1);
+    current=0; timeLeft=30*60;
+    clearInterval(timerInterval);
+    const ords3={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
+    document.getElementById('barTitle').textContent=`${SMETA[selSubject].label} | ${ords3[selClass]} Class`;
+    document.getElementById('progWrap').style.display='block';
+    showScr('s4'); renderQ(); startTimer();
+  }
+  function startTimer(){
+    timerInterval=setInterval(()=>{
+      timeLeft--;
+      const m=String(Math.floor(timeLeft/60)).padStart(2,'0'),s=String(timeLeft%60).padStart(2,'0');
+      const el=document.getElementById('timer');
+      el.textContent=`${m}:${s}`;
+      el.className=timeLeft<=120?'warn':'';
+      if(timeLeft<=0){clearInterval(timerInterval);submitExam();}
+    },1000);
+  }
+  function renderQ(){
+    const q=QUESTIONS[current];
+    document.getElementById('qNum').textContent=`Q ${current+1}/${QUESTIONS.length}`;
+    document.getElementById('qTxt').textContent=q.q;
+    document.getElementById('qTop').textContent=q.t||'';
+    const list=document.getElementById('optList'); list.innerHTML='';
+    ['A','B','C','D'].forEach((lbl,i)=>{
+      const d=document.createElement('div');
+      const answered=answers[current]!==-1;
+      let cls='opt';
+      if(answered){cls+=' dis';if(i===q.ans)cls+=' ok';else if(i===answers[current])cls+=' bad';}
+      d.className=cls;
+      d.innerHTML=`<div class="obadge">${lbl}</div><span>${q.opts[i]}</span>`;
+      if(!answered)d.onclick=()=>selectOpt(i);
+      list.appendChild(d);
+    });
+    const b=document.getElementById('qBlock'); b.classList.remove('qanim'); void b.offsetWidth; b.classList.add('qanim');
+    document.getElementById('progFill').style.width=((current+1)/QUESTIONS.length*100)+'%';
+    document.getElementById('progLbl').textContent=`Question ${current+1} of ${QUESTIONS.length}`;
+    document.getElementById('prevBtn').disabled=current===0;
+    document.getElementById('nextBtn').textContent=current===QUESTIONS.length-1?'Submit ✓':'Next →';
+    const st=document.getElementById('ansSt');
+    if(answers[current]!==-1){const ok=answers[current]===q.ans;st.textContent=ok?'✔ Correct!':'✘ Incorrect';st.className='ans-st '+(ok?'ok':'bad');}
+    else{st.textContent='';st.className='ans-st';}
+  }
+  function selectOpt(i){if(answers[current]!==-1)return;answers[current]=i;renderQ();}
+  function nextQ(){if(current<QUESTIONS.length-1){current++;renderQ();}else submitExam();}
+  function prevQ(){if(current>0){current--;renderQ();}}
 
-function prevQ() {
-  if (current > 0) { current--; renderQuestion(); }
-}
+  /* ═══ SUBMIT ═══ */
+  function submitExam(){
+    clearInterval(timerInterval);
+    let correct=0,wrong=0,skip=0;
+    answers.forEach((a,i)=>{if(a===-1)skip++;else if(a===QUESTIONS[i].ans)correct++;else wrong++;});
+    const pct=Math.round(correct/QUESTIONS.length*100);
+    const grade=pct>=90?'A+':pct>=75?'A':pct>=60?'B':pct>=45?'C':'D';
+    const msg=pct>=75?'🎉 Excellent!':pct>=50?'👍 Good Effort!':'📚 Keep Practicing!';
+    const roll=stuRoll?` (Roll: ${stuRoll})`:'';
+    document.getElementById('resTitle').textContent=`${msg} ${stuName}${roll}`;
+    document.getElementById('ringNum').textContent=`${correct}/${QUESTIONS.length}`;
+    document.getElementById('ring').style.setProperty('--pct',`${pct}%`);
+    const ords4={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
+    document.getElementById('gbadge').textContent=`${SMETA[selSubject].label} | ${ords4[selClass]} Class — Grade ${grade} (${pct}%)`;
+    document.getElementById('cCnt').textContent=correct;
+    document.getElementById('wCnt').textContent=wrong;
+    document.getElementById('sCnt').textContent=skip;
+    const rl=document.getElementById('revList'); rl.innerHTML='';
+    QUESTIONS.forEach((q,i)=>{
+      const ua=answers[i],ca=q.opts[q.ans],ua_t=ua===-1?'Not answered':q.opts[ua],ok=ua===q.ans;
+      const d=document.createElement('div'); d.className='rev-item';
+      d.innerHTML=`<div class="rq">Q${i+1}. ${q.q}</div><div class="${ok?'ra':'rw'}">Your answer: ${ua_t} ${ok?'✔':'✘'}</div>${!ok?`<div class="rc">✔ Correct: ${ca}</div>`:''}`;
+      rl.appendChild(d);
+    });
+    document.getElementById('progWrap').style.display='none';
+    showScr('s5');
+  }
+  function toggleReview(){
+    const sec=document.getElementById('revSec'),btn=document.getElementById('revBtn');
+    const open=sec.style.display==='none';
+    sec.style.display=open?'block':'none';
+    btn.textContent=open?'▲ Hide Answers':'📋 View Answers';
+    if(open)sec.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function restart(){
+    clearInterval(timerInterval);
+    selSubject='';QUESTIONS=[];answers=[];current=0;timeLeft=30*60;
+    document.getElementById('timer').textContent='30:00';document.getElementById('timer').className='';
+    document.getElementById('stuName').value='';document.getElementById('stuRoll').value='';
+    document.getElementById('revSec').style.display='none';document.getElementById('revBtn').textContent='📋 View Answers';
+    document.getElementById('barTitle').textContent='Select Class & Subject';
+    document.getElementById('progWrap').style.display='none';
+    applyTheme('mathematics'); buildClassGrid(); showScr('s1');
+  }
 
-function submitExam() {
-  clearInterval(timerInterval);
-  let correct = 0, wrong = 0, skip = 0;
-  answers.forEach((a, i) => {
-    if (a === -1) skip++;
-    else if (a === QUESTIONS[i].ans) correct++;
-    else wrong++;
-  });
-
-  const total = QUESTIONS.length;
-  const pct   = Math.round((correct / total) * 100);
-  const grade = pct >= 90 ? 'A+' : pct >= 75 ? 'A' : pct >= 60 ? 'B' : pct >= 45 ? 'C' : 'D';
-  const msg   = pct >= 75 ? '🎉 Excellent Work!' : pct >= 50 ? '👍 Good Effort!' : '📚 Keep Practicing!';
-
-  document.getElementById('resultTitle').textContent    = `${msg}, ${studentName}`;
-  document.getElementById('scoreNum').textContent       = `${correct}/${total}`;
-  document.getElementById('scoreRing').style.setProperty('--pct', `${pct}%`);
-  document.getElementById('gradeBadge').textContent     = `${SUBJECT_LABELS[selectedSubject]} — Grade ${grade} (${pct}%)`;
-  document.getElementById('correctCount').textContent   = correct;
-  document.getElementById('wrongCount').textContent     = wrong;
-  document.getElementById('skipCount').textContent      = skip;
-
-  const rl = document.getElementById('reviewList');
-  rl.innerHTML = '';
-  QUESTIONS.forEach((q, i) => {
-    const ua = answers[i], ca = q.opts[q.ans], ua_text = ua === -1 ? 'Not answered' : q.opts[ua];
-    const ok = ua === q.ans;
-    const d = document.createElement('div');
-    d.className = 'review-item';
-    d.innerHTML = `<div class="rq">Q${i+1}. ${q.q}</div>
-      <div class="${ok ? 'ra' : 'rw'}">Your answer: ${ua_text} ${ok ? '✔' : '✘'}</div>
-      ${!ok ? `<div class="rc">✔ Correct: ${ca}</div>` : ''}`;
-    rl.appendChild(d);
-  });
-
-  document.getElementById('progressWrap').style.display = 'none';
-  showScreen('resultScreen');
-}
-
-function toggleReview() {
-  const sec = document.getElementById('reviewSection');
-  const btn = document.getElementById('reviewBtn');
-  const open = sec.style.display === 'none';
-  sec.style.display = open ? 'block' : 'none';
-  btn.textContent = open ? '▲ Hide Answers' : '📋 View Answers';
-  if (open) sec.scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-function restartExam() {
-  clearInterval(timerInterval);
-  current = 0; answers = []; QUESTIONS = []; timeLeft = 30*60; selectedSubject = '';
-  document.getElementById('timer').textContent = '30:00';
-  document.getElementById('timer').className   = '';
-  document.getElementById('studentName').value = '';
-  document.getElementById('classSelect').value = '';
-  document.getElementById('reviewSection').style.display = 'none';
-  document.getElementById('reviewBtn').textContent = '📋 View Answers';
-  document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
-  // Reset theme to gold
-  document.documentElement.style.setProperty('--subject-color', '#B8860B');
-  document.documentElement.style.setProperty('--gold-strip', '#F0C040');
-  document.getElementById('cardBar').style.background = '#B8860B';
-  document.getElementById('barTitle').textContent = 'Select Your Subject';
-  document.getElementById('progressWrap').style.display = 'none';
-  showScreen('startScreen');
-}
+  /* ═══ INIT ═══ */
+  buildClassGrid();
 </script>
 </body>
 </html>
