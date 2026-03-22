@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Results Admin | Nextgenz Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="_csrf"        th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<style>
+:root {
+  --acc:  #1B5E3B;   /* Forest Green – primary accent       */
+  --strp: #2ECC71;   /* Emerald Green – highlight strip     */
+  --bg:   #F0F7F2;   /* Soft green-tinted page background   */
+  --card: #FFFFFF;
+  --opt:  #F4FAF6;   /* Input / option background           */
+  --bdr:  #C8E0CF;   /* Border                              */
+  --tp:   #102A1A;   /* Primary text – deep forest          */
+  --ts:   #2D5A3D;   /* Secondary text                      */
+  --tm:   #6B9478;   /* Muted text                          */
+  --ok:   #1B5E3B;
+  --bad:  #B02020;
+  --okbg: #E8F5EE;
+  --bdbg: #FDF0F0;
+  --sh:   rgba(27,94,59,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tp);min-height:100vh}
+.layout{display:flex;min-height:100vh}
+/* Sidebar */
+.sidebar{width:220px;background:linear-gradient(160deg,#0B3320,#1B5E3B);color:#fff;padding:1.5rem 1rem;flex-shrink:0;position:fixed;height:100vh;overflow-y:auto;z-index:100}
+.logo{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--strp);margin-bottom:.2rem}
+.logo-sub{font-size:.62rem;color:rgba(255,255,255,.45);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.8rem}
+.sidebar nav a{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:10px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.83rem;font-weight:500;margin-bottom:.2rem;transition:all .18s}
+.sidebar nav a:hover{background:rgba(255,255,255,.1);color:#fff}
+.sidebar nav a.active{background:var(--acc);color:#fff}
+.ni{font-size:.95rem;width:20px;text-align:center}
+/* Main */
+.main{margin-left:220px;padding:2rem;flex:1}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--tp)}
+.page-hdr .sub{font-size:.8rem;color:var(--tm);margin-top:.2rem}
+/* Stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:0 1px 8px var(--sh);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--c,var(--acc))}
+.stat-card .sv{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--c,var(--acc))}
+.stat-card .sl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);font-weight:600;margin-top:.12rem}
+/* Subject averages */
+.subj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.4rem}
+.subj-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:.85rem 1rem;box-shadow:0 1px 6px var(--sh)}
+.sc-name{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ts);margin-bottom:.4rem}
+.sc-bar-wrap{background:#EDE8E0;border-radius:99px;height:6px;overflow:hidden;margin-bottom:.3rem}
+.sc-bar{height:100%;background:linear-gradient(90deg,#1B5E3B,#2ECC71);border-radius:99px}
+.sc-val{font-size:.82rem;font-weight:700;color:var(--acc)}
+/* Grade pills */
+.grade-dist{display:flex;gap:.6rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.gd-pill{display:flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:.6rem .9rem;font-size:.82rem;font-weight:600;box-shadow:0 1px 4px var(--sh)}
+.gd-dot{width:10px;height:10px;border-radius:50%}
+/* Filter */
+.filter-bar{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1.3rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end}
+.filter-bar label{font-size:.7rem;font-weight:600;color:var(--ts);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.28rem}
+.filter-bar select,.filter-bar input{padding:.5rem .85rem;border-radius:8px;border:1.5px solid var(--bdr);background:#FAFAF8;font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--tp);outline:none}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--acc)}
+/* Table */
+.tbl-wrap{background:var(--card);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px var(--sh)}
+.tbl-head{padding:.9rem 1.2rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.tbl-head h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--tp)}
+.tbl-count{font-size:.76rem;color:var(--tm);font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{background:#F4FAF6;padding:.7rem 1rem;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ts);border-bottom:1px solid var(--bdr)}
+td{padding:.75rem 1rem;font-size:.85rem;color:var(--tp);border-bottom:1px solid #EBF7EF}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F4FAF6}
+.grade-pill{display:inline-block;padding:.15rem .55rem;border-radius:20px;font-size:.68rem;font-weight:700}
+.grade-pill.Ap,.grade-pill.A{background:#D5F5E3;color:var(--ok)}
+.grade-pill.B{background:#E8F5EE;color:#1A5276}
+.grade-pill.C{background:#EBF3FC;color:#7D6608}
+.grade-pill.D{background:#FDEDEC;color:var(--bad)}
+.view-btn{color:var(--acc);text-decoration:none;font-size:.78rem;font-weight:600;padding:.2rem .5rem;border-radius:6px;transition:background .15s}
+.view-btn:hover{background:#E8F5EE}
+.del-btn{background:none;border:none;color:var(--tm);cursor:pointer;font-size:.82rem;padding:.2rem .4rem;border-radius:6px;transition:all .15s}
+.del-btn:hover{background:#FDEDEC;color:var(--bad)}
+.empty{text-align:center;padding:3rem 1rem}
+.empty .ei{font-size:3rem;margin-bottom:.6rem}.empty p{color:var(--tm);font-size:.9rem}
+.btn{font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;border:none;border-radius:8px;padding:.5rem 1.1rem;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.35rem;text-decoration:none}
+.btn-g{background:var(--acc);color:#fff}.btn-g:hover{filter:brightness(1.1)}
+.btn-o{background:#fff;color:var(--ts);border:1.5px solid var(--bdr)}.btn-o:hover{background:#EBF7EF}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.stat-row{grid-template-columns:repeat(2,1fr)}.subj-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">Nextgenz</div>
+    <div class="logo-sub">Admin Panel</div>
+    <nav>
+      <a th:href="@{/admin/dashboard}"><span class="ni">🏠</span> Dashboard</a>
+      <a th:href="@{/admin/exam-results}" class="active"><span class="ni">📋</span> Exam Results</a>
+      <a th:href="@{/admin/students}"><span class="ni">👨‍🎓</span> Students</a>
+      <a th:href="@{/admin/teachers}"><span class="ni">👩‍🏫</span> Teachers</a>
+      <a th:href="@{/admin/admissions}"><span class="ni">📝</span> Admissions</a>
+      <a th:href="@{/exam}" target="_blank"><span class="ni">🎓</span> Exam Portal</a>
+      <a th:href="@{/logout}" style="margin-top:1rem;color:rgba(255,120,120,.8)"><span class="ni">🚪</span> Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-hdr">
+      <div>
+        <h1>Exam Results</h1>
+        <div class="sub">All student exam submissions — Nextgenz International Academy</div>
+      </div>
+      <a th:href="@{/exam}" target="_blank" class="btn btn-g">📝 Open Exam Portal</a>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div class="stat-card" style="--c:#1B5E3B">
+        <div class="sv" th:text="${totalExams}">0</div>
+        <div class="sl">Total Exams</div>
+      </div>
+      <div class="stat-card" style="--c:#1E6B45">
+        <div class="sv" th:text="${#lists.size(results)}">0</div>
+        <div class="sl">Filtered</div>
+      </div>
+      <div class="stat-card" style="--c:#1A4A8A">
+        <div class="sv" th:text="${overallAvg != null} ? ${overallAvg + '%'} : '—'">—</div>
+        <div class="sl">Overall Avg</div>
+      </div>
+      <div class="stat-card" style="--c:#5A1A8A">
+        <div class="sv"
+             th:text="${#lists.isEmpty(results)} ? '—' :
+               results.stream().mapToInt(r -> r.scorePercent).max().orElse(0) + '%'">—</div>
+        <div class="sl">Highest Score</div>
+      </div>
+    </div>
+
+    <!-- Grade distribution -->
+    <div class="grade-dist" th:if="${not #maps.isEmpty(gradeDistribution)}">
+      <div class="gd-pill" th:each="entry : ${gradeDistribution}">
+        <div class="gd-dot"
+             th:style="'background:' + ${entry.key == 'A+' or entry.key == 'A' ? '#1E6B45' :
+                                          entry.key == 'B' ? '#1A4A8A' :
+                                          entry.key == 'C' ? '#7D6608' : '#B02020'}"></div>
+        <span th:text="'Grade ' + ${entry.key} + ': ' + ${entry.value}">A: 0</span>
+      </div>
+    </div>
+
+    <!-- Subject averages -->
+    <div class="subj-grid" th:if="${not #maps.isEmpty(subjectAverages)}">
+      <div class="subj-card" th:each="entry : ${subjectAverages}">
+        <div class="sc-name" th:text="${entry.key}">Subject</div>
+        <div class="sc-bar-wrap">
+          <div class="sc-bar" th:style="'width:' + ${entry.value} + '%'"></div>
+        </div>
+        <div class="sc-val" th:text="${entry.value} + '%'">0%</div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <form method="get" th:action="@{/admin/exam-results}" style="display:contents">
+        <div>
+          <label>Class</label>
+          <select name="classLevel">
+            <option value="">All Classes</option>
+            <option th:each="c : ${#numbers.sequence(2,10)}"
+                    th:value="${c}"
+                    th:selected="${filterClass == c}"
+                    th:text="${c + (c==2?'nd':c==3?'rd':'th') + ' Class'}">Class</option>
+          </select>
+        </div>
+        <div>
+          <label>Subject</label>
+          <select name="subject">
+            <option value="">All Subjects</option>
+            <option value="mathematics" th:selected="${filterSubject == 'mathematics'}">Mathematics</option>
+            <option value="science"     th:selected="${filterSubject == 'science'}">Science</option>
+            <option value="evs"         th:selected="${filterSubject == 'evs'}">EVS</option>
+            <option value="english"     th:selected="${filterSubject == 'english'}">English</option>
+            <option value="hindi"       th:selected="${filterSubject == 'hindi'}">Hindi</option>
+            <option value="social"      th:selected="${filterSubject == 'social'}">Social Science</option>
+            <option value="sanskrit"    th:selected="${filterSubject == 'sanskrit'}">Sanskrit</option>
+            <option value="computer"    th:selected="${filterSubject == 'computer'}">Computer Science</option>
+            <option value="gk"          th:selected="${filterSubject == 'gk'}">General Knowledge</option>
+          </select>
+        </div>
+        <div>
+          <label>Student Name</label>
+          <input type="text" name="studentName" placeholder="Search name…"
+                 th:value="${filterName}" style="width:150px">
+        </div>
+        <div>
+          <label>Roll Number</label>
+          <input type="text" name="rollNumber" placeholder="Search roll no."
+                 th:value="${filterRoll}" style="width:140px">
+        </div>
+        <button type="submit" class="btn btn-g">🔍 Filter</button>
+        <a th:href="@{/admin/exam-results}" class="btn btn-o">✕ Clear</a>
+      </form>
+    </div>
+
+    <!-- Results table -->
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <h3>Student Submissions</h3>
+        <span class="tbl-count" th:text="${#lists.size(results)} + ' records'">0 records</span>
+      </div>
+
+      <div class="empty" th:if="${#lists.isEmpty(results)}">
+        <div class="ei">📭</div>
+        <p>No results found for the selected filters.</p>
+      </div>
+
+      <table th:if="${not #lists.isEmpty(results)}">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Roll</th>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Score</th>
+            <th>Correct</th>
+            <th>Wrong</th>
+            <th>Grade</th>
+            <th>Time</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="r, st : ${results}">
+            <td style="color:var(--tm);font-size:.75rem" th:text="${st.count}">#</td>
+            <td style="font-weight:600" th:text="${r.studentName}">Name</td>
+            <td style="color:var(--tm)" th:text="${r.rollNumber ?: '—'}">—</td>
+            <td th:text="${r.classDisplay}">9th Class</td>
+            <td style="font-size:.82rem;font-weight:600"
+                th:text="${r.subjectIcon + ' ' + r.subjectDisplay}">📐 Maths</td>
+            <td>
+              <span th:text="${r.scorePercent + '%'}"
+                    th:style="${r.scorePercent >= 75} ? 'color:var(--ok);font-weight:700' :
+                               (${r.scorePercent >= 45} ? 'color:#7D6608;font-weight:700' :
+                               'color:var(--bad);font-weight:700')">0%</span>
+            </td>
+            <td style="color:var(--ok);font-weight:600" th:text="${r.correctAnswers}">0</td>
+            <td style="color:var(--bad);font-weight:600" th:text="${r.wrongAnswers}">0</td>
+            <td>
+              <span class="grade-pill"
+                    th:classappend="${r.grade == 'A+' ? 'Ap' : r.grade}"
+                    th:text="${r.grade}">A</span>
+            </td>
+            <td style="color:var(--tm);font-size:.8rem" th:text="${r.timeTakenDisplay}">—</td>
+            <td style="color:var(--tm);font-size:.76rem" th:text="${r.submittedAtDisplay}">—</td>
+            <td>
+              <a th:href="@{/exam/result/{id}(id=${r.id})}"
+                 class="view-btn" target="_blank">View</a>
+              <button class="del-btn"
+                      th:onclick="'deleteResult(' + ${r.id} + ')'"
+                      title="Delete">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function deleteResult(id){
+  if(!confirm('Permanently delete this result?')) return;
+  const tok = document.querySelector('meta[name="_csrf"]').content;
+  const hdr = document.querySelector('meta[name="_csrf_header"]').content;
+  fetch('/admin/exam-results/'+id, {
+    method: 'DELETE',
+    headers: { [hdr]: tok }
+  })
+  .then(r => r.json())
+  .then(d => { if(d.success) location.reload(); else alert('Error: '+d.message); });
+}
+</script>
+</body>
+</html>

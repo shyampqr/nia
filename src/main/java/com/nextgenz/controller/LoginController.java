@@ -15,7 +15,7 @@ public class LoginController {
     @Autowired
     private OtpService otpService;
 
-    @GetMapping("/login")
+    @GetMapping("/login1")
     public String loginPage() {
         return "login";
     }

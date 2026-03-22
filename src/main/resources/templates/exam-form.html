@@ -1,182 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Online Exam Portal – Class 2-10 | Nextgenz International Academy</title>
+  <title>Online Exam Portal | Nextgenz International Academy</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta name="_csrf"        th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <style>
-    :root {
-      --acc:#B8860B;--strp:#F0C040;--bg:#F7F4EF;--card:#FFFFFF;--opt:#FAFAF8;
-      --bdr:#E5DDD0;--tp:#1A1A1A;--ts:#5A5047;--tm:#8A7E72;
-      --ok:#1E6B45;--bad:#B02020;--okbg:#EAF7F0;--bdbg:#FDF0F0;--sh:rgba(0,0,0,.07);
-    }
+    :root{--acc:#1B5E3B;--strp:#2ECC71;--bg:#F0F7F2;--card:#FFF;--opt:#F4FAF6;--bdr:#C8E0CF;--tp:#102A1A;--ts:#2D5A3D;--tm:#6B9478;--ok:#1B5E3B;--bad:#B02020;--okbg:#E8F5EE;--bdbg:#FDF0F0;--sh:rgba(27,94,59,.08)}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 5rem;color:var(--tp)}
-
-    .hdr{text-align:center;margin-bottom:1.6rem;animation:fadeDown .5s ease both}
+    .topnav{width:100%;max-width:780px;display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem;font-size:.82rem;flex-wrap:wrap;gap:.5rem}
+    .user-info{display:flex;align-items:center;gap:.6rem;background:#fff;border:1px solid var(--bdr);border-radius:20px;padding:.3rem .8rem .3rem .5rem}
+    .avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--strp));display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:700}
+    .uname{font-weight:600;color:var(--tp);font-size:.8rem}.exam-badge{font-size:.72rem;color:var(--tm)}
+    .nav-links{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+    .nav-links a{color:var(--acc);font-weight:600;text-decoration:none;font-size:.8rem;padding:.28rem .65rem;border-radius:8px;border:1px solid rgba(27,94,59,.25);transition:all .15s}
+    .nav-links a:hover{background:#E8F5EE}
+    .nav-links a.admin-link{background:var(--acc);color:#fff;border-color:var(--acc)}
+    .hdr{text-align:center;margin-bottom:1.5rem;animation:fadeDown .5s ease both}
     .hdr .school{font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);border:1.5px solid var(--strp);background:#fff;padding:.25rem 1rem;border-radius:20px;display:inline-block;margin-bottom:.55rem}
     .hdr h1{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3.5vw,2rem);font-weight:700;color:var(--tp)}
     .hdr .meta{font-size:.82rem;color:var(--tm);margin-top:.3rem}
-
-    .card{width:100%;max-width:740px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;box-shadow:0 2px 16px var(--sh);overflow:hidden;animation:fadeUp .6s ease both .1s}
+    .card{width:100%;max-width:780px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;box-shadow:0 2px 16px var(--sh);overflow:hidden;animation:fadeUp .6s ease both .1s}
     .bar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.4rem;background:var(--acc);color:#fff;border-bottom:3px solid var(--strp);transition:background .35s}
-    .dots{display:flex;gap:.4rem}
-    .dot{width:10px;height:10px;border-radius:50%;opacity:.8}
+    .dots{display:flex;gap:.4rem}.dot{width:10px;height:10px;border-radius:50%;opacity:.8}
     .dot:nth-child(1){background:#ff8a80}.dot:nth-child(2){background:#ffe082}.dot:nth-child(3){background:#a5d6a7}
+    .bar-center{display:flex;align-items:center;gap:.7rem}
     .bar-title{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:600;letter-spacing:.04em}
-    .timer-pill{display:flex;align-items:center;gap:.4rem;background:rgba(0,0,0,.2);padding:.28rem .7rem;border-radius:20px;font-size:.84rem;font-weight:700;letter-spacing:.05em}
+    .bar-right{display:flex;align-items:center;gap:.6rem}
+    .timer-pill{display:flex;align-items:center;gap:.4rem;background:rgba(0,0,0,.2);padding:.28rem .7rem;border-radius:20px;font-size:.84rem;font-weight:700}
     #timer{font-variant-numeric:tabular-nums}
     #timer.warn{color:#ff8a80;animation:pulse 1s infinite}
-
-    .prog-wrap{padding:.7rem 1.4rem .2rem;background:#FDFCFA;border-bottom:1px solid var(--bdr);display:none}
-    .prog-track{height:6px;background:#EDE8E0;border-radius:99px;overflow:hidden}
+    #warn-badge{display:none;background:rgba(220,50,50,.88);color:#fff;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:20px;letter-spacing:.04em}
+    .prog-wrap{padding:.7rem 1.4rem .2rem;background:#F7FAF8;border-bottom:1px solid var(--bdr);display:none}
+    .prog-track{height:6px;background:#D0E8D0;border-radius:99px;overflow:hidden}
     .prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--strp));border-radius:99px;transition:width .4s ease}
     .prog-lbl{font-size:.71rem;color:var(--tm);font-weight:600;margin-top:.3rem;letter-spacing:.04em}
-
-    .screen{display:none;padding:1.8rem 1.8rem 1.5rem}
-    .screen.active{display:block}
-
-    /* breadcrumb */
+    .screen{display:none;padding:1.8rem}.screen.active{display:block}
     .bc{display:flex;align-items:center;gap:.5rem;font-size:.74rem;font-weight:600;color:var(--tm);margin-bottom:1.2rem;flex-wrap:wrap}
     .bcs{padding:.22rem .65rem;border-radius:20px;background:var(--opt);border:1px solid var(--bdr)}
-    .bcs.done{background:#FDF3CC;border-color:var(--strp);color:var(--acc);cursor:pointer}
-    .bcs.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-    .bca{color:var(--bdr)}
-
+    .bcs.done{background:#E8F5EE;border-color:var(--strp);color:var(--acc);cursor:pointer}
+    .bcs.active{background:var(--acc);color:#fff;border-color:var(--acc)}.bca{color:var(--bdr)}
     .step-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--tp);text-align:center;margin-bottom:.4rem}
-    .step-sub{font-size:.88rem;color:var(--ts);text-align:center;margin-bottom:1.3rem;line-height:1.6}
-
-    /* class grid */
+    .step-sub{font-size:.88rem;color:var(--ts);text-align:center;margin-bottom:1.3rem;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto}
     .class-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.6rem}
-    .cls-tile{
-      background:#fff;border:2px solid var(--bdr);border-radius:14px;
-      padding:.9rem .5rem .75rem;text-align:center;cursor:pointer;
-      transition:all .2s;user-select:none;position:relative;overflow:hidden;
-    }
-    .cls-tile::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:4px;
-      background:var(--cls-color,var(--acc));border-radius:14px 14px 0 0;
-    }
+    .cls-tile{background:#fff;border:2px solid var(--bdr);border-radius:14px;padding:.9rem .5rem .75rem;text-align:center;cursor:pointer;transition:all .2s;user-select:none;position:relative;overflow:hidden}
+    .cls-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--cls-color,var(--acc));border-radius:14px 14px 0 0}
     .cls-tile:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.1);border-color:var(--cls-color,var(--acc))}
-    .cls-tile.sel{
-      border-color:var(--cls-color,var(--acc));
-      background:var(--cls-bg,#FDF3CC);
-      box-shadow:0 0 0 3px color-mix(in srgb,var(--cls-color,var(--acc)) 20%,transparent),0 4px 14px rgba(0,0,0,.08);
-      transform:translateY(-3px);
-    }
-    .cls-tile .c-emoji{font-size:1.6rem;margin-bottom:.3rem;display:block;line-height:1}
-    .cls-tile .c-num{
-      font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;
-      color:var(--cls-color,var(--acc));line-height:1;
-    }
-    .cls-tile .c-ord{font-size:.7rem;font-weight:700;color:var(--cls-color,var(--acc));opacity:.7}
-    .cls-tile .c-lbl{font-size:.62rem;color:var(--tm);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-top:.25rem}
-    .cls-tile .c-tag{
-      font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
-      background:var(--cls-color,var(--acc));color:#fff;
-      padding:.1rem .45rem;border-radius:20px;display:inline-block;margin-top:.3rem;opacity:.85;
-    }
-
-    /* subject grid */
+    .cls-tile.sel{border-color:var(--cls-color,var(--acc));background:var(--cls-bg,#E8F5EE);box-shadow:0 0 0 3px rgba(27,94,59,.15),0 4px 14px rgba(0,0,0,.08);transform:translateY(-3px)}
+    .c-emoji{font-size:1.6rem;margin-bottom:.3rem;display:block;line-height:1}
+    .c-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--cls-color,var(--acc));line-height:1}
+    .c-lbl{font-size:.62rem;color:var(--tm);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-top:.25rem}
+    .c-tag{font-size:.58rem;font-weight:700;text-transform:uppercase;background:var(--cls-color,var(--acc));color:#fff;padding:.1rem .45rem;border-radius:20px;display:inline-block;margin-top:.3rem;opacity:.85}
     .subj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-bottom:1.5rem}
     .subj-tile{background:var(--opt);border:2px solid var(--bdr);border-radius:12px;padding:.88rem .5rem;text-align:center;cursor:pointer;transition:all .18s;user-select:none}
-    .subj-tile:hover{background:#FDF6E3;border-color:var(--strp);transform:translateY(-2px);box-shadow:0 4px 12px rgba(184,134,11,.12)}
-    .subj-tile.sel{border-color:var(--acc);background:#FDF3CC;box-shadow:0 0 0 3px rgba(184,134,11,.15)}
-    .subj-tile .si{font-size:1.5rem;margin-bottom:.25rem}
-    .subj-tile .sn{font-size:.78rem;font-weight:700;color:var(--tp)}
-    .subj-tile .sq{font-size:.64rem;color:var(--tm);margin-top:.12rem}
-
-    /* details */
-    .detail-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.3rem}
+    .subj-tile:hover{background:#E8F5EE;border-color:var(--strp);transform:translateY(-2px)}
+    .subj-tile.sel{border-color:var(--acc);background:#E8F5EE;box-shadow:0 0 0 3px rgba(27,94,59,.15)}
+    .si{font-size:1.5rem;margin-bottom:.25rem}.sn{font-size:.78rem;font-weight:700;color:var(--tp)}.sq{font-size:.64rem;color:var(--tm);margin-top:.12rem}
+    .detail-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.2rem}
     .inp{padding:.7rem 1rem;border-radius:10px;border:1.5px solid var(--bdr);background:var(--opt);font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--tp);outline:none;transition:border-color .2s}
     .inp:focus{border-color:var(--acc)}.inp::placeholder{color:var(--tm)}
     .inp-name{width:220px}.inp-roll{width:130px}
-
     .info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.4rem}
-    .info-t{background:#FDFAF4;border:1.5px solid #EAE0C8;border-radius:12px;padding:.9rem .6rem;text-align:center}
-    .info-t .iv{font-size:1.4rem;font-weight:700;color:var(--acc)}
-    .info-t .il{font-size:.68rem;color:var(--tm);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:.18rem}
-
-    /* question */
+    .info-t{background:#F4FAF6;border:1.5px solid #C8DCEC;border-radius:12px;padding:.9rem .6rem;text-align:center}
+    .iv{font-size:1.4rem;font-weight:700;color:var(--acc)}.il{font-size:.68rem;color:var(--tm);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:.18rem}
     .qhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
-    .q-num{font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);background:#FDF6E3;border:1px solid #EAD89A;padding:.22rem .7rem;border-radius:20px}
+    .q-num{font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);background:#E8F5EE;border:1px solid #A8D5B8;padding:.22rem .7rem;border-radius:20px}
     .q-top{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tm)}
-    .q-txt{font-size:1.08rem;font-weight:500;color:var(--tp);line-height:1.7;margin-bottom:1.3rem;padding:.95rem 1.1rem;background:#FDFAF5;border-left:3px solid var(--strp);border-radius:0 8px 8px 0}
+    .q-txt{font-size:1.08rem;font-weight:500;color:var(--tp);line-height:1.7;margin-bottom:1.3rem;padding:.95rem 1.1rem;background:#F4FAF6;border-left:3px solid var(--strp);border-radius:0 8px 8px 0}
     .opts{display:flex;flex-direction:column;gap:.65rem}
-    .opt{display:flex;align-items:center;gap:.9rem;padding:.82rem 1rem;background:var(--opt);border:1.5px solid var(--bdr);border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s;font-size:.93rem;color:var(--tp);line-height:1.5}
-    .opt:hover{background:#FDF6E3;border-color:#D4A017;box-shadow:0 2px 8px rgba(180,130,0,.1)}
+    .opt{display:flex;align-items:center;gap:.9rem;padding:.82rem 1rem;background:var(--opt);border:1.5px solid var(--bdr);border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;font-size:.93rem;color:var(--tp);line-height:1.5}
+    .opt:hover{background:#E8F5EE;border-color:#217A4B}
     .opt.ok{background:var(--okbg)!important;border-color:var(--ok)!important;color:var(--ok);font-weight:600}
     .opt.bad{background:var(--bdbg)!important;border-color:var(--bad)!important;color:var(--bad);font-weight:600}
     .opt.dis{pointer-events:none}
-    .obadge{width:30px;height:30px;flex-shrink:0;border-radius:8px;background:#EDE8E0;color:var(--ts);font-size:.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
-    .opt:hover .obadge{background:var(--acc);color:#fff}
-    .opt.ok .obadge{background:var(--ok);color:#fff}
-    .opt.bad .obadge{background:var(--bad);color:#fff}
+    .obadge{width:30px;height:30px;flex-shrink:0;border-radius:8px;background:#D0E8D0;color:var(--ts);font-size:.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+    .opt:hover .obadge{background:var(--acc);color:#fff}.opt.ok .obadge{background:var(--ok);color:#fff}.opt.bad .obadge{background:var(--bad);color:#fff}
     .qnav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--bdr)}
-    .ans-st{font-size:.8rem;font-weight:600;color:var(--tm)}
-    .ans-st.ok{color:var(--ok)}.ans-st.bad{color:var(--bad)}
-
-    /* result */
-    .res-box{text-align:center}
-    .res-box h2{font-family:'Playfair Display',serif;font-size:1.55rem;color:var(--tp);margin-bottom:.4rem}
-    .ring{width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--acc) var(--pct),#EDE8E0 0);display:flex;align-items:center;justify-content:center;margin:1.4rem auto;box-shadow:0 4px 20px rgba(0,0,0,.1);position:relative}
-    .ring::after{content:'';width:104px;height:104px;border-radius:50%;background:#fff;position:absolute}
-    .ring-num{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;color:var(--acc);position:relative;z-index:1}
-    .res-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1.1rem 0}
-    .st-t{background:var(--opt);border:1.5px solid var(--bdr);border-radius:12px;padding:.85rem .5rem}
-    .st-t .sv{font-size:1.4rem;font-weight:700}
-    .st-t .sl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);font-weight:600;margin-top:.12rem}
-    .sv.g{color:var(--ok)}.sv.r{color:var(--bad)}.sv.au{color:var(--acc)}
-    .gbadge{font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;color:#fff;background:var(--acc);border-radius:20px;padding:.42rem 1.4rem;display:inline-block;margin-bottom:1.1rem;letter-spacing:.04em}
-    .rev-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--tp);text-align:left;margin:1.3rem 0 .65rem;padding-bottom:.35rem;border-bottom:2px solid var(--bdr)}
-    .rev-item{background:var(--opt);border:1px solid var(--bdr);border-radius:10px;padding:.85rem 1rem;text-align:left;margin-bottom:.55rem;font-size:.86rem;line-height:1.6}
-    .rev-item .rq{font-weight:600;color:var(--tp);margin-bottom:.35rem}
-    .rev-item .ra{color:var(--ok);font-weight:500}
-    .rev-item .rw{color:var(--bad);font-weight:500}
-    .rev-item .rc{color:var(--tm);font-size:.79rem;margin-top:.22rem}
-
-    .btn{font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;letter-spacing:.04em;border:none;border-radius:10px;padding:.62rem 1.5rem;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.4rem}
+    .ans-st{font-size:.8rem;font-weight:600;color:var(--tm)}.ans-st.ok{color:var(--ok)}.ans-st.bad{color:var(--bad)}
+    .btn{font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;border:none;border-radius:10px;padding:.62rem 1.5rem;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.4rem}
     .btn:active{transform:scale(.97)}
-    .btn-g{background:var(--acc);color:#fff;box-shadow:0 2px 10px rgba(184,134,11,.25)}
-    .btn-g:hover{filter:brightness(1.1)}
-    .btn-o{background:#fff;color:var(--ts);border:1.5px solid var(--bdr)}
-    .btn-o:hover{background:#F5F0E8;border-color:#C8B98A}
+    .btn-g{background:var(--acc);color:#fff;box-shadow:0 2px 10px rgba(27,94,59,.25)}.btn-g:hover{filter:brightness(1.1)}
+    .btn-o{background:#fff;color:var(--ts);border:1.5px solid var(--bdr)}.btn-o:hover{background:#EBF7EF}
     .btn-o:disabled{opacity:.38;cursor:not-allowed}
+    .saving-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
+    .saving-overlay.show{display:flex}
+    .saving-box{background:#fff;border-radius:16px;padding:2rem 2.5rem;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+    .spin{font-size:2rem;animation:spin 1s linear infinite;display:block;margin-bottom:.6rem}
+    .saving-box p{font-size:.95rem;color:var(--ts);font-weight:500}
 
+    /* ═══ ANTI-CHEAT STYLES ═══════════════════════════════════ */
+    /* Camera PIP - fixed bottom right during exam */
+    #cam-pip{position:fixed;bottom:1.2rem;right:1.2rem;z-index:888;display:none;flex-direction:column;align-items:flex-end;gap:.4rem}
+    #cam-pip.show{display:flex}
+    #cam-video{width:150px;height:112px;border-radius:12px;object-fit:cover;border:2.5px solid var(--strp);box-shadow:0 4px 20px rgba(0,0,0,.25);background:#111;transform:scaleX(-1)}
+    #cam-label{font-size:.63rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .55rem;border-radius:20px;display:flex;align-items:center;gap:.3rem}
+    #cam-label.live{background:#E8F5EE;color:var(--ok);border:1px solid var(--ok)}
+    #cam-label.off{background:#FDF0F0;color:var(--bad);border:1px solid var(--bad)}
+    .cam-dot{width:7px;height:7px;border-radius:50%;animation:blink 1.4s infinite}
+    .cam-dot.g{background:var(--ok)}.cam-dot.r{background:var(--bad)}
+    /* Camera permission box in step 3 */
+    .cam-box{background:#F4FAF6;border:1.5px solid var(--bdr);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.2rem;display:flex;align-items:flex-start;gap:1rem}
+    .cam-box-icon{font-size:2rem;flex-shrink:0;margin-top:.1rem}
+    .cam-box-body{flex:1}
+    .cam-box-title{font-weight:700;color:var(--tp);font-size:.9rem;margin-bottom:.22rem}
+    .cam-box-sub{font-size:.78rem;color:var(--ts);line-height:1.55;margin-bottom:.7rem}
+    #cam-preview-mini{display:none;width:120px;height:90px;border-radius:8px;object-fit:cover;border:2px solid var(--strp);transform:scaleX(-1);background:#111;margin-bottom:.55rem}
+    .cam-msg{font-size:.75rem;font-weight:600;padding:.22rem .65rem;border-radius:20px;display:inline-block;margin-bottom:.55rem}
+    .cam-msg.ok  {background:var(--okbg);color:var(--ok);border:1px solid var(--ok)}
+    .cam-msg.warn{background:#FFF8E1;color:#7D6608;border:1px solid #D4AC0D}
+    .cam-msg.off {background:var(--bdbg);color:var(--bad);border:1px solid var(--bad)}
+    .cam-btns{display:flex;gap:.6rem;flex-wrap:wrap}
+    /* Warning toast */
+    #warn-toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:9999;background:#0D1F0D;color:#fff;padding:.65rem 1.4rem;border-radius:12px;font-size:.86rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.4);display:none;align-items:center;gap:.5rem;white-space:nowrap}
+    #warn-toast.show{display:flex;animation:slideDown .3s ease}
+    @keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    /* Snapshot flash */
+    #snap-flash{position:fixed;inset:0;background:rgba(255,255,255,.55);z-index:9998;pointer-events:none;opacity:0;transition:opacity .12s}
+    #snap-flash.on{opacity:1}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
     @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
     @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
     .qanim{animation:popIn .25s ease both}
-
-    @media(max-width:520px){
-      .screen{padding:1.3rem 1rem}.class-grid{grid-template-columns:repeat(3,1fr)}
-      .subj-grid{grid-template-columns:repeat(2,1fr)}.q-txt{font-size:.98rem}
-      .detail-row{flex-direction:column;align-items:center}.inp-name,.inp-roll{width:100%;max-width:300px}
-    }
+    @media(max-width:520px){.screen{padding:1.3rem 1rem}.class-grid{grid-template-columns:repeat(3,1fr)}.subj-grid{grid-template-columns:repeat(2,1fr)}.detail-row{flex-direction:column;align-items:center}.inp-name,.inp-roll{width:100%;max-width:300px}#cam-video{width:110px;height:82px}}
   </style>
 </head>
 <body>
 
+<!-- ── Anti-cheat overlays ── -->
+<div id="cam-pip">
+  <video id="cam-video" autoplay muted playsinline></video>
+  <div id="cam-label" class="live"><div class="cam-dot g"></div>Camera Live</div>
+</div>
+<div id="warn-toast"><span>⚠️</span><span id="warn-msg">Warning!</span></div>
+<div id="snap-flash"></div>
+
+<!-- ── Saving overlay ── -->
+<div class="saving-overlay" id="savingOverlay">
+  <div class="saving-box"><span class="spin">⏳</span><p>Saving your result…</p></div>
+</div>
+
+<!-- ── Top nav ── -->
+<div class="topnav">
+  <div class="user-info">
+    <div class="avatar" th:text="${#strings.substring(username,0,1).toUpperCase()}">S</div>
+    <div>
+      <div class="uname" th:text="${username}">Student</div>
+      <div class="exam-badge" th:text="${myExamCount}+' exam'+(${myExamCount}!=1?'s':'')+' taken'">0 exams</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a th:href="@{/exam/my-results}">📋 My Results</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/exam-results}" class="admin-link">⚙ Admin</a>
+    <a th:href="@{/logout}">Logout</a>
+  </div>
+</div>
+
+<!-- ── Header ── -->
 <div class="hdr">
   <div class="school">Nextgenz International Academy</div>
   <h1>Online Exam Portal</h1>
   <p class="meta">Classes 2–10 &nbsp;|&nbsp; Multiple Subjects &nbsp;|&nbsp; 25 Questions | 30 Min</p>
 </div>
 
+<!-- ── Card ── -->
 <div class="card">
   <div class="bar" id="topBar">
     <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <div class="bar-title" id="barTitle">Select Class &amp; Subject</div>
-    <div class="timer-pill"><span>⏱</span><span id="timer">30:00</span></div>
+    <div class="bar-center">
+      <div class="bar-title" id="barTitle">Select Class &amp; Subject</div>
+      <span id="warn-badge"></span>
+    </div>
+    <div class="bar-right">
+      <div class="timer-pill"><span>⏱</span><span id="timer">30:00</span></div>
+    </div>
   </div>
   <div class="prog-wrap" id="progWrap">
     <div class="prog-track"><div class="prog-fill" id="progFill" style="width:5%"></div></div>
-    <div class="prog-lbl" id="progLbl">Question 1 of 20</div>
+    <div class="prog-lbl" id="progLbl">Question 1 of 25</div>
   </div>
 
-  <!-- STEP 1: Class -->
+  <!-- S1: Class -->
   <div class="screen active" id="s1">
     <div class="step-title">Step 1 — Select Your Class</div>
     <div class="step-sub">Tap the class you are currently studying in.</div>
@@ -184,7 +195,7 @@
     <div style="text-align:center"><button class="btn btn-g" onclick="goStep2()">Next — Choose Subject →</button></div>
   </div>
 
-  <!-- STEP 2: Subject -->
+  <!-- S2: Subject -->
   <div class="screen" id="s2">
     <div class="bc">
       <span class="bcs done" id="bc1" onclick="goStep1()">Class</span>
@@ -200,34 +211,51 @@
     </div>
   </div>
 
-  <!-- STEP 3: Details -->
+  <!-- S3: Details + Camera -->
   <div class="screen" id="s3">
     <div class="bc">
       <span class="bcs done" onclick="goStep1()">Class</span>
       <span class="bca">›</span><span class="bcs done" onclick="goStep2()">Subject</span>
       <span class="bca">›</span><span class="bcs active">Details</span>
     </div>
-    <div class="step-title" id="s3Title">Step 3 — Enter Details</div>
-    <div class="step-sub">Confirm your info and start the exam.</div>
+    <div class="step-title" id="s3Title">Step 3 — Confirm &amp; Start</div>
+    <div class="step-sub">Enter your details and enable camera, then start the exam.</div>
     <div class="info-row">
       <div class="info-t"><div class="iv" id="iClass">—</div><div class="il">Class</div></div>
       <div class="info-t"><div class="iv" id="iSubj">—</div><div class="il">Subject</div></div>
       <div class="info-t"><div class="iv">25</div><div class="il">Questions</div></div>
     </div>
     <div class="detail-row">
-      <input type="text" id="stuName" placeholder="Full Name" class="inp inp-name">
+      <input type="text" id="stuName" th:placeholder="${username}" placeholder="Full Name" class="inp inp-name">
       <input type="text" id="stuRoll" placeholder="Roll No. (optional)" class="inp inp-roll">
     </div>
+
+    <!-- Camera permission box -->
+    <div class="cam-box">
+      <div class="cam-box-icon">📷</div>
+      <div class="cam-box-body">
+        <div class="cam-box-title">Camera for Proctoring (Recommended)</div>
+        <div class="cam-box-sub">Your camera stays active during the exam to prevent cheating.
+          You <strong>can still proceed without it</strong>, but this will be noted in your result.</div>
+        <video id="cam-preview-mini" autoplay muted playsinline></video>
+        <div id="cam-msg" class="cam-msg warn">📷 Camera not yet enabled</div>
+        <div class="cam-btns">
+          <button class="btn btn-g" id="btnCam" onclick="requestCamera()" style="font-size:.82rem;padding:.5rem 1.1rem">📷 Enable Camera</button>
+          <button class="btn btn-o" id="btnSkip" onclick="skipCamera()" style="font-size:.78rem;padding:.5rem 1rem">Skip (not recommended)</button>
+        </div>
+      </div>
+    </div>
+
     <div style="text-align:center">
       <button class="btn btn-o" onclick="goStep2()" style="margin-right:.6rem">← Back</button>
-      <button class="btn btn-g" onclick="startExam()">🚀 Start Exam</button>
+      <button class="btn btn-g" id="btnStart" onclick="startExam()" disabled style="opacity:.45;cursor:not-allowed">🚀 Start Exam</button>
     </div>
   </div>
 
-  <!-- STEP 4: Question -->
+  <!-- S4: Questions -->
   <div class="screen" id="s4">
     <div class="qanim" id="qBlock">
-      <div class="qhdr"><div class="q-num" id="qNum">Q 1/20</div><div class="q-top" id="qTop"></div></div>
+      <div class="qhdr"><div class="q-num" id="qNum">Q 1/25</div><div class="q-top" id="qTop"></div></div>
       <div class="q-txt" id="qTxt"></div>
       <div class="opts" id="optList"></div>
     </div>
@@ -237,451 +265,189 @@
       <button class="btn btn-g" id="nextBtn" onclick="nextQ()">Next →</button>
     </div>
   </div>
-
-  <!-- STEP 5: Result -->
-  <div class="screen" id="s5">
-    <div class="res-box">
-      <h2 id="resTitle">Exam Complete!</h2>
-      <div class="ring" id="ring"><span class="ring-num" id="ringNum">0/20</span></div>
-      <div class="gbadge" id="gbadge">Grade: A</div>
-      <div class="res-stats">
-        <div class="st-t"><div class="sv g" id="cCnt">0</div><div class="sl">Correct</div></div>
-        <div class="st-t"><div class="sv r" id="wCnt">0</div><div class="sl">Wrong</div></div>
-        <div class="st-t"><div class="sv au" id="sCnt">0</div><div class="sl">Skipped</div></div>
-      </div>
-      <button class="btn btn-g" onclick="toggleReview()" id="revBtn">📋 View Answers</button>&nbsp;
-      <button class="btn btn-o" onclick="restart()">↺ New Exam</button>
-      <div id="revSec" style="display:none;text-align:left">
-        <div class="rev-title">Answer Review</div>
-        <div id="revList"></div>
-      </div>
-    </div>
-  </div>
 </div>
 
-<script>
-  /* ═══════════════════════════
-     CONFIG
-  ═══════════════════════════ */
-  const CLASS_SUBJECTS = {
-    2:['mathematics','evs','english','hindi','gk'],
-    3:['mathematics','evs','english','hindi','gk'],
-    4:['mathematics','evs','english','hindi','gk'],
-    5:['mathematics','evs','english','hindi','gk'],
-    6:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
-    7:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
-    8:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
-    9:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
-    10:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],
-  };
-  const SMETA={
-    mathematics:{icon:'📐',label:'Mathematics',color:'#B8860B',strp:'#F0C040'},
-    evs:        {icon:'🌿',label:'EVS',         color:'#2E7D32',strp:'#66BB6A'},
-    science:    {icon:'🔬',label:'Science',     color:'#1A6B3A',strp:'#5CB85C'},
-    english:    {icon:'📖',label:'English',     color:'#1A4A8A',strp:'#5B9BD5'},
-    hindi:      {icon:'🇮🇳',label:'Hindi',      color:'#8B1A1A',strp:'#D96A3A'},
-    social:     {icon:'🏛️',label:'Social Science',color:'#1A5A6B',strp:'#3AABCA'},
-    sanskrit:   {icon:'📜',label:'Sanskrit',    color:'#5A3E00',strp:'#C8960C'},
-    computer:   {icon:'💻',label:'Computer',    color:'#1A1A6B',strp:'#5B5BD5'},
-    gk:         {icon:'🌍',label:'GK',          color:'#5A1A8A',strp:'#9B59B6'},
-  };
+<script th:inline="javascript">
+  const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]').content;
+  const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]').content;
+  const LOGGED_USER = /*[[${username}]]*/ 'Student';
 
-  /* ═══════════════════════════
-     QUESTION BANKS
-     band: 'lower'=Class2-5, 'upper'=Class6-10
-  ═══════════════════════════ */
+  /* ── CONFIG ─────────────────── */
+  const CLASS_SUBJECTS={2:['mathematics','evs','english','hindi','gk'],3:['mathematics','evs','english','hindi','gk'],4:['mathematics','evs','english','hindi','gk'],5:['mathematics','evs','english','hindi','gk'],6:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],7:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],8:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],9:['mathematics','science','english','hindi','social','sanskrit','computer','gk'],10:['mathematics','science','english','hindi','social','sanskrit','computer','gk']};
+  const SMETA={mathematics:{icon:'📐',label:'Mathematics',color:'#1B5E3B',strp:'#2ECC71'},evs:{icon:'🌿',label:'EVS',color:'#2E7D32',strp:'#66BB6A'},science:{icon:'🔬',label:'Science',color:'#1A6B3A',strp:'#5CB85C'},english:{icon:'📖',label:'English',color:'#1A4A8A',strp:'#5B9BD5'},hindi:{icon:'🇮🇳',label:'Hindi',color:'#8B1A1A',strp:'#D96A3A'},social:{icon:'🏛️',label:'Social Science',color:'#1A5A6B',strp:'#3AABCA'},sanskrit:{icon:'📜',label:'Sanskrit',color:'#5A3E00',strp:'#C8960C'},computer:{icon:'💻',label:'Computer',color:'#1A1A6B',strp:'#5B5BD5'},gk:{icon:'🌍',label:'GK',color:'#5A1A8A',strp:'#9B59B6'}};
+  const CLASS_DATA={2:{emoji:'🌱',ord:'2nd',color:'#1A5276',bg:'#EBF5FB',tag:'Primary'},3:{emoji:'🌻',ord:'3rd',color:'#1F618D',bg:'#EBF5FB',tag:'Primary'},4:{emoji:'📚',ord:'4th',color:'#1B5E3B',bg:'#E8F6F0',tag:'Primary'},5:{emoji:'🔭',ord:'5th',color:'#0E6655',bg:'#E8F6F0',tag:'Primary'},6:{emoji:'⚗️',ord:'6th',color:'#1B4F72',bg:'#EBF5FB',tag:'Middle'},7:{emoji:'🧮',ord:'7th',color:'#6C3483',bg:'#F0EAF7',tag:'Middle'},8:{emoji:'🌐',ord:'8th',color:'#922B21',bg:'#FDEDEC',tag:'Middle'},9:{emoji:'🎯',ord:'9th',color:'#1B5E3B',bg:'#E8F5EE',tag:'Secondary'},10:{emoji:'🏆',ord:'10th',color:'#1A252F',bg:'#E8EDF3',tag:'Secondary'}};
+
+  /* ── QUESTION BANKS ─────────── */
   const QB={};
+  QB.mathematics={lower:[{q:"What is 15 + 27?",opts:["40","42","45","38"],ans:1,t:"Addition"},{q:"What is 63 − 28?",opts:["35","33","37","31"],ans:0,t:"Subtraction"},{q:"What is 6 × 7?",opts:["42","48","36","54"],ans:0,t:"Multiplication"},{q:"What is 48 ÷ 6?",opts:["6","7","8","9"],ans:2,t:"Division"},{q:"Smallest 3-digit number?",opts:["999","100","001","010"],ans:1,t:"Number System"},{q:"What comes after 99?",opts:["90","100","109","110"],ans:1,t:"Number System"},{q:"Sides of a triangle?",opts:["2","3","4","5"],ans:1,t:"Geometry"},{q:"Half of 80?",opts:["20","30","40","50"],ans:2,t:"Fractions"},{q:"Which is even?",opts:["13","17","22","35"],ans:2,t:"Number System"},{q:"9 × 9 = ?",opts:["72","81","90","63"],ans:1,t:"Multiplication"},{q:"100 − 45 = ?",opts:["65","55","45","60"],ans:1,t:"Subtraction"},{q:"Centimetres in 1 metre?",opts:["10","100","1000","50"],ans:1,t:"Measurement"},{q:"3/4 of 40?",opts:["20","25","30","35"],ans:2,t:"Fractions"},{q:"Shape with 4 equal sides?",opts:["Rectangle","Triangle","Square","Pentagon"],ans:2,t:"Geometry"},{q:"5² = ?",opts:["10","15","20","25"],ans:3,t:"Powers"},{q:"1000 + 250 = ?",opts:["1025","1250","1500","1200"],ans:1,t:"Addition"},{q:"Hours in a day?",opts:["12","16","20","24"],ans:3,t:"Time"},{q:"72 ÷ 8 = ?",opts:["7","8","9","10"],ans:2,t:"Division"},{q:"Perimeter of square side 5cm?",opts:["10 cm","15 cm","20 cm","25 cm"],ans:2,t:"Geometry"},{q:"Largest 2-digit number?",opts:["89","98","99","90"],ans:2,t:"Number System"},{q:"5 × 8 = ?",opts:["35","40","45","50"],ans:1,t:"Multiplication"},{q:"144 ÷ 12 = ?",opts:["10","11","12","13"],ans:2,t:"Division"},{q:"3 out of 8 parts shaded:",opts:["3/5","3/8","5/8","8/3"],ans:1,t:"Fractions"},{q:"Area of rectangle 6cm × 4cm:",opts:["10 cm²","20 cm²","24 cm²","18 cm²"],ans:2,t:"Geometry"},{q:"Multiple of both 3 and 4:",opts:["10","14","12","9"],ans:2,t:"Number System"}],upper:[{q:"Which is an irrational number?",opts:["√4","√9","√7","√16"],ans:2,t:"Number Systems"},{q:"Decimal expansion of rational:",opts:["Always terminating","Always non-terminating","Terminating or repeating","Non-repeating"],ans:2,t:"Number Systems"},{q:"If x²−5x+6=0, x values:",opts:["2 and 3","1 and 6","−2 and −3","2 and −3"],ans:0,t:"Algebra"},{q:"(a+b)²−(a−b)² =",opts:["4ab","2ab","a²−b²","4a²"],ans:0,t:"Algebra"},{q:"2x+3=11, x=?",opts:["3","4","5","6"],ans:1,t:"Algebra"},{q:"Factorize: x²−9",opts:["(x+3)(x−3)","(x+9)(x−1)","(x−3)²","(x+3)²"],ans:0,t:"Algebra"},{q:"Sum of roots of ax²+bx+c=0:",opts:["b/a","−b/a","c/a","−c/a"],ans:1,t:"Algebra"},{q:"Angle sum of triangle:",opts:["90°","180°","270°","360°"],ans:1,t:"Geometry"},{q:"Area of circle radius r:",opts:["2πr","πr²","πd","2πr²"],ans:1,t:"Geometry"},{q:"sin 30° =",opts:["1","√3/2","1/2","1/√2"],ans:2,t:"Trigonometry"},{q:"cos 0° =",opts:["0","1","−1","Undefined"],ans:1,t:"Trigonometry"},{q:"sin²θ+cos²θ =",opts:["2","0","1","−1"],ans:2,t:"Trigonometry"},{q:"tan 45° =",opts:["0","√3","1/√3","1"],ans:3,t:"Trigonometry"},{q:"Mean of 5,10,15,20,25:",opts:["12","13","15","17"],ans:2,t:"Statistics"},{q:"Probability of impossible event:",opts:["0","1","0.5","−1"],ans:0,t:"Statistics"},{q:"Median of 3,7,8,10,14:",opts:["7","8","10","9"],ans:1,t:"Statistics"},{q:"Side opposite 90°:",opts:["Base","Altitude","Hypotenuse","Median"],ans:2,t:"Geometry"},{q:"Product of roots of ax²+bx+c=0:",opts:["b/a","−b/a","c/a","−c/a"],ans:2,t:"Algebra"},{q:"Volume of cube side a:",opts:["a²","a³","3a","6a²"],ans:1,t:"Mensuration"},{q:"Measure most affected by extremes:",opts:["Median","Mode","Mean","Range"],ans:2,t:"Statistics"},{q:"Sides 3,4,5 form a ___ triangle:",opts:["Equilateral","Isosceles","Right-angled","Obtuse"],ans:2,t:"Geometry"},{q:"LCM of 12 and 18:",opts:["6","36","24","72"],ans:1,t:"Number Systems"},{q:"√169 =",opts:["11","12","13","14"],ans:2,t:"Algebra"},{q:"Distance (0,0) to (3,4):",opts:["3","4","5","7"],ans:2,t:"Coord Geometry"},{q:"Surface area of sphere r:",opts:["4πr","2πr²","4πr²","πr²"],ans:2,t:"Mensuration"}]};
+  QB.evs={lower:[{q:"Gas plants take in?",opts:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"],ans:2,t:"Plants"},{q:"Top layer of Earth?",opts:["Mantle","Crust","Core","Magma"],ans:1,t:"Earth"},{q:"Animal giving us milk?",opts:["Dog","Cow","Cat","Parrot"],ans:1,t:"Animals"},{q:"Plants need ___ to make food:",opts:["Moonlight","Sunlight","Only water","Only soil"],ans:1,t:"Plants"},{q:"Sense organ to hear:",opts:["Eyes","Nose","Ears","Tongue"],ans:2,t:"Human Body"},{q:"Main source of energy for Earth:",opts:["Moon","Stars","Sun","Wind"],ans:2,t:"Environment"},{q:"Which is a water body?",opts:["Mountain","Desert","River","Forest"],ans:2,t:"Geography"},{q:"Continents on Earth:",opts:["5","6","7","8"],ans:2,t:"Geography"},{q:"Which is a natural disaster?",opts:["Picnic","Earthquake","Reading","Cycling"],ans:1,t:"Environment"},{q:"We breathe in:",opts:["CO₂","Nitrogen","Oxygen","Hydrogen"],ans:2,t:"Human Body"},{q:"Non-renewable resource:",opts:["Solar","Wind","Coal","Water"],ans:2,t:"Resources"},{q:"Fish live in:",opts:["Land","Air","Water","Desert"],ans:2,t:"Animals"},{q:"Season after summer:",opts:["Spring","Winter","Monsoon","Autumn"],ans:2,t:"Seasons"},{q:"Animals eating only plants:",opts:["Carnivores","Herbivores","Omnivores","Decomposers"],ans:1,t:"Animals"},{q:"Tallest animal:",opts:["Elephant","Giraffe","Horse","Camel"],ans:1,t:"Animals"},{q:"Plant part absorbing water:",opts:["Leaf","Stem","Root","Flower"],ans:2,t:"Plants"},{q:"Days in a leap year:",opts:["365","366","364","360"],ans:1,t:"Time"},{q:"Source of light:",opts:["Mirror","Table","Sun","Book"],ans:2,t:"Environment"},{q:"Which is a fruit?",opts:["Carrot","Potato","Mango","Spinach"],ans:2,t:"Plants"},{q:"Animals eating both:",opts:["Herbivores","Carnivores","Omnivores","Decomposers"],ans:2,t:"Animals"},{q:"Solid waste:",opts:["Smoke","Plastic bag","Sewage","Steam"],ans:1,t:"Environment"},{q:"Planet closest to Sun:",opts:["Earth","Venus","Mercury","Mars"],ans:2,t:"Space"},{q:"Bones in adult body:",opts:["196","206","216","226"],ans:1,t:"Human Body"},{q:"Organ purifying blood:",opts:["Heart","Lungs","Kidney","Liver"],ans:2,t:"Human Body"},{q:"Water turning to vapour:",opts:["Condensation","Precipitation","Evaporation","Transpiration"],ans:2,t:"Water"}],upper:[]};
+  QB.science={lower:[],upper:[{q:"Powerhouse of the cell?",opts:["Nucleus","Mitochondria","Ribosome","Golgi body"],ans:1,t:"Biology"},{q:"Chemical formula of water:",opts:["H₂O₂","HO","H₂O","H₃O"],ans:2,t:"Chemistry"},{q:"Gas produced in photosynthesis:",opts:["CO₂","N₂","O₂","H₂"],ans:2,t:"Biology"},{q:"Newton's 2nd law: F =",opts:["mv","ma","m/a","v/t"],ans:1,t:"Physics"},{q:"SI unit of current:",opts:["Volt","Watt","Ampere","Ohm"],ans:2,t:"Physics"},{q:"Acid in vinegar:",opts:["HCl","Acetic acid","Citric acid","H₂SO₄"],ans:1,t:"Chemistry"},{q:"Sound travels fastest in:",opts:["Air","Water","Vacuum","Steel"],ans:3,t:"Physics"},{q:"Atomic number of Carbon:",opts:["6","8","12","14"],ans:0,t:"Chemistry"},{q:"Brain controlling balance:",opts:["Cerebrum","Medulla","Cerebellum","Hypothalamus"],ans:2,t:"Biology"},{q:"Symbol for Gold:",opts:["Go","Gd","Au","Ag"],ans:2,t:"Chemistry"},{q:"Universal blood donor:",opts:["A","B","AB","O"],ans:3,t:"Biology"},{q:"Unit of resistance:",opts:["Ampere","Volt","Ohm","Watt"],ans:2,t:"Physics"},{q:"DNA stands for:",opts:["Deoxyribonucleic Acid","Diribonucleic Acid","Deoxynitronic Acid","None"],ans:0,t:"Biology"},{q:"Greenhouse gas:",opts:["O₂","N₂","CO₂","H₂"],ans:2,t:"Environment"},{q:"Symbol of Sodium:",opts:["So","Na","S","Sn"],ans:1,t:"Chemistry"},{q:"Speed of light approx:",opts:["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"],ans:1,t:"Physics"},{q:"Chromosomes made of:",opts:["Protein only","DNA and Protein","RNA only","Lipids"],ans:1,t:"Biology"},{q:"Rear-view mirror type:",opts:["Plane","Concave","Convex","Parabolic"],ans:2,t:"Physics"},{q:"pH of pure water:",opts:["0","7","14","5"],ans:1,t:"Chemistry"},{q:"Hormone for blood sugar:",opts:["Thyroxine","Adrenaline","Insulin","Estrogen"],ans:2,t:"Biology"},{q:"Velocity = Distance / ___:",opts:["Mass","Time","Force","Area"],ans:1,t:"Physics"},{q:"Acid in our stomach:",opts:["Citric","Acetic","Hydrochloric","Sulphuric"],ans:2,t:"Chemistry"},{q:"Rusting involves:",opts:["Only O₂","Only water","O₂ and water","CO₂"],ans:2,t:"Chemistry"},{q:"Smallest unit of life:",opts:["Tissue","Organ","Cell","Atom"],ans:2,t:"Biology"},{q:"Plant organ for photosynthesis:",opts:["Root","Stem","Leaf","Flower"],ans:2,t:"Biology"}]};
+  QB.english={lower:[{q:"Which is a vowel?",opts:["B","C","A","D"],ans:2,t:"Alphabet"},{q:"Plural of 'cat':",opts:["cats","cates","cat's","caties"],ans:0,t:"Grammar"},{q:"Which word is a verb?",opts:["Happy","Run","Tree","Blue"],ans:1,t:"Grammar"},{q:"Opposite of 'hot':",opts:["Warm","Cold","Big","Fast"],ans:1,t:"Vocabulary"},{q:"'She ___ a book.'",opts:["read","reads","reading","readed"],ans:1,t:"Grammar"},{q:"Correct sentence:",opts:["He go to school.","He goes to school.","He going school.","He gone school."],ans:1,t:"Grammar"},{q:"Plural of 'child':",opts:["childs","childrens","children","child"],ans:2,t:"Grammar"},{q:"Naming word in 'The dog runs':",opts:["runs","fast","The","dog"],ans:3,t:"Grammar"},{q:"Which is a colour word?",opts:["Run","Beautiful","Blue","Quickly"],ans:2,t:"Vocabulary"},{q:"'Big' means:",opts:["Small","Tiny","Large","Narrow"],ans:2,t:"Vocabulary"},{q:"Letters in alphabet:",opts:["24","25","26","27"],ans:2,t:"Alphabet"},{q:"Rhymes with 'bat':",opts:["bin","but","cat","big"],ans:2,t:"Phonics"},{q:"'I ___ happy today.'",opts:["am","is","are","be"],ans:0,t:"Grammar"},{q:"Question word:",opts:["and","but","Why","or"],ans:2,t:"Grammar"},{q:"Opposite of 'day':",opts:["Evening","Morning","Night","Dusk"],ans:2,t:"Vocabulary"},{q:"'and' is a:",opts:["Noun","Verb","Conjunction","Adjective"],ans:2,t:"Grammar"},{q:"'Very happy' means:",opts:["Sad","Angry","Joyful","Tired"],ans:2,t:"Vocabulary"},{q:"'She has two ___.' (book):",opts:["book","books","bookes","booksies"],ans:1,t:"Grammar"},{q:"'She sings.' — 'sings' is a:",opts:["Noun","Verb","Adjective","Adverb"],ans:1,t:"Grammar"},{q:"Opposite of 'open':",opts:["Wide","Narrow","Close","Shut"],ans:3,t:"Vocabulary"},{q:"Describing word:",opts:["Run","Tall","Table","Slowly"],ans:1,t:"Grammar"},{q:"'Cat sat ___ the mat.'",opts:["in","at","on","by"],ans:2,t:"Grammar"},{q:"Opposite of 'clean':",opts:["Fresh","Bright","Dirty","New"],ans:2,t:"Vocabulary"},{q:"Vowels in 'elephant':",opts:["2","3","4","5"],ans:1,t:"Phonics"},{q:"Correct punctuation:",opts:["where are you.","Where are you?","where are you?","Where are you."],ans:1,t:"Punctuation"}],upper:[{q:"Synonym for 'Benevolent':",opts:["Cruel","Kind","Angry","Lazy"],ans:1,t:"Vocabulary"},{q:"Passive Voice:",opts:["She reads a book","He wrote a letter","The letter was written by him","They are playing"],ans:2,t:"Grammar"},{q:"Plural of 'Leaf':",opts:["Leafs","Leaves","Leafes","Leavs"],ans:1,t:"Grammar"},{q:"Antonym of 'Ancient':",opts:["Old","Modern","Historic","Classic"],ans:1,t:"Vocabulary"},{q:"'singing' in 'good at singing' is:",opts:["Noun","Verb","Gerund","Adjective"],ans:2,t:"Grammar"},{q:"'Quickly' is a:",opts:["Adjective","Noun","Adverb","Conjunction"],ans:2,t:"Grammar"},{q:"Correctly spelled:",opts:["Accomodation","Accommodation","Acommodation","Acomodation"],ans:1,t:"Spelling"},{q:"'The wind whispered' — device:",opts:["Simile","Metaphor","Personification","Alliteration"],ans:2,t:"Literature"},{q:"'Neither he nor I ___ present.'",opts:["was","were","are","is"],ans:0,t:"Grammar"},{q:"'Bite the bullet' means:",opts:["Eat fast","Face pain bravely","Argue","Quit"],ans:1,t:"Idioms"},{q:"'How beautiful the sunset!' is:",opts:["Declarative","Interrogative","Imperative","Exclamatory"],ans:3,t:"Grammar"},{q:"Past tense of 'Ring':",opts:["Ringed","Rang","Rung","Ring"],ans:1,t:"Grammar"},{q:"Compound sentence:",opts:["She sang","He ran fast","It rained and streets flooded","Because he was tired"],ans:2,t:"Grammar"},{q:"'Cannot read/write' — one word:",opts:["Illiterate","Ignorant","Mute","Blind"],ans:0,t:"Vocabulary"},{q:"'She is afraid ___ dogs.'",opts:["from","of","by","with"],ans:1,t:"Grammar"},{q:"'Peter Piper picked…' device:",opts:["Simile","Onomatopoeia","Alliteration","Assonance"],ans:2,t:"Literature"},{q:"Tense: 'He has been working since morning.'",opts:["Simple Past","Past Perfect","Present Perfect Continuous","Future Perfect"],ans:2,t:"Grammar"},{q:"Correct article: ___ apple a day…",opts:["A","An","The","No article"],ans:1,t:"Grammar"},{q:"'Enormous' means:",opts:["Tiny","Huge","Fast","Bright"],ans:1,t:"Vocabulary"},{q:"'Ephemeral' means:",opts:["Eternal","Long-lasting","Short-lived","Ancient"],ans:2,t:"Vocabulary"},{q:"Synonym for 'Candid':",opts:["Dishonest","Frank","Timid","Arrogant"],ans:1,t:"Vocabulary"},{q:"'Proof of pudding' means:",opts:["Food matters","Results judge quality","Cooking is art","Patience"],ans:1,t:"Idioms"},{q:"'She ___ to school every day.'",opts:["go","went","goes","going"],ans:2,t:"Grammar"},{q:"Subordinating conjunction:",opts:["And","But","Although","Or"],ans:2,t:"Grammar"},{q:"'Brevity is soul of wit' author:",opts:["Keats","Shakespeare","Milton","Wordsworth"],ans:1,t:"Literature"}]};
+  QB.hindi={lower:[{q:"'किताब' का बहुवचन:",opts:["किताबें","किताबों","किताब","किताबे"],ans:0,t:"व्याकरण"},{q:"'अच्छा' का विलोम:",opts:["सुंदर","बुरा","सफेद","नया"],ans:1,t:"विलोम"},{q:"'सूरज' का पर्यायवाची:",opts:["चाँद","तारा","सूर्य","आकाश"],ans:2,t:"पर्यायवाची"},{q:"हिंदी में स्वर:",opts:["10","11","12","13"],ans:1,t:"वर्णमाला"},{q:"'पानी' का पर्यायवाची:",opts:["आग","जल","हवा","धरती"],ans:1,t:"पर्यायवाची"},{q:"'लड़का' का स्त्रीलिंग:",opts:["लड़की","लड़कियाँ","बालक","बालिका"],ans:0,t:"लिंग"},{q:"'बड़ा' का विलोम:",opts:["मोटा","नया","छोटा","लंबा"],ans:2,t:"विलोम"},{q:"'रात' का विलोम:",opts:["शाम","सुबह","दिन","दोपहर"],ans:2,t:"विलोम"},{q:"'नदी' का बहुवचन:",opts:["नदीएँ","नदियाँ","नदियों","नदीयाँ"],ans:1,t:"व्याकरण"},{q:"'ठंडा' का विलोम:",opts:["बड़ा","गरम","नया","पुराना"],ans:1,t:"विलोम"},{q:"'पुस्तक' का अर्थ:",opts:["कलम","किताब","थैला","मेज"],ans:1,t:"शब्द-ज्ञान"},{q:"'वह खेल रहा है।' काल:",opts:["भूतकाल","भविष्यकाल","वर्तमानकाल","सामान्य"],ans:2,t:"काल"},{q:"'सफेद' का विलोम:",opts:["लाल","काला","नीला","पीला"],ans:1,t:"विलोम"},{q:"'गाय' का बच्चा:",opts:["पिल्ला","बछड़ा","मेमना","चूज़ा"],ans:1,t:"सामान्य ज्ञान"},{q:"हिंदी की लिपि:",opts:["रोमन","अरबी","देवनागरी","गुरुमुखी"],ans:2,t:"भाषा"},{q:"'महान' है:",opts:["संज्ञा","सर्वनाम","विशेषण","क्रिया"],ans:2,t:"व्याकरण"},{q:"'आम' किस मौसम में?",opts:["सर्दी","बसंत","गर्मी","बरसात"],ans:2,t:"सामान्य ज्ञान"},{q:"'पक्षी' का बहुवचन:",opts:["पक्षीएँ","पक्षियाँ","पक्षी","पक्षियों"],ans:1,t:"व्याकरण"},{q:"'खाना' क्रिया का अर्थ:",opts:["पीना","सोना","खाना","दौड़ना"],ans:2,t:"शब्द-ज्ञान"},{q:"'नीला' किस प्रकार का?",opts:["संज्ञा","क्रिया","विशेषण","सर्वनाम"],ans:2,t:"व्याकरण"},{q:"मोर राष्ट्रीय क्या है?",opts:["पशु","पक्षी","फूल","वृक्ष"],ans:1,t:"सामान्य ज्ञान"},{q:"'फूल' का बहुवचन:",opts:["फूलें","फूल","फूलों","फूले"],ans:1,t:"व्याकरण"},{q:"'आकाश' का पर्यायवाची:",opts:["धरती","नभ","सागर","पर्वत"],ans:1,t:"पर्यायवाची"},{q:"'राम स्कूल जाता है।' क्रिया:",opts:["राम","स्कूल","जाता","है"],ans:2,t:"व्याकरण"},{q:"'म' से शुरू फल:",opts:["सेब","आम","केला","अंगूर"],ans:1,t:"शब्द-ज्ञान"}],upper:[{q:"'पुस्तक' का बहुवचन:",opts:["पुस्तकें","पुस्तकों","पुस्तकों को","पुस्तक"],ans:0,t:"व्याकरण"},{q:"'आना' का भूतकाल:",opts:["आता है","आया","आएगा","आ रहा है"],ans:1,t:"काल"},{q:"'वह पढ़ रहा है' काल:",opts:["भूतकाल","वर्तमानकाल","भविष्यकाल","संदिग्ध"],ans:1,t:"काल"},{q:"'रात-दिन' में समास:",opts:["तत्पुरुष","द्वंद्व","कर्मधारय","बहुव्रीहि"],ans:1,t:"समास"},{q:"'निः+जन' की संधि:",opts:["निरजन","निर्जन","नीरज","निजन"],ans:1,t:"संधि"},{q:"'पंकज' का पर्यायवाची:",opts:["पत्थर","कमल","नदी","बादल"],ans:1,t:"पर्यायवाची"},{q:"'अंधेरा' का विलोम:",opts:["काला","उजाला","रात","धुंधला"],ans:1,t:"विलोम"},{q:"रस के प्रकार:",opts:["7","8","9","10"],ans:2,t:"काव्य"},{q:"'श्रृंगार रस' का भाव:",opts:["हास","रति","शोक","भय"],ans:1,t:"काव्य"},{q:"'जो कभी न मरे' एक शब्द:",opts:["अनश्वर","अमर","अजर","नश्वर"],ans:1,t:"वाक्यांश"},{q:"'यमक अलंकार' में:",opts:["शब्द की आवृत्ति","उपमा","रूपक","अनुप्रास"],ans:0,t:"अलंकार"},{q:"'कवि' का स्त्रीलिंग:",opts:["कवियत्री","कवयित्री","कवित्री","कविनी"],ans:1,t:"लिंग"},{q:"'ने' विभक्ति:",opts:["कर्म","करण","कर्ता","सम्प्रदान"],ans:2,t:"कारक"},{q:"'आकाश' का तत्सम:",opts:["आसमान","गगन","अम्बर","आकाश"],ans:3,t:"तत्सम"},{q:"'सरस्वती' किसकी देवी?",opts:["धन","शक्ति","विद्या","प्रकृति"],ans:2,t:"सामान्य ज्ञान"},{q:"'पेड़' का बहुवचन:",opts:["पेड़े","पेड़ें","पेड़ों","पेड़"],ans:2,t:"व्याकरण"},{q:"हिंदी दिवस कब?",opts:["14 जनवरी","14 नवंबर","14 सितंबर","14 अगस्त"],ans:2,t:"सामान्य ज्ञान"},{q:"'निराशा' में उपसर्ग:",opts:["निर","नि","निरा","निराश"],ans:0,t:"उपसर्ग"},{q:"'चिड़िया' शब्द है:",opts:["तत्सम","तद्भव","देशज","विदेशज"],ans:2,t:"शब्द"},{q:"'कवि' में प्रत्यय:",opts:["इ","वि","क","None"],ans:0,t:"प्रत्यय"},{q:"'राम ने सेब खाया' कारक:",opts:["कर्म","कर्ता","करण","अपादान"],ans:1,t:"कारक"},{q:"'महाभारत' के लेखक:",opts:["वाल्मीकि","तुलसीदास","वेदव्यास","कालिदास"],ans:2,t:"साहित्य"},{q:"'दोहा' में चरण:",opts:["2","4","6","8"],ans:1,t:"काव्य"},{q:"'विद्यालय' में समास:",opts:["तत्पुरुष","द्वंद्व","बहुव्रीहि","कर्मधारय"],ans:0,t:"समास"},{q:"'आकाश' का पर्यायवाची:",opts:["धरती","नभ","सागर","पर्वत"],ans:1,t:"पर्यायवाची"}]};
+  QB.social={lower:[],upper:[{q:"French Revolution began in:",opts:["1776","1789","1800","1815"],ans:1,t:"World History"},{q:"Tropic of Cancer through Indian states:",opts:["6","7","8","9"],ans:2,t:"Geography"},{q:"Preamble begins:",opts:["We the Citizens","We the People","We the Indians","We the Nation"],ans:1,t:"Civics"},{q:"Amendment — Fundamental Duties:",opts:["40th","42nd","44th","46th"],ans:1,t:"Civics"},{q:"Black Soil grows:",opts:["Rice","Cotton","Wheat","Jute"],ans:1,t:"Geography"},{q:"'Do or Die' slogan:",opts:["Nehru","Gandhi","Bose","Tilak"],ans:1,t:"Indian History"},{q:"Highest peak in world:",opts:["K2","Kangchenjunga","Mount Everest","Lhotse"],ans:2,t:"Geography"},{q:"Permanent Settlement 1793 by:",opts:["Dalhousie","Cornwallis","Clive","Wellesley"],ans:1,t:"Indian History"},{q:"Fundamental Rights in Part:",opts:["I","II","III","IV"],ans:2,t:"Civics"},{q:"Dandi March — related to:",opts:["Non-Cooperation","Salt Tax","Partition","Rowlatt"],ans:1,t:"Indian History"},{q:"Largest ocean:",opts:["Atlantic","Indian","Arctic","Pacific"],ans:3,t:"Geography"},{q:"Directive Principles from:",opts:["USA","Ireland","UK","Australia"],ans:1,t:"Civics"},{q:"Longest National Highway:",opts:["NH 44","NH 1","NH 27","NH 48"],ans:0,t:"Geography"},{q:"Berlin Wall fell in:",opts:["1985","1987","1989","1991"],ans:2,t:"World History"},{q:"Panchayati Raj first in:",opts:["1952","1955","1959","1962"],ans:2,t:"Civics"},{q:"Sundarbans delta river:",opts:["Indus","Ganga-Brahmaputra","Mahanadi","Krishna"],ans:1,t:"Geography"},{q:"'Discovery of India' by:",opts:["Gandhi","Ambedkar","Nehru","Tagore"],ans:2,t:"Indian History"},{q:"RTE Act year:",opts:["2005","2007","2009","2011"],ans:2,t:"Civics"},{q:"Thar Desert climate:",opts:["Tropical","Arid","Mediterranean","Continental"],ans:1,t:"Geography"},{q:"Green Revolution:",opts:["Industry","Agriculture","Space","Education"],ans:1,t:"Indian History"},{q:"Article abolishing untouchability:",opts:["14","17","21","25"],ans:1,t:"Civics"},{q:"Indus Valley around:",opts:["500 BCE","1500 BCE","2500 BCE","3500 BCE"],ans:2,t:"Indian History"},{q:"Largest desert:",opts:["Thar","Gobi","Sahara","Arabian"],ans:2,t:"Geography"},{q:"WTO headquarters:",opts:["New York","Geneva","Paris","London"],ans:1,t:"World"},{q:"'Laissez-faire' related to:",opts:["Political","Economic","Military","Cultural"],ans:1,t:"Economics"}]};
+  QB.sanskrit={lower:[],upper:[{q:"'नमस्ते' का अर्थ:",opts:["अलविदा","प्रणाम","धन्यवाद","स्वागत"],ans:1,t:"शब्द"},{q:"'गच्छति' का अर्थ:",opts:["खाता","पढ़ता","जाता","लिखता"],ans:2,t:"क्रिया"},{q:"'जल' का अर्थ:",opts:["आग","पानी","हवा","मिट्टी"],ans:1,t:"शब्द"},{q:"'अहम्' का अर्थ:",opts:["वह","तुम","मैं","हम"],ans:2,t:"सर्वनाम"},{q:"'सूर्यः' लिंग:",opts:["स्त्री","पुल्लिंग","नपुंसक","None"],ans:1,t:"लिंग"},{q:"'पठति' का अर्थ:",opts:["खाता","पढ़ता","जाता","लिखता"],ans:1,t:"क्रिया"},{q:"'एकः' का अर्थ:",opts:["दो","एक","तीन","शून्य"],ans:1,t:"संख्या"},{q:"'गुरुः' का अर्थ:",opts:["शिष्य","माता","शिक्षक","पिता"],ans:2,t:"शब्द"},{q:"'त्वम्' का अर्थ:",opts:["मैं","वह","तुम","हम"],ans:2,t:"सर्वनाम"},{q:"'वन्दे मातरम्' का अर्थ:",opts:["जय भारत","माँ को नमन","भारत माँ","विजय"],ans:1,t:"साहित्य"},{q:"'पितृ' का अर्थ:",opts:["माता","पिता","भाई","बहन"],ans:1,t:"शब्द"},{q:"'खादति' का अर्थ:",opts:["पीता","खाता","जाता","देता"],ans:1,t:"क्रिया"},{q:"'सत्यम्' का अर्थ:",opts:["ईश्वर","सत्य","सुंदर","शांति"],ans:1,t:"साहित्य"},{q:"'नदी' बहुवचन:",opts:["नद्यः","नदीः","नदयः","नदीनि"],ans:0,t:"वचन"},{q:"'धर्मः' का अर्थ:",opts:["युद्ध","धर्म","शत्रु","भय"],ans:1,t:"शब्द"},{q:"'लता' लिंग:",opts:["पुल्लिंग","स्त्रीलिंग","नपुंसक","None"],ans:1,t:"लिंग"},{q:"'बालकः' विभक्ति:",opts:["द्वितीया","प्रथमा","तृतीया","चतुर्थी"],ans:1,t:"व्याकरण"},{q:"'मातृ' का अर्थ:",opts:["पिता","माता","पुत्र","पुत्री"],ans:1,t:"शब्द"},{q:"'विद्या' बहुवचन:",opts:["विद्याः","विद्यानि","विद्यासु","विद्याभ्यः"],ans:0,t:"वचन"},{q:"'ग्रहः' का अर्थ:",opts:["नदी","ग्रह","पर्वत","आकाश"],ans:1,t:"शब्द"},{q:"'देवः' बहुवचन:",opts:["देवाः","देवानि","देवेषु","देवम्"],ans:0,t:"वचन"},{q:"'रामायण' रचयिता:",opts:["वेदव्यास","वाल्मीकि","कालिदास","तुलसीदास"],ans:1,t:"साहित्य"},{q:"'पुस्तकम्' का अर्थ:",opts:["कलम","किताब","थैला","मेज"],ans:1,t:"शब्द"},{q:"'अहम् पठामि' का अर्थ:",opts:["मैं खाता","मैं पढ़ता","मैं जाता","मैं लिखता"],ans:1,t:"वाक्य"},{q:"'भारतम्' का अर्थ:",opts:["पाकिस्तान","श्रीलंका","भारत","चीन"],ans:2,t:"शब्द"}]};
+  QB.computer={lower:[],upper:[{q:"CPU stands for:",opts:["Central Processing Unit","Computer Processing Unit","Central Program Unit","Control Processing Unit"],ans:0,t:"Hardware"},{q:"Input device:",opts:["Monitor","Printer","Speaker","Keyboard"],ans:3,t:"Hardware"},{q:"Output device:",opts:["Mouse","Keyboard","Printer","Scanner"],ans:2,t:"Hardware"},{q:"1 Byte =",opts:["4 bits","8 bits","16 bits","32 bits"],ans:1,t:"Data"},{q:"'www' stands for:",opts:["World Wide Web","World Web Wide","Wide World Web","Web Wide World"],ans:0,t:"Internet"},{q:"Computer understands directly:",opts:["C++","Java","Binary Language","Python"],ans:2,t:"Programming"},{q:"RAM stands for:",opts:["Random Access Memory","Read Access Memory","Run Access Memory","Random All Memory"],ans:0,t:"Hardware"},{q:"NOT an OS:",opts:["Windows","macOS","Linux","MS Word"],ans:3,t:"Software"},{q:"Brain of computer:",opts:["RAM","Hard Disk","CPU","Monitor"],ans:2,t:"Hardware"},{q:"HTML stands for:",opts:["Hyper Text Markup Language","High Text Markup Language","Hyper Transfer Markup Language","None"],ans:0,t:"Internet"},{q:"Image file extension:",opts:[".mp3",".exe",".jpg",".docx"],ans:2,t:"Files"},{q:"Shortcut to copy:",opts:["Ctrl+V","Ctrl+X","Ctrl+C","Ctrl+Z"],ans:2,t:"Shortcuts"},{q:"Transistors — ___ generation:",opts:["1st","2nd","3rd","4th"],ans:1,t:"History"},{q:"Computer virus is:",opts:["Hardware","Malicious software","Antivirus","Network"],ans:1,t:"Security"},{q:"Permanent storage:",opts:["RAM","Cache","Hard Disk","Register"],ans:2,t:"Hardware"},{q:"Email stands for:",opts:["Electronic Mail","Electric Mail","Express Mail","Encoded Mail"],ans:0,t:"Internet"},{q:"Programming language:",opts:["HTTP","FTP","Python","HTML"],ans:2,t:"Programming"},{q:"Binary uses:",opts:["0–9","0 and 1","A–F","1–8"],ans:1,t:"Data"},{q:"Shortcut to undo:",opts:["Ctrl+Y","Ctrl+Z","Ctrl+U","Ctrl+A"],ans:1,t:"Shortcuts"},{q:"GUI stands for:",opts:["Graphical User Interface","General User Interface","Graphical Unique Interface","None"],ans:0,t:"Software"},{q:"Ring topology — devices in a:",opts:["Line","Star","Circle","Mesh"],ans:2,t:"Networking"},{q:"HTTP '404' means:",opts:["Server error","Not Found","Forbidden","Timeout"],ans:1,t:"Internet"},{q:"Web styling language:",opts:["Java","Python","CSS","C++"],ans:2,t:"Programming"},{q:"USB stands for:",opts:["Universal Serial Bus","Unique Serial Bus","Universal System Bus","None"],ans:0,t:"Hardware"},{q:"Search engine:",opts:["MS Word","Excel","Google","Photoshop"],ans:2,t:"Internet"}]};
+  QB.gk={lower:[{q:"Capital of India?",opts:["Mumbai","Kolkata","New Delhi","Chennai"],ans:2,t:"India"},{q:"Days in a week?",opts:["5","6","7","8"],ans:2,t:"General"},{q:"Largest land animal?",opts:["Lion","Elephant","Giraffe","Rhino"],ans:1,t:"Animals"},{q:"'Stop' colour?",opts:["Green","Yellow","Blue","Red"],ans:3,t:"Safety"},{q:"Months in a year?",opts:["10","11","12","13"],ans:2,t:"General"},{q:"Planet we live on?",opts:["Mars","Venus","Earth","Jupiter"],ans:2,t:"Space"},{q:"Festival of Lights?",opts:["Holi","Eid","Diwali","Christmas"],ans:2,t:"India"},{q:"First PM of India?",opts:["Shastri","Nehru","Indira","Rajiv"],ans:1,t:"India"},{q:"Legs of a spider?",opts:["6","8","10","4"],ans:1,t:"Animals"},{q:"Tallest mountain?",opts:["K2","Everest","Alps","Andes"],ans:1,t:"Geography"},{q:"Bird that talks?",opts:["Sparrow","Eagle","Parrot","Owl"],ans:2,t:"Animals"},{q:"Day after Wednesday?",opts:["Tuesday","Monday","Thursday","Friday"],ans:2,t:"General"},{q:"Colour of sky?",opts:["Green","Blue","Red","Yellow"],ans:1,t:"Nature"},{q:"Vehicle on railway?",opts:["Bus","Car","Train","Bicycle"],ans:2,t:"Transport"},{q:"NOT a planet:",opts:["Mars","Sun","Earth","Venus"],ans:1,t:"Space"},{q:"National animal?",opts:["Lion","Peacock","Tiger","Elephant"],ans:2,t:"India"},{q:"Corners in square?",opts:["3","4","5","6"],ans:1,t:"General"},{q:"Organ for smelling?",opts:["Eyes","Ears","Nose","Tongue"],ans:2,t:"Human Body"},{q:"Colours in rainbow?",opts:["5","6","7","8"],ans:2,t:"Nature"},{q:"National flower?",opts:["Rose","Lotus","Jasmine","Marigold"],ans:1,t:"India"},{q:"Fastest land animal:",opts:["Lion","Leopard","Cheetah","Tiger"],ans:2,t:"Animals"},{q:"Frozen rain:",opts:["Snow","Hail","Sleet","Frost"],ans:1,t:"Nature"},{q:"Independence year:",opts:["1942","1945","1947","1950"],ans:2,t:"India"},{q:"King of fruits:",opts:["Apple","Banana","Mango","Grapes"],ans:2,t:"General"},{q:"National bird:",opts:["Sparrow","Pigeon","Peacock","Eagle"],ans:2,t:"India"}],upper:[{q:"Father of Constitution?",opts:["Gandhi","Nehru","B.R. Ambedkar","Sardar Patel"],ans:2,t:"History"},{q:"Largest planet?",opts:["Earth","Saturn","Jupiter","Neptune"],ans:2,t:"Space"},{q:"Capital of Australia?",opts:["Sydney","Melbourne","Brisbane","Canberra"],ans:3,t:"Geography"},{q:"Author of national anthem?",opts:["Bankim Chandra","Rabindranath Tagore","Sarojini Naidu","Bose"],ans:1,t:"India"},{q:"Longest river?",opts:["Amazon","Nile","Yangtze","Mississippi"],ans:1,t:"Geography"},{q:"First Indian in space?",opts:["Sunita Williams","Kalpana Chawla","Rakesh Sharma","APJ Abdul Kalam"],ans:2,t:"India"},{q:"UN headquarters?",opts:["Geneva","London","New York","Washington"],ans:2,t:"World"},{q:"Most abundant gas?",opts:["Oxygen","CO₂","Nitrogen","Argon"],ans:2,t:"Science"},{q:"Olympic Games every:",opts:["2 years","3 years","4 years","5 years"],ans:2,t:"Sports"},{q:"Telephone inventor?",opts:["Edison","Tesla","Alexander Graham Bell","Marconi"],ans:2,t:"Inventions"},{q:"Smallest country?",opts:["Monaco","San Marino","Vatican City","Liechtenstein"],ans:2,t:"Geography"},{q:"Currency of Japan?",opts:["Yuan","Won","Yen","Baht"],ans:2,t:"World"},{q:"'Satyameva Jayate' from?",opts:["Rigveda","Mundaka Upanishad","Bhagavad Gita","Mahabharata"],ans:1,t:"India"},{q:"Red Planet?",opts:["Venus","Mars","Jupiter","Mercury"],ans:1,t:"Space"},{q:"Mona Lisa painter?",opts:["Michelangelo","Raphael","Leonardo da Vinci","Van Gogh"],ans:2,t:"Art"},{q:"National Science Day?",opts:["Jan 28","Feb 28","Mar 28","Apr 28"],ans:1,t:"India"},{q:"Largest country area?",opts:["China","USA","Canada","Russia"],ans:3,t:"Geography"},{q:"National bird?",opts:["Sparrow","Pigeon","Peacock","Eagle"],ans:2,t:"India"},{q:"Blood pressure by?",opts:["Thermometer","Stethoscope","Sphygmomanometer","ECG"],ans:2,t:"Health"},{q:"States in India (2024)?",opts:["26","27","28","29"],ans:2,t:"India"},{q:"Nobel Peace 2014:",opts:["Obama","Malala Yousafzai","Mother Teresa","Mandela"],ans:1,t:"World"},{q:"Highest population (2024)?",opts:["USA","India","China","Russia"],ans:1,t:"Geography"},{q:"Father of Internet?",opts:["Bill Gates","Tim Berners-Lee","Vint Cerf","Steve Jobs"],ans:2,t:"Technology"},{q:"Sport using 'Love':",opts:["Cricket","Football","Tennis","Hockey"],ans:2,t:"Sports"},{q:"India's first satellite:",opts:["INSAT","Aryabhata","Bhaskara","Rohini"],ans:1,t:"India"}]};
 
-  QB.mathematics={
-    lower:[
-      {q:"What is 15 + 27?",opts:["40","42","45","38"],ans:1,t:"Addition"},
-      {q:"What is 63 − 28?",opts:["35","33","37","31"],ans:0,t:"Subtraction"},
-      {q:"What is 6 × 7?",opts:["42","48","36","54"],ans:0,t:"Multiplication"},
-      {q:"What is 48 ÷ 6?",opts:["6","7","8","9"],ans:2,t:"Division"},
-      {q:"Smallest 3-digit number?",opts:["999","100","001","010"],ans:1,t:"Number System"},
-      {q:"What comes after 99?",opts:["90","100","109","110"],ans:1,t:"Number System"},
-      {q:"Sides of a triangle?",opts:["2","3","4","5"],ans:1,t:"Geometry"},
-      {q:"Half of 80?",opts:["20","30","40","50"],ans:2,t:"Fractions"},
-      {q:"Which is even?",opts:["13","17","22","35"],ans:2,t:"Number System"},
-      {q:"9 × 9 = ?",opts:["72","81","90","63"],ans:1,t:"Multiplication"},
-      {q:"100 − 45 = ?",opts:["65","55","45","60"],ans:1,t:"Subtraction"},
-      {q:"Centimetres in 1 metre?",opts:["10","100","1000","50"],ans:1,t:"Measurement"},
-      {q:"3/4 of 40?",opts:["20","25","30","35"],ans:2,t:"Fractions"},
-      {q:"Shape with 4 equal sides?",opts:["Rectangle","Triangle","Square","Pentagon"],ans:2,t:"Geometry"},
-      {q:"5² = ?",opts:["10","15","20","25"],ans:3,t:"Powers"},
-      {q:"1000 + 250 = ?",opts:["1025","1250","1500","1200"],ans:1,t:"Addition"},
-      {q:"Hours in a day?",opts:["12","16","20","24"],ans:3,t:"Time"},
-      {q:"72 ÷ 8 = ?",opts:["7","8","9","10"],ans:2,t:"Division"},
-      {q:"Perimeter of square with side 5 cm?",opts:["10 cm","15 cm","20 cm","25 cm"],ans:2,t:"Geometry"},
-      {q:"Largest 2-digit number?",opts:["89","98","99","90"],ans:2,t:"Number System"},
-      {q:"What is 5 × 8?",opts:["35","40","45","50"],ans:1,t:"Multiplication"},
-      {q:"144 ÷ 12 = ?",opts:["10","11","12","13"],ans:2,t:"Division"},
-      {q:"3 out of 8 parts shaded — fraction:",opts:["3/5","3/8","5/8","8/3"],ans:1,t:"Fractions"},
-      {q:"Area of rectangle 6cm × 4cm:",opts:["10 cm²","20 cm²","24 cm²","18 cm²"],ans:2,t:"Geometry"},
-      {q:"Multiple of both 3 and 4:",opts:["10","14","12","9"],ans:2,t:"Number System"},
-    ],
-    upper:[
-      {q:"Which is an irrational number?",opts:["√4","√9","√7","√16"],ans:2,t:"Number Systems"},
-      {q:"Decimal expansion of rational number:",opts:["Always terminating","Always non-terminating","Terminating or repeating","Non-repeating"],ans:2,t:"Number Systems"},
-      {q:"If x²−5x+6=0, x values:",opts:["2 and 3","1 and 6","−2 and −3","2 and −3"],ans:0,t:"Algebra"},
-      {q:"(a+b)²−(a−b)² =",opts:["4ab","2ab","a²−b²","4a²"],ans:0,t:"Algebra"},
-      {q:"2x+3=11, x=?",opts:["3","4","5","6"],ans:1,t:"Algebra"},
-      {q:"Factorize: x²−9",opts:["(x+3)(x−3)","(x+9)(x−1)","(x−3)²","(x+3)²"],ans:0,t:"Algebra"},
-      {q:"Sum of roots of ax²+bx+c=0:",opts:["b/a","−b/a","c/a","−c/a"],ans:1,t:"Algebra"},
-      {q:"Angle sum of triangle:",opts:["90°","180°","270°","360°"],ans:1,t:"Geometry"},
-      {q:"Area of circle radius r:",opts:["2πr","πr²","πd","2πr²"],ans:1,t:"Geometry"},
-      {q:"sin 30° =",opts:["1","√3/2","1/2","1/√2"],ans:2,t:"Trigonometry"},
-      {q:"cos 0° =",opts:["0","1","−1","Undefined"],ans:1,t:"Trigonometry"},
-      {q:"sin²θ + cos²θ =",opts:["2","0","1","−1"],ans:2,t:"Trigonometry"},
-      {q:"tan 45° =",opts:["0","√3","1/√3","1"],ans:3,t:"Trigonometry"},
-      {q:"Mean of 5,10,15,20,25:",opts:["12","13","15","17"],ans:2,t:"Statistics"},
-      {q:"Probability of impossible event:",opts:["0","1","0.5","−1"],ans:0,t:"Statistics"},
-      {q:"Median of 3,7,8,10,14:",opts:["7","8","10","9"],ans:1,t:"Statistics"},
-      {q:"Side opposite 90° is called:",opts:["Base","Altitude","Hypotenuse","Median"],ans:2,t:"Geometry"},
-      {q:"Product of roots of ax²+bx+c=0:",opts:["b/a","−b/a","c/a","−c/a"],ans:2,t:"Algebra"},
-      {q:"Volume of cube with side a:",opts:["a²","a³","3a","6a²"],ans:1,t:"Mensuration"},
-      {q:"Measure most affected by extreme values:",opts:["Median","Mode","Mean","Range"],ans:2,t:"Statistics"},
-      {q:"Sides 3,4,5 form a ___ triangle:",opts:["Equilateral","Isosceles","Right-angled","Obtuse"],ans:2,t:"Geometry"},
-      {q:"LCM of 12 and 18:",opts:["6","36","24","72"],ans:1,t:"Number Systems"},
-      {q:"√169 =",opts:["11","12","13","14"],ans:2,t:"Algebra"},
-      {q:"Distance from (0,0) to (3,4):",opts:["3","4","5","7"],ans:2,t:"Coordinate Geometry"},
-      {q:"Surface area of sphere radius r:",opts:["4πr","2πr²","4πr²","πr²"],ans:2,t:"Mensuration"},
-    ]};
-
-  QB.evs={lower:[
-      {q:"Gas plants take in during photosynthesis?",opts:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"],ans:2,t:"Plants"},
-      {q:"Top layer of the Earth?",opts:["Mantle","Crust","Core","Magma"],ans:1,t:"Earth"},
-      {q:"Animal that gives us milk?",opts:["Dog","Cow","Cat","Parrot"],ans:1,t:"Animals"},
-      {q:"Plants need ___ to make food:",opts:["Moonlight","Sunlight","Only water","Only soil"],ans:1,t:"Plants"},
-      {q:"Sense organ to hear:",opts:["Eyes","Nose","Ears","Tongue"],ans:2,t:"Human Body"},
-      {q:"Main source of energy for Earth:",opts:["Moon","Stars","Sun","Wind"],ans:2,t:"Environment"},
-      {q:"Which is a water body?",opts:["Mountain","Desert","River","Forest"],ans:2,t:"Geography"},
-      {q:"Number of continents on Earth:",opts:["5","6","7","8"],ans:2,t:"Geography"},
-      {q:"Which is a natural disaster?",opts:["Picnic","Earthquake","Reading","Cycling"],ans:1,t:"Environment"},
-      {q:"We breathe in:",opts:["Carbon dioxide","Nitrogen","Oxygen","Hydrogen"],ans:2,t:"Human Body"},
-      {q:"Non-renewable resource:",opts:["Solar energy","Wind","Coal","Water"],ans:2,t:"Resources"},
-      {q:"Fish live in:",opts:["Land","Air","Water","Desert"],ans:2,t:"Animals"},
-      {q:"Season after summer:",opts:["Spring","Winter","Monsoon","Autumn"],ans:2,t:"Seasons"},
-      {q:"Animals that eat only plants are:",opts:["Carnivores","Herbivores","Omnivores","Decomposers"],ans:1,t:"Animals"},
-      {q:"Tallest animal:",opts:["Elephant","Giraffe","Horse","Camel"],ans:1,t:"Animals"},
-      {q:"Part of plant that absorbs water:",opts:["Leaf","Stem","Root","Flower"],ans:2,t:"Plants"},
-      {q:"Days in a leap year:",opts:["365","366","364","360"],ans:1,t:"Time"},
-      {q:"Source of light:",opts:["Mirror","Table","Sun","Book"],ans:2,t:"Environment"},
-      {q:"Which is a fruit?",opts:["Carrot","Potato","Mango","Spinach"],ans:2,t:"Plants"},
-      {q:"Animals that eat both plants and animals:",opts:["Herbivores","Carnivores","Omnivores","Decomposers"],ans:2,t:"Animals"},
-      {q:"Which is solid waste?",opts:["Smoke","Plastic bag","Sewage","Steam"],ans:1,t:"Environment"},
-      {q:"Planet closest to the Sun:",opts:["Earth","Venus","Mercury","Mars"],ans:2,t:"Space"},
-      {q:"Bones in an adult human body:",opts:["196","206","216","226"],ans:1,t:"Human Body"},
-      {q:"Organ that purifies blood:",opts:["Heart","Lungs","Kidney","Liver"],ans:2,t:"Human Body"},
-      {q:"Water turning into vapour is called:",opts:["Condensation","Precipitation","Evaporation","Transpiration"],ans:2,t:"Water"},
-    ],upper:[]};
-
-  QB.science={lower:[],upper:[
-      {q:"Powerhouse of the cell?",opts:["Nucleus","Mitochondria","Ribosome","Golgi body"],ans:1,t:"Biology"},
-      {q:"Chemical formula of water:",opts:["H₂O₂","HO","H₂O","H₃O"],ans:2,t:"Chemistry"},
-      {q:"Gas produced during photosynthesis:",opts:["CO₂","N₂","O₂","H₂"],ans:2,t:"Biology"},
-      {q:"Newton's 2nd law: F =",opts:["mv","ma","m/a","v/t"],ans:1,t:"Physics"},
-      {q:"SI unit of electric current:",opts:["Volt","Watt","Ampere","Ohm"],ans:2,t:"Physics"},
-      {q:"Acid in vinegar:",opts:["HCl","Acetic acid","Citric acid","H₂SO₄"],ans:1,t:"Chemistry"},
-      {q:"Sound travels fastest in:",opts:["Air","Water","Vacuum","Steel"],ans:3,t:"Physics"},
-      {q:"Atomic number of Carbon:",opts:["6","8","12","14"],ans:0,t:"Chemistry"},
-      {q:"Brain part controlling balance:",opts:["Cerebrum","Medulla","Cerebellum","Hypothalamus"],ans:2,t:"Biology"},
-      {q:"Symbol for Gold:",opts:["Go","Gd","Au","Ag"],ans:2,t:"Chemistry"},
-      {q:"Universal blood donor group:",opts:["A","B","AB","O"],ans:3,t:"Biology"},
-      {q:"Unit of resistance:",opts:["Ampere","Volt","Ohm","Watt"],ans:2,t:"Physics"},
-      {q:"DNA stands for:",opts:["Deoxyribonucleic Acid","Diribonucleic Acid","Deoxynitronic Acid","Dioxynucleic Acid"],ans:0,t:"Biology"},
-      {q:"Gas causing greenhouse effect:",opts:["O₂","N₂","CO₂","H₂"],ans:2,t:"Environment"},
-      {q:"Chemical symbol of Sodium:",opts:["So","Na","S","Sn"],ans:1,t:"Chemistry"},
-      {q:"Speed of light approx:",opts:["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"],ans:1,t:"Physics"},
-      {q:"Chromosomes made of:",opts:["Protein only","DNA and Protein","RNA only","Lipids"],ans:1,t:"Biology"},
-      {q:"Rear-view mirror type:",opts:["Plane","Concave","Convex","Parabolic"],ans:2,t:"Physics"},
-      {q:"pH value of pure water:",opts:["0","7","14","5"],ans:1,t:"Chemistry"},
-      {q:"Hormone regulating blood sugar:",opts:["Thyroxine","Adrenaline","Insulin","Estrogen"],ans:2,t:"Biology"},
-      {q:"Velocity = Distance / ___:",opts:["Mass","Time","Force","Area"],ans:1,t:"Physics"},
-      {q:"Acid in our stomach:",opts:["Citric acid","Acetic acid","Hydrochloric acid","Sulphuric acid"],ans:2,t:"Chemistry"},
-      {q:"Rusting involves:",opts:["Only oxygen","Only water","Oxygen and water","Carbon dioxide"],ans:2,t:"Chemistry"},
-      {q:"Smallest unit of life:",opts:["Tissue","Organ","Cell","Atom"],ans:2,t:"Biology"},
-      {q:"Plant organ mainly responsible for photosynthesis:",opts:["Root","Stem","Leaf","Flower"],ans:2,t:"Biology"},
-    ]};
-
-  QB.english={
-    lower:[
-      {q:"Which is a vowel?",opts:["B","C","A","D"],ans:2,t:"Alphabet"},
-      {q:"Plural of 'cat':",opts:["cats","cates","cat's","caties"],ans:0,t:"Grammar"},
-      {q:"Which word is a verb?",opts:["Happy","Run","Tree","Blue"],ans:1,t:"Grammar"},
-      {q:"Opposite of 'hot':",opts:["Warm","Cold","Big","Fast"],ans:1,t:"Vocabulary"},
-      {q:"'She ___ a book.' Correct form:",opts:["read","reads","reading","readed"],ans:1,t:"Grammar"},
-      {q:"Correct sentence:",opts:["He go to school.","He goes to school.","He going school.","He gone school."],ans:1,t:"Grammar"},
-      {q:"Plural of 'child':",opts:["childs","childrens","children","child"],ans:2,t:"Grammar"},
-      {q:"Naming word in 'The dog runs fast':",opts:["runs","fast","The","dog"],ans:3,t:"Grammar"},
-      {q:"Which is a colour word?",opts:["Run","Beautiful","Blue","Quickly"],ans:2,t:"Vocabulary"},
-      {q:"'Big' means:",opts:["Small","Tiny","Large","Narrow"],ans:2,t:"Vocabulary"},
-      {q:"Letters in English alphabet:",opts:["24","25","26","27"],ans:2,t:"Alphabet"},
-      {q:"Word rhyming with 'bat':",opts:["bin","but","cat","big"],ans:2,t:"Phonics"},
-      {q:"'I ___ happy today.'",opts:["am","is","are","be"],ans:0,t:"Grammar"},
-      {q:"Which is a question word?",opts:["and","but","Why","or"],ans:2,t:"Grammar"},
-      {q:"Opposite of 'day':",opts:["Evening","Morning","Night","Dusk"],ans:2,t:"Vocabulary"},
-      {q:"'and' in 'Cats and dogs' is a:",opts:["Noun","Verb","Conjunction","Adjective"],ans:2,t:"Grammar"},
-      {q:"Word meaning 'very happy':",opts:["Sad","Angry","Joyful","Tired"],ans:2,t:"Vocabulary"},
-      {q:"'She has two ___.' (book form):",opts:["book","books","bookes","booksies"],ans:1,t:"Grammar"},
-      {q:"'She sings.' — 'sings' is a:",opts:["Noun","Verb","Adjective","Adverb"],ans:1,t:"Grammar"},
-      {q:"Opposite of 'open':",opts:["Wide","Narrow","Close","Shut"],ans:3,t:"Vocabulary"},
-      {q:"Which is a describing word (adjective)?",opts:["Run","Tall","Table","Slowly"],ans:1,t:"Grammar"},
-      {q:"'The cat sat ___ the mat.'",opts:["in","at","on","by"],ans:2,t:"Grammar"},
-      {q:"Opposite of 'clean':",opts:["Fresh","Bright","Dirty","New"],ans:2,t:"Vocabulary"},
-      {q:"Vowels in 'elephant':",opts:["2","3","4","5"],ans:1,t:"Phonics"},
-      {q:"Correct punctuation:",opts:["where are you.","Where are you?","where are you?","Where are you."],ans:1,t:"Punctuation"},
-    ],
-    upper:[
-      {q:"Synonym for 'Benevolent':",opts:["Cruel","Kind","Angry","Lazy"],ans:1,t:"Vocabulary"},
-      {q:"Passive Voice:",opts:["She reads a book","He wrote a letter","The letter was written by him","They are playing"],ans:2,t:"Grammar"},
-      {q:"Plural of 'Leaf':",opts:["Leafs","Leaves","Leafes","Leavs"],ans:1,t:"Grammar"},
-      {q:"Antonym of 'Ancient':",opts:["Old","Modern","Historic","Classic"],ans:1,t:"Vocabulary"},
-      {q:"'She is good at singing.' — 'singing' is:",opts:["Noun","Verb","Gerund","Adjective"],ans:2,t:"Grammar"},
-      {q:"'Quickly' is a:",opts:["Adjective","Noun","Adverb","Conjunction"],ans:2,t:"Grammar"},
-      {q:"Correctly spelled:",opts:["Accomodation","Accommodation","Acommodation","Acomodation"],ans:1,t:"Spelling"},
-      {q:"'The wind whispered' — figure of speech:",opts:["Simile","Metaphor","Personification","Alliteration"],ans:2,t:"Literature"},
-      {q:"'Neither he nor I ___ present.'",opts:["was","were","are","is"],ans:0,t:"Grammar"},
-      {q:"'Bite the bullet' means:",opts:["Eat fast","Face pain bravely","Argue","Quit"],ans:1,t:"Idioms"},
-      {q:"'How beautiful the sunset is!' is:",opts:["Declarative","Interrogative","Imperative","Exclamatory"],ans:3,t:"Grammar"},
-      {q:"Past tense of 'Ring':",opts:["Ringed","Rang","Rung","Ring"],ans:1,t:"Grammar"},
-      {q:"Compound sentence:",opts:["She sang","He ran fast","It rained and streets flooded","Because he was tired"],ans:2,t:"Grammar"},
-      {q:"'Person who cannot read/write':",opts:["Illiterate","Ignorant","Mute","Blind"],ans:0,t:"Vocabulary"},
-      {q:"'She is afraid ___ dogs.'",opts:["from","of","by","with"],ans:1,t:"Grammar"},
-      {q:"'Peter Piper picked…' — device:",opts:["Simile","Onomatopoeia","Alliteration","Assonance"],ans:2,t:"Literature"},
-      {q:"Tense: 'He has been working since morning.'",opts:["Simple Past","Past Perfect","Present Perfect Continuous","Future Perfect"],ans:2,t:"Grammar"},
-      {q:"Correct article: ___ apple a day…",opts:["A","An","The","No article"],ans:1,t:"Grammar"},
-      {q:"'Enormous' means:",opts:["Tiny","Huge","Fast","Bright"],ans:1,t:"Vocabulary"},
-      {q:"'Ephemeral' means:",opts:["Eternal","Long-lasting","Short-lived","Ancient"],ans:2,t:"Vocabulary"},
-      {q:"Synonym for 'Candid':",opts:["Dishonest","Frank","Timid","Arrogant"],ans:1,t:"Vocabulary"},
-      {q:"'The proof of the pudding is in the eating' means:",opts:["Food matters","Results judge quality","Cooking is art","Patience"],ans:1,t:"Idioms"},
-      {q:"'She ___ to school every day.' (go):",opts:["go","went","goes","going"],ans:2,t:"Grammar"},
-      {q:"Subordinating conjunction:",opts:["And","But","Although","Or"],ans:2,t:"Grammar"},
-      {q:"'Brevity is the soul of wit' — author:",opts:["Keats","Shakespeare","Milton","Wordsworth"],ans:1,t:"Literature"},
-    ]};
-
-  QB.hindi={
-    lower:[
-      {q:"'किताब' का बहुवचन:",opts:["किताबें","किताबों","किताब","किताबे"],ans:0,t:"व्याकरण"},
-      {q:"'राम स्कूल जाता है।' — क्रिया:",opts:["राम","स्कूल","जाता","है"],ans:2,t:"व्याकरण"},
-      {q:"'अच्छा' का विलोम:",opts:["सुंदर","बुरा","सफेद","नया"],ans:1,t:"विलोम"},
-      {q:"'सूरज' का पर्यायवाची:",opts:["चाँद","तारा","सूर्य","आकाश"],ans:2,t:"पर्यायवाची"},
-      {q:"हिंदी वर्णमाला में स्वर:",opts:["10","11","12","13"],ans:1,t:"वर्णमाला"},
-      {q:"'पानी' का पर्यायवाची:",opts:["आग","जल","हवा","धरती"],ans:1,t:"पर्यायवाची"},
-      {q:"'लड़का' का स्त्रीलिंग:",opts:["लड़की","लड़कियाँ","बालक","बालिका"],ans:0,t:"लिंग"},
-      {q:"'बड़ा' का विलोम:",opts:["मोटा","नया","छोटा","लंबा"],ans:2,t:"विलोम"},
-      {q:"'रात' का विलोम:",opts:["शाम","सुबह","दिन","दोपहर"],ans:2,t:"विलोम"},
-      {q:"'नदी' का बहुवचन:",opts:["नदीएँ","नदियाँ","नदियों","नदीयाँ"],ans:1,t:"व्याकरण"},
-      {q:"'ठंडा' का विलोम:",opts:["बड़ा","गरम","नया","पुराना"],ans:1,t:"विलोम"},
-      {q:"'पुस्तक' का अर्थ:",opts:["कलम","किताब","थैला","मेज"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'वह खेल रहा है।' — काल:",opts:["भूतकाल","भविष्यकाल","वर्तमानकाल","सामान्य काल"],ans:2,t:"काल"},
-      {q:"'सफेद' का विलोम:",opts:["लाल","काला","नीला","पीला"],ans:1,t:"विलोम"},
-      {q:"'गाय' का बच्चा:",opts:["पिल्ला","बछड़ा","मेमना","चूज़ा"],ans:1,t:"सामान्य ज्ञान"},
-      {q:"हिंदी की लिपि:",opts:["रोमन","अरबी","देवनागरी","गुरुमुखी"],ans:2,t:"भाषा-ज्ञान"},
-      {q:"'मेरा भारत महान' — 'महान' है:",opts:["संज्ञा","सर्वनाम","विशेषण","क्रिया"],ans:2,t:"व्याकरण"},
-      {q:"'आम' किस मौसम में होता है?",opts:["सर्दी","बसंत","गर्मी","बरसात"],ans:2,t:"सामान्य ज्ञान"},
-      {q:"'म' से शुरू होने वाला फल:",opts:["सेब","आम","केला","अंगूर"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'पक्षी' का बहुवचन:",opts:["पक्षीएँ","पक्षियाँ","पक्षी","पक्षियों"],ans:1,t:"व्याकरण"},
-      {q:"'खाना' क्रिया का अर्थ:",opts:["पीना","सोना","खाना","दौड़ना"],ans:2,t:"शब्द-ज्ञान"},
-      {q:"'फूल' का बहुवचन:",opts:["फूलें","फूल","फूलों","फूले"],ans:1,t:"व्याकरण"},
-      {q:"'नीला' किस प्रकार का शब्द?",opts:["संज्ञा","क्रिया","विशेषण","सर्वनाम"],ans:2,t:"व्याकरण"},
-      {q:"मोर भारत का राष्ट्रीय क्या है?",opts:["पशु","पक्षी","फूल","वृक्ष"],ans:1,t:"सामान्य ज्ञान"},
-    ],
-    upper:[
-      {q:"'पुस्तक' का बहुवचन:",opts:["पुस्तकें","पुस्तकों","पुस्तकों को","पुस्तक"],ans:0,t:"व्याकरण"},
-      {q:"'आना' का सामान्य भूतकाल:",opts:["आता है","आया","आएगा","आ रहा है"],ans:1,t:"काल"},
-      {q:"'वह पढ़ रहा है' — काल:",opts:["भूतकाल","वर्तमानकाल","भविष्यकाल","संदिग्ध काल"],ans:1,t:"काल"},
-      {q:"'रात-दिन' में समास:",opts:["तत्पुरुष","द्वंद्व","कर्मधारय","बहुव्रीहि"],ans:1,t:"समास"},
-      {q:"'निः+जन' की संधि:",opts:["निरजन","निर्जन","नीरज","निजन"],ans:1,t:"संधि"},
-      {q:"'पंकज' का पर्यायवाची:",opts:["पत्थर","कमल","नदी","बादल"],ans:1,t:"पर्यायवाची"},
-      {q:"'अंधेरा' का विलोम:",opts:["काला","उजाला","रात","धुंधला"],ans:1,t:"विलोम"},
-      {q:"रस के प्रकार:",opts:["7","8","9","10"],ans:2,t:"काव्य"},
-      {q:"'श्रृंगार रस' का स्थायी भाव:",opts:["हास","रति","शोक","भय"],ans:1,t:"काव्य"},
-      {q:"'जो कभी न मरे' — एक शब्द:",opts:["अनश्वर","अमर","अजर","नश्वर"],ans:1,t:"वाक्यांश"},
-      {q:"'यमक अलंकार' में:",opts:["शब्द की आवृत्ति अलग अर्थों में","उपमा देना","रूपक","अनुप्रास"],ans:0,t:"अलंकार"},
-      {q:"'कवि' का स्त्रीलिंग:",opts:["कवियत्री","कवयित्री","कवित्री","कविनी"],ans:1,t:"लिंग"},
-      {q:"'मोहन ने रोटी खाई' — 'ने' विभक्ति:",opts:["कर्म","करण","कर्ता","सम्प्रदान"],ans:2,t:"कारक"},
-      {q:"'आकाश' का तत्सम:",opts:["आसमान","गगन","अम्बर","आकाश"],ans:3,t:"तत्सम-तद्भव"},
-      {q:"'सरस्वती' किसकी देवी?",opts:["धन","शक्ति","विद्या","प्रकृति"],ans:2,t:"सामान्य ज्ञान"},
-      {q:"'पेड़' का बहुवचन:",opts:["पेड़े","पेड़ें","पेड़ों","पेड़"],ans:2,t:"व्याकरण"},
-      {q:"'हिंदी दिवस' कब?",opts:["14 जनवरी","14 नवंबर","14 सितंबर","14 अगस्त"],ans:2,t:"सामान्य ज्ञान"},
-      {q:"'निराशा' में उपसर्ग:",opts:["निर","नि","निरा","निराश"],ans:0,t:"उपसर्ग"},
-      {q:"'चिड़िया' शब्द है:",opts:["तत्सम","तद्भव","देशज","विदेशज"],ans:2,t:"शब्द-ज्ञान"},
-      {q:"'कवि' शब्द में कौन-सा प्रत्यय?",opts:["इ","वि","क","None"],ans:0,t:"प्रत्यय"},
-      {q:"'राम ने सेब खाया' — कारक:",opts:["कर्म कारक","कर्ता कारक","करण कारक","अपादान कारक"],ans:1,t:"कारक"},
-      {q:"'महाभारत' के लेखक:",opts:["वाल्मीकि","तुलसीदास","वेदव्यास","कालिदास"],ans:2,t:"साहित्य"},
-      {q:"'दोहा' में कितने चरण होते हैं?",opts:["2","4","6","8"],ans:1,t:"काव्य"},
-      {q:"'विद्यालय' में कौन-सा समास?",opts:["तत्पुरुष","द्वंद्व","बहुव्रीहि","कर्मधारय"],ans:0,t:"समास"},
-    ]};
-
-  QB.social={lower:[],upper:[
-      {q:"French Revolution began in:",opts:["1776","1789","1800","1815"],ans:1,t:"World History"},
-      {q:"Tropic of Cancer through how many Indian states?",opts:["6","7","8","9"],ans:2,t:"Geography"},
-      {q:"Preamble begins:",opts:["We the Citizens","We the People","We the Indians","We the Nation"],ans:1,t:"Civics"},
-      {q:"Amendment adding Fundamental Duties:",opts:["40th","42nd","44th","46th"],ans:1,t:"Civics"},
-      {q:"Black Soil grows:",opts:["Rice","Cotton","Wheat","Jute"],ans:1,t:"Geography"},
-      {q:"'Do or Die' slogan:",opts:["Nehru","Gandhi","Bose","Tilak"],ans:1,t:"Indian History"},
-      {q:"Highest peak in world:",opts:["K2","Kangchenjunga","Mount Everest","Lhotse"],ans:2,t:"Geography"},
-      {q:"Permanent Settlement 1793 by:",opts:["Dalhousie","Cornwallis","Clive","Wellesley"],ans:1,t:"Indian History"},
-      {q:"Fundamental Rights in Constitution Part:",opts:["I","II","III","IV"],ans:2,t:"Civics"},
-      {q:"Dandi March related to:",opts:["Non-Cooperation","Salt Tax","Partition","Rowlatt Act"],ans:1,t:"Indian History"},
-      {q:"Largest ocean:",opts:["Atlantic","Indian","Arctic","Pacific"],ans:3,t:"Geography"},
-      {q:"Directive Principles borrowed from:",opts:["USA","Ireland","UK","Australia"],ans:1,t:"Civics"},
-      {q:"Longest National Highway in India:",opts:["NH 44","NH 1","NH 27","NH 48"],ans:0,t:"Geography"},
-      {q:"Berlin Wall fell in:",opts:["1985","1987","1989","1991"],ans:2,t:"World History"},
-      {q:"Panchayati Raj first in:",opts:["1952","1955","1959","1962"],ans:2,t:"Civics"},
-      {q:"Sundarbans delta river:",opts:["Indus","Ganga-Brahmaputra","Mahanadi","Krishna"],ans:1,t:"Geography"},
-      {q:"'Discovery of India' author:",opts:["Gandhi","Ambedkar","Nehru","Tagore"],ans:2,t:"Indian History"},
-      {q:"RTE Act passed in:",opts:["2005","2007","2009","2011"],ans:2,t:"Civics"},
-      {q:"Thar Desert climate:",opts:["Tropical","Arid","Mediterranean","Continental"],ans:1,t:"Geography"},
-      {q:"Green Revolution is related to:",opts:["Industry","Agriculture","Space","Education"],ans:1,t:"Indian History"},
-      {q:"Article abolishing untouchability:",opts:["Article 14","Article 17","Article 21","Article 25"],ans:1,t:"Civics"},
-      {q:"Indus Valley Civilisation flourished around:",opts:["500 BCE","1500 BCE","2500 BCE","3500 BCE"],ans:2,t:"Indian History"},
-      {q:"Largest desert in the world:",opts:["Thar","Gobi","Sahara","Arabian"],ans:2,t:"Geography"},
-      {q:"WTO headquarters:",opts:["New York","Geneva","Paris","London"],ans:1,t:"World Affairs"},
-      {q:"'Laissez-faire' is related to:",opts:["Political theory","Economic policy","Military strategy","Cultural movement"],ans:1,t:"Economics"},
-    ]};
-
-  QB.sanskrit={lower:[],upper:[
-      {q:"'नमस्ते' का अर्थ:",opts:["अलविदा","प्रणाम","धन्यवाद","स्वागत"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'रामः वनम् गच्छति।' में क्रिया:",opts:["रामः","वनम्","गच्छति","None"],ans:2,t:"व्याकरण"},
-      {q:"संस्कृत में 'जल' का अर्थ:",opts:["आग","पानी","हवा","मिट्टी"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'अहम्' का अर्थ:",opts:["वह","तुम","मैं","हम"],ans:2,t:"सर्वनाम"},
-      {q:"'सूर्यः' किस लिंग का?",opts:["स्त्रीलिंग","पुल्लिंग","नपुंसकलिंग","None"],ans:1,t:"लिंग"},
-      {q:"'पठति' का अर्थ:",opts:["खाता है","पढ़ता है","जाता है","लिखता है"],ans:1,t:"क्रिया"},
-      {q:"संस्कृत में 'एकः' का अर्थ:",opts:["दो","एक","तीन","शून्य"],ans:1,t:"संख्या"},
-      {q:"'गुरुः' का अर्थ:",opts:["शिष्य","माता","शिक्षक","पिता"],ans:2,t:"शब्द-ज्ञान"},
-      {q:"'त्वम्' का अर्थ:",opts:["मैं","वह","तुम","हम"],ans:2,t:"सर्वनाम"},
-      {q:"'वन्दे मातरम्' का अर्थ:",opts:["जय भारत","माँ को नमन","भारत माँ","विजयी भव"],ans:1,t:"साहित्य"},
-      {q:"'पितृ' का अर्थ:",opts:["माता","पिता","भाई","बहन"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'खादति' का अर्थ:",opts:["पीता है","खाता है","जाता है","देता है"],ans:1,t:"क्रिया"},
-      {q:"'सत्यम् शिवम् सुन्दरम्' — 'सत्यम्' का अर्थ:",opts:["ईश्वर","सत्य","सुंदर","शांति"],ans:1,t:"साहित्य"},
-      {q:"'नदी' का संस्कृत बहुवचन:",opts:["नद्यः","नदीः","नदयः","नदीनि"],ans:0,t:"वचन"},
-      {q:"'धर्मः' का अर्थ:",opts:["युद्ध","धर्म/कर्तव्य","शत्रु","भय"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'लता' शब्द किस लिंग का?",opts:["पुल्लिंग","स्त्रीलिंग","नपुंसकलिंग","None"],ans:1,t:"लिंग"},
-      {q:"'बालकः' किस विभक्ति का?",opts:["द्वितीया","प्रथमा","तृतीया","चतुर्थी"],ans:1,t:"व्याकरण"},
-      {q:"संस्कृत में 'मातृ' का अर्थ:",opts:["पिता","माता","पुत्र","पुत्री"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'विद्या' का बहुवचन:",opts:["विद्याः","विद्यानि","विद्यासु","विद्याभ्यः"],ans:0,t:"वचन"},
-      {q:"'ग्रहः' का अर्थ:",opts:["नदी","ग्रह","पर्वत","आकाश"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'देवः' का बहुवचन:",opts:["देवाः","देवानि","देवेषु","देवम्"],ans:0,t:"वचन"},
-      {q:"'रामायण' के रचयिता:",opts:["वेदव्यास","वाल्मीकि","कालिदास","तुलसीदास"],ans:1,t:"साहित्य"},
-      {q:"संस्कृत में 'पुस्तकम्' का अर्थ:",opts:["कलम","किताब","थैला","मेज"],ans:1,t:"शब्द-ज्ञान"},
-      {q:"'अहम् पठामि' का अर्थ:",opts:["मैं खाता हूँ","मैं पढ़ता हूँ","मैं जाता हूँ","मैं लिखता हूँ"],ans:1,t:"वाक्य"},
-    ]};
-
-  QB.computer={lower:[],upper:[
-      {q:"CPU stands for:",opts:["Central Processing Unit","Computer Processing Unit","Central Program Unit","Control Processing Unit"],ans:0,t:"Hardware"},
-      {q:"Which is an input device?",opts:["Monitor","Printer","Speaker","Keyboard"],ans:3,t:"Hardware"},
-      {q:"Which is an output device?",opts:["Mouse","Keyboard","Printer","Scanner"],ans:2,t:"Hardware"},
-      {q:"1 Byte =",opts:["4 bits","8 bits","16 bits","32 bits"],ans:1,t:"Data"},
-      {q:"'www' stands for:",opts:["World Wide Web","World Web Wide","Wide World Web","Web Wide World"],ans:0,t:"Internet"},
-      {q:"Computer understands directly:",opts:["C++","Java","Binary Language","Python"],ans:2,t:"Programming"},
-      {q:"RAM stands for:",opts:["Random Access Memory","Read Access Memory","Run Access Memory","Random All Memory"],ans:0,t:"Hardware"},
-      {q:"NOT an operating system:",opts:["Windows","macOS","Linux","MS Word"],ans:3,t:"Software"},
-      {q:"'Brain' of a computer:",opts:["RAM","Hard Disk","CPU","Monitor"],ans:2,t:"Hardware"},
-      {q:"HTML stands for:",opts:["Hyper Text Markup Language","High Text Markup Language","Hyper Transfer Markup Language","None"],ans:0,t:"Internet"},
-      {q:"Image file extension:",opts:[".mp3",".exe",".jpg",".docx"],ans:2,t:"Files"},
-      {q:"Shortcut to copy:",opts:["Ctrl+V","Ctrl+X","Ctrl+C","Ctrl+Z"],ans:2,t:"Shortcuts"},
-      {q:"Transistors used in ___ generation computers:",opts:["1st","2nd","3rd","4th"],ans:1,t:"History"},
-      {q:"Computer virus is:",opts:["Hardware","Malicious software","Antivirus","Network"],ans:1,t:"Security"},
-      {q:"Device that stores data permanently:",opts:["RAM","Cache","Hard Disk","Register"],ans:2,t:"Hardware"},
-      {q:"Email stands for:",opts:["Electronic Mail","Electric Mail","Express Mail","Encoded Mail"],ans:0,t:"Internet"},
-      {q:"Which is a programming language?",opts:["HTTP","FTP","Python","HTML"],ans:2,t:"Programming"},
-      {q:"Binary number system uses:",opts:["0–9","0 and 1","A–F","1–8"],ans:1,t:"Data"},
-      {q:"Shortcut to undo:",opts:["Ctrl+Y","Ctrl+Z","Ctrl+U","Ctrl+A"],ans:1,t:"Shortcuts"},
-      {q:"GUI stands for:",opts:["Graphical User Interface","General User Interface","Graphical Unique Interface","None"],ans:0,t:"Software"},
-      {q:"Topology connecting all devices in a circle:",opts:["Bus","Star","Ring","Mesh"],ans:2,t:"Networking"},
-      {q:"HTTP '404' error means:",opts:["Server error","Not Found","Forbidden","Timeout"],ans:1,t:"Internet"},
-      {q:"Language used for web styling:",opts:["Java","Python","CSS","C++"],ans:2,t:"Programming"},
-      {q:"USB stands for:",opts:["Universal Serial Bus","Unique Serial Bus","Universal System Bus","None"],ans:0,t:"Hardware"},
-      {q:"Which is a search engine?",opts:["MS Word","Excel","Google","Photoshop"],ans:2,t:"Internet"},
-    ]};
-
-  QB.gk={
-    lower:[
-      {q:"Capital of India?",opts:["Mumbai","Kolkata","New Delhi","Chennai"],ans:2,t:"India"},
-      {q:"Days in a week?",opts:["5","6","7","8"],ans:2,t:"General"},
-      {q:"Largest land animal?",opts:["Lion","Elephant","Giraffe","Rhino"],ans:1,t:"Animals"},
-      {q:"'Stop' colour in traffic lights?",opts:["Green","Yellow","Blue","Red"],ans:3,t:"Safety"},
-      {q:"Months in a year?",opts:["10","11","12","13"],ans:2,t:"General"},
-      {q:"Planet we live on?",opts:["Mars","Venus","Earth","Jupiter"],ans:2,t:"Space"},
-      {q:"Festival of Lights?",opts:["Holi","Eid","Diwali","Christmas"],ans:2,t:"India"},
-      {q:"First Prime Minister of India?",opts:["Lal Bahadur Shastri","Jawaharlal Nehru","Indira Gandhi","Rajiv Gandhi"],ans:1,t:"India"},
-      {q:"Legs of a spider?",opts:["6","8","10","4"],ans:1,t:"Animals"},
-      {q:"Tallest mountain?",opts:["K2","Everest","Alps","Andes"],ans:1,t:"Geography"},
-      {q:"Bird that can talk?",opts:["Sparrow","Eagle","Parrot","Owl"],ans:2,t:"Animals"},
-      {q:"Day after Wednesday?",opts:["Tuesday","Monday","Thursday","Friday"],ans:2,t:"General"},
-      {q:"Colour of sky on clear day?",opts:["Green","Blue","Red","Yellow"],ans:1,t:"Nature"},
-      {q:"Vehicle on railway track?",opts:["Bus","Car","Train","Bicycle"],ans:2,t:"Transport"},
-      {q:"Which is NOT a planet?",opts:["Mars","Sun","Earth","Venus"],ans:1,t:"Space"},
-      {q:"India's national animal?",opts:["Lion","Peacock","Tiger","Elephant"],ans:2,t:"India"},
-      {q:"Corners in a square?",opts:["3","4","5","6"],ans:1,t:"General"},
-      {q:"Organ used for smelling?",opts:["Eyes","Ears","Nose","Tongue"],ans:2,t:"Human Body"},
-      {q:"How many colours in a rainbow?",opts:["5","6","7","8"],ans:2,t:"Nature"},
-      {q:"India's national flower?",opts:["Rose","Lotus","Jasmine","Marigold"],ans:1,t:"India"},
-      {q:"Fastest land animal:",opts:["Lion","Leopard","Cheetah","Tiger"],ans:2,t:"Animals"},
-      {q:"Frozen rain is called:",opts:["Snow","Hail","Sleet","Frost"],ans:1,t:"Nature"},
-      {q:"India's independence year:",opts:["1942","1945","1947","1950"],ans:2,t:"India"},
-      {q:"King of fruits:",opts:["Apple","Banana","Mango","Grapes"],ans:2,t:"General"},
-    ],
-    upper:[
-      {q:"Father of Indian Constitution?",opts:["Mahatma Gandhi","Nehru","B.R. Ambedkar","Sardar Patel"],ans:2,t:"Indian History"},
-      {q:"Largest planet in Solar System?",opts:["Earth","Saturn","Jupiter","Neptune"],ans:2,t:"Space"},
-      {q:"Capital of Australia?",opts:["Sydney","Melbourne","Brisbane","Canberra"],ans:3,t:"Geography"},
-      {q:"Author of India's national anthem?",opts:["Bankim Chandra","Rabindranath Tagore","Sarojini Naidu","Subhash Bose"],ans:1,t:"India"},
-      {q:"Longest river in world?",opts:["Amazon","Nile","Yangtze","Mississippi"],ans:1,t:"Geography"},
-      {q:"First Indian in space?",opts:["Sunita Williams","Kalpana Chawla","Rakesh Sharma","APJ Abdul Kalam"],ans:2,t:"India"},
-      {q:"UN headquarters?",opts:["Geneva","London","New York","Washington D.C."],ans:2,t:"World"},
-      {q:"Most abundant gas in atmosphere?",opts:["Oxygen","CO₂","Nitrogen","Argon"],ans:2,t:"Science"},
-      {q:"Olympic Games held every:",opts:["2 years","3 years","4 years","5 years"],ans:2,t:"Sports"},
-      {q:"Who invented the telephone?",opts:["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Marconi"],ans:2,t:"Inventions"},
-      {q:"Smallest country in world?",opts:["Monaco","San Marino","Vatican City","Liechtenstein"],ans:2,t:"Geography"},
-      {q:"Currency of Japan?",opts:["Yuan","Won","Yen","Baht"],ans:2,t:"World"},
-      {q:"'Satyameva Jayate' is from?",opts:["Rigveda","Mundaka Upanishad","Bhagavad Gita","Mahabharata"],ans:1,t:"India"},
-      {q:"The Red Planet?",opts:["Venus","Mars","Jupiter","Mercury"],ans:1,t:"Space"},
-      {q:"Who painted the Mona Lisa?",opts:["Michelangelo","Raphael","Leonardo da Vinci","Van Gogh"],ans:2,t:"Art"},
-      {q:"National Science Day?",opts:["Jan 28","Feb 28","Mar 28","Apr 28"],ans:1,t:"India"},
-      {q:"Largest country by area?",opts:["China","USA","Canada","Russia"],ans:3,t:"Geography"},
-      {q:"India's national bird?",opts:["Sparrow","Pigeon","Peacock","Eagle"],ans:2,t:"India"},
-      {q:"Blood pressure measured by?",opts:["Thermometer","Stethoscope","Sphygmomanometer","ECG"],ans:2,t:"Health"},
-      {q:"States in India (2024)?",opts:["26","27","28","29"],ans:2,t:"India"},
-      {q:"Nobel Peace Prize 2014 awarded to:",opts:["Obama","Malala Yousafzai","Mother Teresa","Nelson Mandela"],ans:1,t:"World"},
-      {q:"Country with highest population (2024):",opts:["USA","India","China","Russia"],ans:1,t:"Geography"},
-      {q:"Father of the Internet:",opts:["Bill Gates","Tim Berners-Lee","Vint Cerf","Steve Jobs"],ans:2,t:"Technology"},
-      {q:"Sport using the term 'Love':",opts:["Cricket","Football","Tennis","Hockey"],ans:2,t:"Sports"},
-      {q:"India's first satellite:",opts:["INSAT","Aryabhata","Bhaskara","Rohini"],ans:1,t:"India"},
-    ]};
-
-  /* ═══ STATE ═══ */
+  /* ═══ STATE ══════════════════ */
   let selClass=0,selSubject='',stuName='',stuRoll='';
-  let QUESTIONS=[],answers=[],current=0,timeLeft=30*60,timerInterval;
+  let QUESTIONS=[],answers=[],current=0,timeLeft=30*60,timerInterval,examStartTime=0;
 
-  /* ═══ BUILD GRIDS ═══ */
+  /* ═══ ANTI-CHEAT STATE ══════════════════════════════════════
+     POLICY: Always warn, always allow to continue.
+     Camera is recommended but not mandatory.
+  ════════════════════════════════════════════════════════════ */
+  let cameraStream  = null;
+  let cameraGranted = false;
+  let warningCount  = 0;
+  let snapshotLog   = [];
+  let snapInterval  = null;
+  let warnTimer;
+
+  /* ── Camera: request ─────────────────────────────────────── */
+  async function requestCamera() {
+    const btn = document.getElementById('btnCam');
+    btn.disabled = true; btn.textContent = '⏳ Requesting…';
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia(
+              { video:{ width:320, height:240, facingMode:'user' }, audio:false });
+      cameraGranted = true;
+
+      // Mini preview in step 3
+      const prev = document.getElementById('cam-preview-mini');
+      prev.srcObject = cameraStream; prev.style.display = 'block';
+
+      // Feed PIP
+      document.getElementById('cam-video').srcObject = cameraStream;
+
+      // UI updates
+      setMsg('ok','✔ Camera enabled — ready to start!');
+      btn.textContent = '✔ Camera Active'; btn.style.background='var(--ok)';
+      document.getElementById('btnSkip').style.display = 'none';
+      enableStart();
+    } catch(err) {
+      setMsg('warn','⚠ Camera access denied — you may still continue without it');
+      btn.textContent = '🔄 Try Again'; btn.disabled = false;
+      enableStart(); // still allow start, just warned
+    }
+  }
+
+  /* ── Camera: skip ────────────────────────────────────────── */
+  function skipCamera() {
+    setMsg('warn','⚠ Camera skipped — exam will be marked as unproctored');
+    document.getElementById('btnCam').style.display  = 'none';
+    document.getElementById('btnSkip').style.display = 'none';
+    const lbl = document.getElementById('cam-label');
+    lbl.className='off'; lbl.innerHTML='<div class="cam-dot r"></div>No Camera';
+    enableStart();
+  }
+
+  function setMsg(cls, txt) {
+    const el = document.getElementById('cam-msg');
+    el.className = 'cam-msg ' + cls; el.textContent = txt;
+  }
+
+  function enableStart() {
+    const b = document.getElementById('btnStart');
+    b.disabled=false; b.style.opacity='1'; b.style.cursor='pointer';
+  }
+
+  /* ── PIP during exam ─────────────────────────────────────── */
+  function startCamPip() {
+    document.getElementById('cam-pip').classList.add('show');
+    const lbl = document.getElementById('cam-label');
+    if (cameraGranted) {
+      lbl.className='live'; lbl.innerHTML='<div class="cam-dot g"></div>Camera Live';
+    } else {
+      lbl.className='off'; lbl.innerHTML='<div class="cam-dot r"></div>No Camera';
+    }
+  }
+  function stopCamPip() {
+    document.getElementById('cam-pip').classList.remove('show');
+    if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream=null; }
+    if (snapInterval) { clearInterval(snapInterval); snapInterval=null; }
+  }
+
+  /* ── Periodic snapshots ──────────────────────────────────── */
+  function startSnapshots() {
+    if (!cameraGranted) return;
+    setTimeout(takeSnapshot, 5000);        // first snap after 5s
+    snapInterval = setInterval(takeSnapshot, 60000); // then every 60s
+  }
+  function takeSnapshot() {
+    const vid = document.getElementById('cam-video');
+    if (!vid || !cameraGranted || vid.readyState < 2) return;
+    try {
+      const c = document.createElement('canvas');
+      c.width = vid.videoWidth||320; c.height = vid.videoHeight||240;
+      c.getContext('2d').drawImage(vid,0,0);
+      snapshotLog.push({ time: new Date().toISOString(), dataUrl: c.toDataURL('image/jpeg',.55) });
+      // brief flash so student sees it
+      const f = document.getElementById('snap-flash');
+      f.classList.add('on'); setTimeout(()=>f.classList.remove('on'), 150);
+    } catch(e) {}
+  }
+
+  /* ── Warning: ALWAYS warn, NEVER block ──────────────────── */
+  function triggerWarning(msg) {
+    warningCount++;
+    const b = document.getElementById('warn-badge');
+    b.style.display='inline-block';
+    b.textContent = `⚠ ${warningCount} warning${warningCount>1?'s':''}`;
+    showToast(msg);
+  }
+  function showToast(msg) {
+    const t = document.getElementById('warn-toast');
+    document.getElementById('warn-msg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(warnTimer);
+    warnTimer = setTimeout(()=>t.classList.remove('show'), 4200);
+  }
+
+  /* ── Event listeners (tab/fullscreen/blur) ──────────────── */
+  document.addEventListener('visibilitychange', ()=>{
+    if (!document.getElementById('s4').classList.contains('active')) return;
+    if (document.hidden) triggerWarning('⚠️ You switched tabs or minimised the window!');
+  });
+  window.addEventListener('blur', ()=>{
+    if (!document.getElementById('s4').classList.contains('active')) return;
+    triggerWarning('⚠️ You left the exam window!');
+  });
+  document.addEventListener('fullscreenchange', ()=>{
+    if (!document.getElementById('s4').classList.contains('active')) return;
+    if (!document.fullscreenElement) triggerWarning('⚠️ You exited fullscreen mode!');
+  });
+  document.addEventListener('webkitfullscreenchange', ()=>{
+    if (!document.getElementById('s4').classList.contains('active')) return;
+    if (!document.webkitFullscreenElement) triggerWarning('⚠️ You exited fullscreen mode!');
+  });
+  document.addEventListener('contextmenu', e=>{
+    if (document.getElementById('s4').classList.contains('active')) e.preventDefault();
+  });
+  ['copy','cut','paste'].forEach(ev=>document.addEventListener(ev, e=>{
+    if (document.getElementById('s4').classList.contains('active')) e.preventDefault();
+  }));
+
+  function enterFullscreen() {
+    try {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } catch(e){}
+  }
+  function stopAntiCheat() {
+    stopCamPip();
+    try { if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen(); } catch(e){}
+  }
+
+  /* ═══ GRID BUILDERS ══════════ */
   function buildClassGrid(){
-    const CLASS_DATA = {
-      2:  {emoji:'🌱', ord:'2nd', color:'#E67E22', bg:'#FEF0E3', tag:'Primary'},
-      3:  {emoji:'🌻', ord:'3rd', color:'#F39C12', bg:'#FEF9E7', tag:'Primary'},
-      4:  {emoji:'📚', ord:'4th', color:'#27AE60', bg:'#EAFAF1', tag:'Primary'},
-      5:  {emoji:'🔭', ord:'5th', color:'#16A085', bg:'#E8F8F5', tag:'Primary'},
-      6:  {emoji:'⚗️',  ord:'6th', color:'#2980B9', bg:'#EBF5FB', tag:'Middle'},
-      7:  {emoji:'🧮', ord:'7th', color:'#8E44AD', bg:'#F5EEF8', tag:'Middle'},
-      8:  {emoji:'🌐', ord:'8th', color:'#C0392B', bg:'#FDEDEC', tag:'Middle'},
-      9:  {emoji:'🎯', ord:'9th', color:'#B8860B', bg:'#FDF3CC', tag:'Secondary'},
-      10: {emoji:'🏆', ord:'10th',color:'#1A252F', bg:'#EAECEE', tag:'Secondary'},
-    };
     const g=document.getElementById('classGrid'); g.innerHTML='';
     for(let c=2;c<=10;c++){
-      const d=CLASS_DATA[c];
-      const el=document.createElement('div');
+      const d=CLASS_DATA[c],el=document.createElement('div');
       el.className='cls-tile'+(selClass===c?' sel':'');
-      el.style.setProperty('--cls-color', d.color);
-      el.style.setProperty('--cls-bg', d.bg);
-      el.innerHTML=`
-      <span class="c-emoji">${d.emoji}</span>
-      <div class="c-num">${d.ord}</div>
-      <div class="c-lbl">Class</div>
-      <div class="c-tag">${d.tag}</div>
-    `;
+      el.style.setProperty('--cls-color',d.color); el.style.setProperty('--cls-bg',d.bg);
+      el.innerHTML=`<span class="c-emoji">${d.emoji}</span><div class="c-num">${d.ord}</div><div class="c-lbl">Class</div><div class="c-tag">${d.tag}</div>`;
       el.onclick=()=>{selClass=c;buildClassGrid();};
       g.appendChild(el);
     }
@@ -691,7 +457,7 @@
     (CLASS_SUBJECTS[selClass]||[]).forEach(s=>{
       const m=SMETA[s],d=document.createElement('div');
       d.className='subj-tile'+(selSubject===s?' sel':'');
-      d.innerHTML=`<div class="si">${m.icon}</div><div class="sn">${m.label}</div><div class="sq">20 Qs</div>`;
+      d.innerHTML=`<div class="si">${m.icon}</div><div class="sn">${m.label}</div><div class="sq">25 Qs</div>`;
       d.onclick=()=>{selSubject=s;buildSubjGrid();applyTheme(s);};
       g.appendChild(d);
     });
@@ -703,52 +469,56 @@
     document.getElementById('topBar').style.background=t.color;
   }
 
-  /* ═══ NAVIGATION ═══ */
+  /* ═══ NAVIGATION ══════════════ */
   function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
   function goStep1(){showScr('s1');}
   function goStep2(){
     if(!selClass){alert('Please select a class first.');return;}
     buildSubjGrid();
-    document.getElementById('s2Title').textContent=`Step 2 — Select Subject for Class ${selClass}`;
-    const ords={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
-    document.getElementById('bc1').textContent=`${ords[selClass]} Class`;
+    const ord=CLASS_DATA[selClass].ord;
+    document.getElementById('s2Title').textContent=`Step 2 — Select Subject for ${ord} Class`;
+    document.getElementById('bc1').textContent=`${ord} Class`;
     showScr('s2');
   }
   function goStep3(){
     if(!selSubject){alert('Please select a subject.');return;}
-    const m=SMETA[selSubject];
-    const ords2={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
-    document.getElementById('iClass').textContent=`${ords2[selClass]} Class`;
+    const m=SMETA[selSubject],ord=CLASS_DATA[selClass].ord;
+    document.getElementById('iClass').textContent=`${ord} Class`;
     document.getElementById('iSubj').textContent=m.icon+' '+m.label;
-    document.getElementById('s3Title').textContent=`${m.label} Exam — ${ords2[selClass]} Class`;
+    document.getElementById('s3Title').textContent=`${m.label} — ${ord} Class`;
+    const nf=document.getElementById('stuName');
+    if(!nf.value) nf.value=LOGGED_USER;
     showScr('s3');
   }
 
-  /* ═══ START ═══ */
+  /* ═══ START EXAM ══════════════ */
   function startExam(){
-    const n=document.getElementById('stuName').value.trim();
-    const r=document.getElementById('stuRoll').value.trim();
-    if(!n){alert('Please enter your name.');return;}
-    stuName=n; stuRoll=r;
+    stuName=document.getElementById('stuName').value.trim()||LOGGED_USER;
+    stuRoll=document.getElementById('stuRoll').value.trim();
     const band=selClass<=5?'lower':'upper';
     const pool=QB[selSubject]?.[band];
-    if(!pool||pool.length===0){alert('Question bank not available for this class/subject yet. We\'re adding it soon!');return;}
+    if(!pool||pool.length===0){alert('Question bank not available for this selection.');return;}
     QUESTIONS=pool.slice(0,25);
     answers=new Array(QUESTIONS.length).fill(-1);
-    current=0; timeLeft=30*60;
+    current=0; timeLeft=30*60; examStartTime=Date.now();
+    warningCount=0; snapshotLog=[];
     clearInterval(timerInterval);
-    const ords3={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
-    document.getElementById('barTitle').textContent=`${SMETA[selSubject].label} | ${ords3[selClass]} Class`;
+    const ord=CLASS_DATA[selClass].ord;
+    document.getElementById('barTitle').textContent=`${SMETA[selSubject].label} | ${ord} Class`;
+    document.getElementById('warn-badge').style.display='none';
     document.getElementById('progWrap').style.display='block';
     showScr('s4'); renderQ(); startTimer();
+    startCamPip(); startSnapshots(); enterFullscreen();
+    if(!cameraGranted) setTimeout(()=>showToast('📷 No camera — exam flagged as unproctored'),1500);
   }
+
+  /* ═══ EXAM ENGINE ══════════════ */
   function startTimer(){
     timerInterval=setInterval(()=>{
       timeLeft--;
       const m=String(Math.floor(timeLeft/60)).padStart(2,'0'),s=String(timeLeft%60).padStart(2,'0');
       const el=document.getElementById('timer');
-      el.textContent=`${m}:${s}`;
-      el.className=timeLeft<=120?'warn':'';
+      el.textContent=`${m}:${s}`; el.className=timeLeft<=120?'warn':'';
       if(timeLeft<=0){clearInterval(timerInterval);submitExam();}
     },1000);
   }
@@ -781,52 +551,40 @@
   function nextQ(){if(current<QUESTIONS.length-1){current++;renderQ();}else submitExam();}
   function prevQ(){if(current>0){current--;renderQ();}}
 
-  /* ═══ SUBMIT ═══ */
+  /* ═══ SUBMIT ═══════════════════ */
   function submitExam(){
     clearInterval(timerInterval);
+    stopAntiCheat();
     let correct=0,wrong=0,skip=0;
     answers.forEach((a,i)=>{if(a===-1)skip++;else if(a===QUESTIONS[i].ans)correct++;else wrong++;});
-    const pct=Math.round(correct/QUESTIONS.length*100);
+    const total=QUESTIONS.length,pct=Math.round(correct/total*100);
     const grade=pct>=90?'A+':pct>=75?'A':pct>=60?'B':pct>=45?'C':'D';
-    const msg=pct>=75?'🎉 Excellent!':pct>=50?'👍 Good Effort!':'📚 Keep Practicing!';
-    const roll=stuRoll?` (Roll: ${stuRoll})`:'';
-    document.getElementById('resTitle').textContent=`${msg} ${stuName}${roll}`;
-    document.getElementById('ringNum').textContent=`${correct}/${QUESTIONS.length}`;
-    document.getElementById('ring').style.setProperty('--pct',`${pct}%`);
-    const ords4={2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th'};
-    document.getElementById('gbadge').textContent=`${SMETA[selSubject].label} | ${ords4[selClass]} Class — Grade ${grade} (${pct}%)`;
-    document.getElementById('cCnt').textContent=correct;
-    document.getElementById('wCnt').textContent=wrong;
-    document.getElementById('sCnt').textContent=skip;
-    const rl=document.getElementById('revList'); rl.innerHTML='';
-    QUESTIONS.forEach((q,i)=>{
-      const ua=answers[i],ca=q.opts[q.ans],ua_t=ua===-1?'Not answered':q.opts[ua],ok=ua===q.ans;
-      const d=document.createElement('div'); d.className='rev-item';
-      d.innerHTML=`<div class="rq">Q${i+1}. ${q.q}</div><div class="${ok?'ra':'rw'}">Your answer: ${ua_t} ${ok?'✔':'✘'}</div>${!ok?`<div class="rc">✔ Correct: ${ca}</div>`:''}`;
-      rl.appendChild(d);
-    });
+    const timeTaken=Math.round((Date.now()-examStartTime)/1000);
+    document.getElementById('savingOverlay').classList.add('show');
     document.getElementById('progWrap').style.display='none';
-    showScr('s5');
-  }
-  function toggleReview(){
-    const sec=document.getElementById('revSec'),btn=document.getElementById('revBtn');
-    const open=sec.style.display==='none';
-    sec.style.display=open?'block':'none';
-    btn.textContent=open?'▲ Hide Answers':'📋 View Answers';
-    if(open)sec.scrollIntoView({behavior:'smooth',block:'start'});
-  }
-  function restart(){
-    clearInterval(timerInterval);
-    selSubject='';QUESTIONS=[];answers=[];current=0;timeLeft=30*60;
-    document.getElementById('timer').textContent='30:00';document.getElementById('timer').className='';
-    document.getElementById('stuName').value='';document.getElementById('stuRoll').value='';
-    document.getElementById('revSec').style.display='none';document.getElementById('revBtn').textContent='📋 View Answers';
-    document.getElementById('barTitle').textContent='Select Class & Subject';
-    document.getElementById('progWrap').style.display='none';
-    applyTheme('mathematics'); buildClassGrid(); showScr('s1');
+    fetch('/exam/submit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',[CSRF_HEADER]:CSRF_TOKEN},
+      body:JSON.stringify({
+        studentName:stuName, rollNumber:stuRoll,
+        classLevel:selClass, subject:selSubject,
+        totalQuestions:total, correctAnswers:correct,
+        wrongAnswers:wrong, skippedAnswers:skip,
+        scorePercent:pct, grade:grade,
+        timeTakenSeconds:timeTaken,
+        warningCount:warningCount,        // ← anti-cheat data
+        cameraUsed:cameraGranted,         // ← anti-cheat data
+        snapshotCount:snapshotLog.length  // ← anti-cheat data
+      })
+    })
+            .then(r=>r.json())
+            .then(data=>{
+              if(data.success){ window.location.href='/exam/result/'+data.resultId; }
+              else{ document.getElementById('savingOverlay').classList.remove('show'); alert('Could not save: '+data.message); }
+            })
+            .catch(()=>{ document.getElementById('savingOverlay').classList.remove('show'); alert('Network error. Please try again.'); });
   }
 
-  /* ═══ INIT ═══ */
   buildClassGrid();
 </script>
 </body>

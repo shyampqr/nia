@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | Nextgenz Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --acc:  #1B5E3B;   /* Forest Green – primary accent       */
+            --strp: #2ECC71;   /* Emerald Green – highlight strip     */
+            --bg:   #F0F7F2;   /* Soft green-tinted page background   */
+            --card: #FFFFFF;
+            --opt:  #F4FAF6;   /* Input / option background           */
+            --bdr:  #C8E0CF;   /* Border                              */
+            --tp:   #102A1A;   /* Primary text – deep forest          */
+            --ts:   #2D5A3D;   /* Secondary text                      */
+            --tm:   #6B9478;   /* Muted text                          */
+            --ok:   #1B5E3B;
+            --bad:  #B02020;
+            --okbg: #E8F5EE;
+            --bdbg: #FDF0F0;
+            --sh:   rgba(27,94,59,.08);
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+        .box{background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:3rem 2.5rem;text-align:center;max-width:480px;width:100%}
+        .code{font-family:'Playfair Display',serif;font-size:4rem;font-weight:700;color:var(--acc);line-height:1}
+        h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--tp);margin:.6rem 0 .8rem}
+        p{font-size:.9rem;color:var(--tm);line-height:1.6;margin-bottom:1.5rem}
+        a{display:inline-flex;align-items:center;gap:.4rem;background:var(--acc);color:#fff;padding:.65rem 1.5rem;border-radius:10px;text-decoration:none;font-weight:600;font-size:.88rem}
+        a:hover{filter:brightness(1.1)}
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="code" th:text="${status}">Error</div>
+    <h2 th:text="${error}">Something went wrong</h2>
+    <p th:text="${message}">An unexpected error occurred. Please try again.</p>
+    <a href="/exam">← Back to Exam Portal</a>
+</div>
+</body>
+</html>
