@@ -1,5 +1,3 @@
-/*
-
 package com.nextgenz.entity;
 
 import jakarta.persistence.*;
@@ -56,4 +54,3 @@ public class Student {
         this.email = email;
     }
 }
-*/

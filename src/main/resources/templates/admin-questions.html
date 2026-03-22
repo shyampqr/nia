@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Bank Admin | Nextgenz Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════
+           CSS Variables — matches all Nextgenz pages
+        ═══════════════════════════════════════════════ */
+        :root {
+            --acc:  #1B5E3B;   /* Forest Green – primary accent       */
+            --strp: #2ECC71;   /* Emerald Green – highlight strip     */
+            --bg:   #F0F7F2;   /* Soft green-tinted page background   */
+            --card: #FFFFFF;
+            --opt:  #F4FAF6;   /* Input / option background           */
+            --bdr:  #C8E0CF;   /* Border                              */
+            --tp:   #102A1A;   /* Primary text – deep forest          */
+            --ts:   #2D5A3D;   /* Secondary text                      */
+            --tm:   #6B9478;   /* Muted text                          */
+            --ok:   #1B5E3B;
+            --bad:  #B02020;
+            --okbg: #E8F5EE;
+            --bdbg: #FDF0F0;
+            --sh:   rgba(27,94,59,.08);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--tp);
+            min-height: 100vh;
+        }
+
+        /* ── Layout ── */
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 230px;
+            background: #FFFDF7;
+            border-right: 1.5px solid #C8DCEC;
+            padding: 1.6rem 1rem 2rem;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 2px 0 12px rgba(27,94,59,.06);
+        }
+
+        /* Sidebar top brand strip */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1.5px solid #C8DCEC;
+        }
+        .brand-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--acc), var(--strp));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(27,94,59,.25);
+        }
+        .sidebar .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--tp);
+            line-height: 1.2;
+        }
+        .sidebar .logo-sub {
+            font-size: .6rem;
+            color: var(--tm);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            margin-top: .1rem;
+        }
+
+        /* Nav section label */
+        .nav-section-label {
+            font-size: .62rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--tm);
+            padding: 0 .75rem;
+            margin: 1.1rem 0 .4rem;
+        }
+
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            padding: .58rem .85rem;
+            border-radius: 10px;
+            color: var(--ts);
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 500;
+            margin-bottom: .15rem;
+            transition: all .18s;
+            border: 1px solid transparent;
+        }
+        .sidebar nav a:hover {
+            background: #EBF3FC;
+            color: var(--acc);
+            border-color: #A8D5B8;
+        }
+        .sidebar nav a.active {
+            background: #E8F5EE;
+            color: var(--acc);
+            font-weight: 700;
+            border-color: #2ECC71;
+            box-shadow: 0 1px 4px rgba(27,94,59,.12);
+        }
+        .sidebar nav a.logout-link {
+            color: #C0392B;
+            margin-top: .5rem;
+        }
+        .sidebar nav a.logout-link:hover {
+            background: #FDF0F0;
+            border-color: #F5C6C6;
+            color: #B02020;
+        }
+        .nav-icon {
+            font-size: .95rem;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        /* Active left accent bar */
+        .sidebar nav a.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 3px;
+            background: var(--acc);
+            border-radius: 0 3px 3px 0;
+        }
+        .sidebar nav a { position: relative; }
+
+        /* ── Main ── */
+        .main { margin-left: 230px; padding: 2rem; flex: 1; }
+
+        /* ── Page header ── */
+        .page-hdr {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.6rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .page-hdr h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--tp);
+        }
+        .page-hdr .sub { font-size: .8rem; color: var(--tm); margin-top: .2rem; }
+        .school-pill {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--acc);
+            border: 1.5px solid var(--strp);
+            background: #fff;
+            padding: .25rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: .5rem;
+        }
+
+        /* ── Card base ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--bdr);
+            border-radius: 16px;
+            box-shadow: 0 2px 16px var(--sh);
+            overflow: hidden;
+            margin-bottom: 1.6rem;
+        }
+        .card-bar {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .85rem 1.4rem;
+            background: var(--acc);
+            border-bottom: 3px solid var(--strp);
+        }
+        .card-bar .dots { display: flex; gap: .4rem; }
+        .card-bar .dot  { width: 10px; height: 10px; border-radius: 50%; opacity: .8; }
+        .card-bar .dot:nth-child(1) { background: #ff8a80; }
+        .card-bar .dot:nth-child(2) { background: #ffe082; }
+        .card-bar .dot:nth-child(3) { background: #a5d6a7; }
+        .card-bar h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: .95rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: .04em;
+            margin-left: .4rem;
+        }
+        .card-body { padding: 1.6rem 1.5rem; }
+
+        /* ── Flash messages ── */
+        .alert {
+            padding: .75rem 1rem;
+            border-radius: 10px;
+            font-size: .86rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .alert-success { background: var(--okbg); border: 1px solid var(--ok); color: var(--ok); }
+        .alert-error   { background: var(--bdbg); border: 1px solid var(--bad); color: var(--bad); }
+
+        /* ── Form grid ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: .85rem;
+            margin-bottom: .85rem;
+        }
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .85rem;
+            margin-bottom: .85rem;
+        }
+        .form-full  { grid-column: 1 / -1; }
+
+        .form-group label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--ts);
+            margin-bottom: .3rem;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            padding: .68rem 1rem;
+            border-radius: 10px;
+            border: 1.5px solid var(--bdr);
+            background: var(--opt);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            color: var(--tp);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--acc);
+            box-shadow: 0 0 0 3px rgba(27,94,59,.1);
+        }
+        .form-control::placeholder { color: var(--tm); }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .select-wrap { position: relative; }
+        .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: .9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--tm);
+            pointer-events: none;
+            font-size: .8rem;
+        }
+
+        /* Option input groups */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .85rem;
+            margin-bottom: .85rem;
+        }
+        .option-input-wrap {
+            position: relative;
+        }
+        .option-badge {
+            position: absolute;
+            left: .7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #A8D5B8, var(--strp));
+            color: var(--ts);
+            font-size: .72rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .option-input-wrap .form-control { padding-left: 2.4rem; }
+
+        /* ── Submit button ── */
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: .6rem;
+            border-top: 1px solid var(--bdr);
+            margin-top: .4rem;
+        }
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .86rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            padding: .65rem 1.6rem;
+            cursor: pointer;
+            transition: all .18s;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            text-decoration: none;
+        }
+        .btn:active { transform: scale(.97); }
+        .btn-g  { background: var(--acc); color: #fff; box-shadow: 0 2px 10px rgba(27,94,59,.25); }
+        .btn-g:hover { filter: brightness(1.1); }
+        .btn-o  { background: #fff; color: var(--ts); border: 1.5px solid var(--bdr); }
+        .btn-o:hover { background: #EBF7EF; }
+        .btn-sm { padding: .32rem .75rem; font-size: .78rem; border-radius: 7px; }
+        .btn-danger { background: var(--bdbg); color: var(--bad); border: 1px solid #F5C6C6; }
+        .btn-danger:hover { background: var(--bad); color: #fff; }
+
+        /* ── Filter bar ── */
+        .filter-bar {
+            background: var(--card);
+            border: 1px solid var(--bdr);
+            border-radius: 14px;
+            padding: .9rem 1.2rem;
+            margin-bottom: 1.3rem;
+            display: flex;
+            gap: .75rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .filter-bar label {
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--ts);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            display: block;
+            margin-bottom: .28rem;
+        }
+        .filter-bar select, .filter-bar input {
+            padding: .5rem .85rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--bdr);
+            background: var(--opt);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .86rem;
+            color: var(--tp);
+            outline: none;
+        }
+        .filter-bar select:focus { border-color: var(--acc); }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--bdr);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 1px 8px var(--sh);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--c, var(--acc));
+        }
+        .stat-card .sv {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--c, var(--acc));
+        }
+        .stat-card .sl {
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--tm);
+            font-weight: 600;
+            margin-top: .12rem;
+        }
+
+        /* ── Table ── */
+        .tbl-wrap {
+            background: var(--card);
+            border: 1px solid var(--bdr);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px var(--sh);
+        }
+        .tbl-head {
+            padding: .9rem 1.2rem;
+            border-bottom: 1px solid var(--bdr);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .tbl-head h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--tp);
+        }
+        .tbl-count { font-size: .76rem; color: var(--tm); font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            background: #F4FAF6;
+            padding: .72rem 1rem;
+            text-align: left;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--ts);
+            border-bottom: 1px solid var(--bdr);
+        }
+        tbody td {
+            padding: .78rem 1rem;
+            font-size: .86rem;
+            color: var(--tp);
+            border-bottom: 1px solid #EBF7EF;
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #F4FAF6; }
+
+        /* Badges */
+        .subj-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            font-size: .75rem;
+            font-weight: 700;
+            padding: .18rem .6rem;
+            border-radius: 20px;
+            background: #E8F5EE;
+            color: var(--acc);
+            border: 1px solid #A8D5B8;
+        }
+        .class-badge {
+            display: inline-block;
+            font-size: .73rem;
+            font-weight: 700;
+            padding: .18rem .55rem;
+            border-radius: 20px;
+            background: var(--opt);
+            color: var(--ts);
+            border: 1px solid var(--bdr);
+        }
+        .topic-chip {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--tm);
+            background: var(--bg);
+            border-radius: 6px;
+            padding: .12rem .5rem;
+        }
+        .q-text-cell {
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+            color: var(--tp);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .empty-state .ei { font-size: 3rem; margin-bottom: .6rem; }
+        .empty-state p   { color: var(--tm); font-size: .9rem; }
+
+        /* ── Animations ── */
+        @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+        .hdr-anim { animation: fadeDown .5s ease both; }
+        .card-anim { animation: fadeUp .55s ease both .1s; }
+
+        /* ── Responsive ── */
+        @media(max-width:900px) {
+            .sidebar { display: none; }
+            .main    { margin-left: 0; }
+            .form-grid { grid-template-columns: repeat(2,1fr); }
+            .stats-row { grid-template-columns: repeat(2,1fr); }
+        }
+        @media(max-width:600px) {
+            .form-grid, .form-grid-2, .options-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <div class="brand-icon">🎓</div>
+            <div>
+                <div class="logo">Nextgenz</div>
+                <div class="logo-sub">Admin Panel</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-section-label">Main Menu</div>
+        <nav>
+            <a th:href="@{/admin/dashboard}">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+            <a th:href="@{/admin/exam-results}">
+                <span class="nav-icon">📋</span> Exam Results
+            </a>
+            <a th:href="@{/admin/questions}" class="active">
+                <span class="nav-icon">❓</span> Question Bank
+            </a>
+
+            <div class="nav-section-label">People</div>
+            <a th:href="@{/admin/students}">
+                <span class="nav-icon">👨‍🎓</span> Students
+            </a>
+            <a th:href="@{/admin/teachers}">
+                <span class="nav-icon">👩‍🏫</span> Teachers
+            </a>
+            <a th:href="@{/admin/admissions}">
+                <span class="nav-icon">📝</span> Admissions
+            </a>
+
+            <div class="nav-section-label">Quick Links</div>
+            <a th:href="@{/exam}" target="_blank">
+                <span class="nav-icon">🎓</span> Exam Portal
+            </a>
+
+            <a th:href="@{/logout}" class="logout-link">
+                <span class="nav-icon">🚪</span> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ── Main content ── -->
+    <main class="main">
+
+        <!-- Page header -->
+        <div class="page-hdr hdr-anim">
+            <div>
+                <div class="school-pill">Nextgenz International Academy</div>
+                <h1>Question Bank</h1>
+                <div class="sub">Add, manage and organise exam questions by class &amp; subject</div>
+            </div>
+            <a th:href="@{/exam}" target="_blank" class="btn btn-g">🎓 Open Exam Portal</a>
+        </div>
+
+        <!-- Flash messages -->
+        <div class="alert alert-success"
+             th:if="${successMsg}"
+             th:text="'✔ ' + ${successMsg}"></div>
+        <div class="alert alert-error"
+             th:if="${errorMsg}"
+             th:text="'✘ ' + ${errorMsg}"></div>
+
+        <!-- Stats row -->
+        <div class="stats-row">
+            <div class="stat-card" style="--c:#1B5E3B">
+                <div class="sv" th:text="${totalQuestions != null} ? ${totalQuestions} : '0'">0</div>
+                <div class="sl">Total Questions</div>
+            </div>
+            <div class="stat-card" style="--c:#1A4A8A">
+                <div class="sv" th:text="${totalSubjects != null} ? ${totalSubjects} : '9'">9</div>
+                <div class="sl">Subjects</div>
+            </div>
+            <div class="stat-card" style="--c:#1E6B45">
+                <div class="sv">9</div>
+                <div class="sl">Classes (2–10)</div>
+            </div>
+            <div class="stat-card" style="--c:#5A1A8A">
+                <div class="sv" th:text="${recentlyAdded != null} ? ${recentlyAdded} : '0'">0</div>
+                <div class="sl">Added This Week</div>
+            </div>
+        </div>
+
+        <!-- ══ ADD QUESTION FORM CARD ══ -->
+        <div class="card card-anim">
+            <div class="card-bar">
+                <div class="dots">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <h4>➕ Add New Question</h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/questions/add}"
+                      th:object="${newQuestion}"
+                      method="post">
+
+                    <!-- Row 1: Class · Subject · Topic · Correct Answer -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Class</label>
+                            <div class="select-wrap">
+                                <select class="form-select" th:field="*{classLevel}" required>
+                                    <option value="">Select Class</option>
+                                    <option value="2">2nd Class</option>
+                                    <option value="3">3rd Class</option>
+                                    <option value="4">4th Class</option>
+                                    <option value="5">5th Class</option>
+                                    <option value="6">6th Class</option>
+                                    <option value="7">7th Class</option>
+                                    <option value="8">8th Class</option>
+                                    <option value="9">9th Class</option>
+                                    <option value="10">10th Class</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <div class="select-wrap">
+                                <select class="form-select" th:field="*{subject}" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="mathematics">📐 Mathematics</option>
+                                    <option value="science">🔬 Science</option>
+                                    <option value="english">📖 English</option>
+                                    <option value="hindi">🇮🇳 Hindi</option>
+                                    <option value="gk">🌍 General Knowledge</option>
+                                    <option value="social">🏛️ Social Science</option>
+                                    <option value="computer">💻 Computer Science</option>
+                                    <option value="sanskrit">📜 Sanskrit</option>
+                                    <option value="evs">🌿 EVS</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Topic</label>
+                            <input type="text" class="form-control"
+                                   th:field="*{topic}"
+                                   placeholder="e.g. Algebra, Geometry">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correct Answer</label>
+                            <div class="select-wrap">
+                                <select class="form-select" th:field="*{correctOption}" required>
+                                    <option value="">Select Correct Option</option>
+                                    <option value="0">✅ Option A</option>
+                                    <option value="1">✅ Option B</option>
+                                    <option value="2">✅ Option C</option>
+                                    <option value="3">✅ Option D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Question text (full width) -->
+                    <div class="form-group" style="margin-bottom:.85rem">
+                        <label>Question Text</label>
+                        <textarea class="form-control"
+                                  th:field="*{questionText}"
+                                  rows="3"
+                                  placeholder="Type the full question here…"
+                                  required></textarea>
+                    </div>
+
+                    <!-- Row 3: Options A–D -->
+                    <div class="options-grid">
+                        <div class="form-group">
+                            <label>Option A</label>
+                            <div class="option-input-wrap">
+                                <div class="option-badge">A</div>
+                                <input type="text" class="form-control"
+                                       th:field="*{optionA}"
+                                       placeholder="Option A" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Option B</label>
+                            <div class="option-input-wrap">
+                                <div class="option-badge">B</div>
+                                <input type="text" class="form-control"
+                                       th:field="*{optionB}"
+                                       placeholder="Option B" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Option C</label>
+                            <div class="option-input-wrap">
+                                <div class="option-badge">C</div>
+                                <input type="text" class="form-control"
+                                       th:field="*{optionC}"
+                                       placeholder="Option C" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Option D</label>
+                            <div class="option-input-wrap">
+                                <div class="option-badge">D</div>
+                                <input type="text" class="form-control"
+                                       th:field="*{optionD}"
+                                       placeholder="Option D" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-footer">
+                        <button type="reset" class="btn btn-o" style="margin-right:.6rem">✕ Clear</button>
+                        <button type="submit" class="btn btn-g">💾 Save Question</button>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /add form card -->
+
+        <!-- ══ FILTER BAR ══ -->
+        <div class="filter-bar">
+            <form method="get" th:action="@{/admin/questions}" style="display:contents">
+                <div>
+                    <label>Class</label>
+                    <select name="classLevel">
+                        <option value="">All Classes</option>
+                        <option th:each="c : ${#numbers.sequence(2,10)}"
+                                th:value="${c}"
+                                th:selected="${filterClass == c}"
+                                th:text="${c + (c==2?'nd':c==3?'rd':'th') + ' Class'}">Class</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Subject</label>
+                    <select name="subject">
+                        <option value="">All Subjects</option>
+                        <option value="mathematics" th:selected="${filterSubject=='mathematics'}">Mathematics</option>
+                        <option value="science"     th:selected="${filterSubject=='science'}">Science</option>
+                        <option value="english"     th:selected="${filterSubject=='english'}">English</option>
+                        <option value="hindi"       th:selected="${filterSubject=='hindi'}">Hindi</option>
+                        <option value="gk"          th:selected="${filterSubject=='gk'}">GK</option>
+                        <option value="social"      th:selected="${filterSubject=='social'}">Social Science</option>
+                        <option value="computer"    th:selected="${filterSubject=='computer'}">Computer</option>
+                        <option value="sanskrit"    th:selected="${filterSubject=='sanskrit'}">Sanskrit</option>
+                        <option value="evs"         th:selected="${filterSubject=='evs'}">EVS</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Search</label>
+                    <input type="text" name="search" placeholder="Search question…"
+                           th:value="${filterSearch}" style="width:180px">
+                </div>
+                <button type="submit" class="btn btn-g btn-sm">🔍 Filter</button>
+                <a th:href="@{/admin/questions}" class="btn btn-o btn-sm">✕ Clear</a>
+            </form>
+        </div>
+
+        <!-- ══ QUESTIONS TABLE ══ -->
+        <div class="tbl-wrap">
+            <div class="tbl-head">
+                <h3>All Questions</h3>
+                <span class="tbl-count"
+                      th:text="${questions != null} ? ${#lists.size(questions)} + ' questions' : '0 questions'">
+          0 questions
+        </span>
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-state"
+                 th:if="${questions == null or #lists.isEmpty(questions)}">
+                <div class="ei">📭</div>
+                <p>No questions found. Add your first question above.</p>
+            </div>
+
+            <!-- Table -->
+            <table th:if="${questions != null and not #lists.isEmpty(questions)}">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Question</th>
+                    <th>Options</th>
+                    <th>Correct</th>
+                    <th>Topic</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="q, st : ${questions}">
+
+                    <!-- # -->
+                    <td style="color:var(--tm);font-size:.75rem"
+                        th:text="${st.count}">#</td>
+
+                    <!-- Class -->
+                    <td>
+              <span class="class-badge"
+                    th:text="${q.classLevel + (q.classLevel == 2 ? 'nd' :
+                               q.classLevel == 3 ? 'rd' : 'th')}">9th</span>
+                    </td>
+
+                    <!-- Subject -->
+                    <td>
+              <span class="subj-badge">
+                <span th:text="${q.subject == 'mathematics' ? '📐' :
+                                  q.subject == 'science'     ? '🔬' :
+                                  q.subject == 'english'     ? '📖' :
+                                  q.subject == 'hindi'       ? '🇮🇳' :
+                                  q.subject == 'gk'          ? '🌍' :
+                                  q.subject == 'social'      ? '🏛️' :
+                                  q.subject == 'computer'    ? '💻' :
+                                  q.subject == 'sanskrit'    ? '📜' :
+                                  q.subject == 'evs'         ? '🌿' : '📝'}">📐</span>
+                <span th:text="${#strings.capitalize(q.subject)}">Subject</span>
+              </span>
+                    </td>
+
+                    <!-- Question text (truncated) -->
+                    <td class="q-text-cell"
+                        th:text="${#strings.abbreviate(q.questionText, 55)}"
+                        th:title="${q.questionText}">Question text</td>
+
+                    <!-- Options inline -->
+                    <td style="font-size:.78rem;color:var(--tm);min-width:160px">
+                        <div th:text="'A: ' + ${q.optionA}">A: —</div>
+                        <div th:text="'B: ' + ${q.optionB}">B: —</div>
+                        <div th:text="'C: ' + ${q.optionC}">C: —</div>
+                        <div th:text="'D: ' + ${q.optionD}">D: —</div>
+                    </td>
+
+                    <!-- Correct answer -->
+                    <td>
+              <span style="font-weight:700;color:var(--ok);font-size:.82rem"
+                    th:text="${q.correctOption == 0 ? 'A' :
+                               q.correctOption == 1 ? 'B' :
+                               q.correctOption == 2 ? 'C' : 'D'}">A</span>
+                    </td>
+
+                    <!-- Topic chip -->
+                    <td>
+              <span class="topic-chip"
+                    th:text="${q.topic != null and !q.topic.isEmpty()} ? ${q.topic} : '—'">—</span>
+                    </td>
+
+                    <!-- Delete action -->
+                    <td>
+                        <a th:href="@{/admin/questions/delete/{id}(id=${q.id})}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Delete this question permanently?')">
+                            🗑 Delete
+                        </a>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div><!-- /tbl-wrap -->
+
+    </main>
+</div><!-- /layout -->
+</body>
+</html>

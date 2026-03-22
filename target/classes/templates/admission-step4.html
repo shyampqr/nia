@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admission Form - Step 3</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #f9e79f, #f1c40f, #d4ac0d);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .form-card {
+            background: #fffbea;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #d4ac0d;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-header h2 {
+            font-weight: bold;
+            color: #b7950b;
+        }
+        .section-title {
+            font-weight: 600;
+            color: #7d6608;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #f1c40f, #d4ac0d);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #d4ac0d, #f1c40f);
+        }
+        .form-label {
+            font-weight: 500;
+            color: #7d6608;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Nextgenz International Academy</h2>
+            <p class="text-muted">Admission Application Form - Step 4 of 6</p>
+        </div>
+
+        <!-- Attractive Progress Bar -->
+        <div class="progress mb-4" style="height: 25px; border-radius: 12px; background-color: #f5f5f5;">
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                 role="progressbar"
+                 style="width: 50%; font-weight: bold; font-size: 1rem;"
+                 aria-valuenow="2" aria-valuemin="0" aria-valuemax="6">
+                Step 4 of 6
+            </div>
+        </div>
+
+        <form th:action="@{/admission/step2}" method="post">
+
+            <!-- Father’s Details -->
+            <h5 class="section-title">👨 Father’s Details</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Father Name *</label>
+                    <input type="text" name="fatherName" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Father Aadhaar No</label>
+                    <input type="text" name="fatherAadhaar" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Father Email</label>
+                    <input type="email" name="fatherEmail" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Father Occupation *</label>
+                    <select name="fatherOccupation" class="form-select" required>
+                        <option value="">-Select-</option>
+                        <option>Business</option>
+                        <option>Government Service</option>
+                        <option>Private Service</option>
+                        <option>Farmer</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Country Code *</label>
+                    <select name="fatherCountryCode" class="form-select" required>
+                        <option value="+91">91</option>
+                        <option value="+1">1</option>
+                        <option value="+44">44</option>
+                        <option value="+61">61</option>
+                        <option value="+971">971</option>
+                    </select>
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label">Father Mobile No *</label>
+                    <input type="tel" name="fatherMobile" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Mother’s Details -->
+            <h5 class="section-title">👩 Mother’s Details</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Mother Name *</label>
+                    <input type="text" name="motherName" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Mother Aadhaar No</label>
+                    <input type="text" name="motherAadhaar" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Mother Email</label>
+                    <input type="email" name="motherEmail" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Mother Occupation *</label>
+                    <select name="motherOccupation" class="form-select" required>
+                        <option value="">-Select-</option>
+                        <option>Homemaker</option>
+                        <option>Business</option>
+                        <option>Government Service</option>
+                        <option>Private Service</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Country Code *</label>
+                    <select name="motherCountryCode" class="form-select" required>
+                        <option value="+91">91</option>
+                        <option value="+1">1</option>
+                        <option value="+44">44</option>
+                        <option value="+61">61</option>
+                        <option value="+971">971</option>
+                    </select>
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label">Mother Mobile No *</label>
+                    <input type="tel" name="motherMobile" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary">Previous</button>
+                <button type="submit" class="btn btn-primary">Save & Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
