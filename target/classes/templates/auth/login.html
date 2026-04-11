@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | Nextgenz Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --acc:  #1B5E3B;   /* Forest Green – primary accent       */
+  --strp: #2ECC71;   /* Emerald Green – highlight strip     */
+  --bg:   #F0F7F2;   /* Soft green-tinted page background   */
+  --card: #FFFFFF;
+  --opt:  #F4FAF6;   /* Input / option background           */
+  --bdr:  #C8E0CF;   /* Border                              */
+  --tp:   #102A1A;   /* Primary text – deep forest          */
+  --ts:   #2D5A3D;   /* Secondary text                      */
+  --tm:   #6B9478;   /* Muted text                          */
+  --ok:   #1B5E3B;
+  --bad:  #B02020;
+  --okbg: #E8F5EE;
+  --bdbg: #FDF0F0;
+  --sh:   rgba(27,94,59,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.login-wrap{width:100%;max-width:420px}
+.logo-area{text-align:center;margin-bottom:1.8rem}
+.logo-area .school{font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);border:1.5px solid var(--strp);background:#fff;padding:.25rem 1rem;border-radius:20px;display:inline-block;margin-bottom:.65rem}
+.logo-area h1{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--tp)}
+.logo-area p{font-size:.84rem;color:var(--tm);margin-top:.3rem}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;box-shadow:0 4px 20px var(--sh);overflow:hidden}
+.card-top{height:4px;background:linear-gradient(90deg,#1B5E3B,#2ECC71)}
+.card-body{padding:2rem}
+.card-body h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--tp);margin-bottom:1.4rem;text-align:center}
+.alert{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;font-weight:500;margin-bottom:1.1rem}
+.alert-error{background:#FDF0F0;border:1px solid var(--bad);color:var(--bad)}
+.alert-success{background:#E8F5EE;border:1px solid var(--ok);color:var(--ok)}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ts);margin-bottom:.35rem}
+.form-control{width:100%;padding:.72rem 1rem;border-radius:10px;border:1.5px solid var(--bdr);background:#FAFAF8;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--tp);outline:none;transition:border-color .2s}
+.form-control:focus{border-color:var(--acc)}
+.btn-submit{width:100%;padding:.75rem;background:var(--acc);color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;border:none;border-radius:10px;cursor:pointer;transition:filter .18s;margin-top:.4rem;box-shadow:0 2px 10px rgba(27,94,59,.25)}
+.btn-submit:hover{filter:brightness(1.1)}
+.footer-link{text-align:center;margin-top:1.2rem;font-size:.84rem;color:var(--tm)}
+.footer-link a{color:var(--acc);font-weight:600;text-decoration:none}
+.footer-link a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="logo-area">
+    <div class="school">Nextgenz International Academy</div>
+    <h1>Exam Portal</h1>
+    <p>Sign in to access your exams</p>
+  </div>
+  <div class="card">
+    <div class="card-top"></div>
+    <div class="card-body">
+      <h2>Welcome Back 👋</h2>
+
+      <div class="alert alert-error"
+           th:if="${errorMsg}" th:text="${errorMsg}"></div>
+      <div class="alert alert-success"
+           th:if="${logoutMsg}" th:text="${logoutMsg}"></div>
+      <div class="alert alert-success"
+           th:if="${successMsg}" th:text="${successMsg}"></div>
+
+      <form th:action="@{/login}" method="post">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username"
+                 class="form-control" placeholder="Enter username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password"
+                 class="form-control" placeholder="Enter password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-submit">Sign In →</button>
+      </form>
+
+      <div class="footer-link">
+        Don't have an account? <a th:href="@{/register}">Register here</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

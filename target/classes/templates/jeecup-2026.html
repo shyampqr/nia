@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UP Polytechnic JEECUP Online Form 2026</title>
+    <meta name="description" content="UP Polytechnic JEECUP Online Form 2026 detail page with important dates and links.">
+    <link rel="stylesheet" th:href="@{/css/portal.css}">
+</head>
+<body>
+<div class="top-strip">
+    <div class="portal-shell">
+        <span>UP Polytechnic JEECUP Online Form 2026</span>
+        <a th:href="@{/home}" style="color:#fffaf0;text-decoration:none;font-weight:700;">Back to Home</a>
+    </div>
+</div>
+
+<header class="brand-bar">
+    <div class="portal-shell">
+        <div class="brand-wrap">
+            <img class="brand-logo" th:src="@{/images/logo1.jpeg}" alt="JEECUP portal">
+            <div class="brand-copy">
+                <h1>JEECUP 2026</h1>
+                <p>
+                    Dedicated application page for Uttar Pradesh Polytechnic admissions with a cleaner presentation
+                    than legacy result sites and a structure suitable for future backend publishing.
+                </p>
+            </div>
+            <div class="brand-badge">Online Form</div>
+        </div>
+    </div>
+</header>
+
+<main class="insight-section">
+    <div class="portal-shell insight-grid">
+        <article class="details-card">
+            <span class="eyebrow" style="background:rgba(214,161,29,0.16);color:#6f4b00;border-color:rgba(180,122,8,0.22);">Application Overview</span>
+            <h3>UP Joint Entrance Examination Polytechnic 2026</h3>
+            <p>
+                This page is designed like a modern, readable alternative to a Sarkari Result article page.
+                The layout separates overview, dates, and action links so users do not need to hunt through a long text wall.
+            </p>
+            <table class="details-table">
+                <tr>
+                    <td>Exam Name</td>
+                    <td>Joint Entrance Examination Council Uttar Pradesh (JEECUP)</td>
+                </tr>
+                <tr>
+                    <td>Course Type</td>
+                    <td>Diploma / Polytechnic Admission</td>
+                </tr>
+                <tr>
+                    <td>Mode</td>
+                    <td>Online Application</td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td>Uttar Pradesh</td>
+                </tr>
+                <tr>
+                    <td>Age Limit</td>
+                    <td>Minimum age 14 years as per admission rulebook.</td>
+                </tr>
+            </table>
+        </article>
+
+        <aside class="details-card">
+            <span class="eyebrow" style="background:rgba(15,122,69,0.12);color:#0f7a45;border-color:rgba(15,122,69,0.18);">Important Dates</span>
+            <h3>Key Schedule</h3>
+            <div class="link-grid">
+                <a href="#" th:each="date : ${importantDates}">
+                    <strong th:text="${date}">Date Item</strong>
+                    <span>Keep this section synced with official notice updates.</span>
+                </a>
+            </div>
+        </aside>
+    </div>
+
+    <div class="portal-shell" style="margin-top:22px;">
+        <section class="details-card">
+            <span class="eyebrow" style="background:rgba(31,78,163,0.12);color:#1f4ea3;border-color:rgba(31,78,163,0.18);">Important Links</span>
+            <h3>Apply, Notice, Official Website</h3>
+            <div class="board-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+                <article class="notice-card" th:each="link : ${importantLinks}">
+                    <h4 th:text="${link.title}">Link Title</h4>
+                    <div class="notice-meta">
+                        <span th:text="${link.department}">Department</span>
+                        <span> | </span>
+                        <span th:text="${link.updateDate}">Status</span>
+                    </div>
+                    <a class="notice-link" th:href="${link.actionUrl}" th:text="${link.actionLabel}" target="_blank" rel="noopener noreferrer">Open</a>
+                </article>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="portal-footer">
+    <div class="portal-shell">
+        <div class="footer-card">
+            <p>This JEECUP page is now part of the application routing and is ready to be expanded with eligibility, application fee, exam pattern, FAQs, and database-managed notices.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

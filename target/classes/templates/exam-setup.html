@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Setup - Nextgenz International Academy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .exam-setup-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 30px;
+            max-width: 500px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light opacity-75 mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">Nextgenz International Academy</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+        <div class="exam-setup-card">
+            <h3 class="text-center fw-bold mb-4">Start Online Exam</h3>
+            <form th:action="@{/exam/start}" method="post">
+                <div class="mb-3">
+                    <label for="subject" class="form-label fw-semibold">Choose Subject</label>
+                    <select class="form-select" id="subject" name="subject" required>
+                        <option value="Math">Mathematics</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="count" class="form-label fw-semibold">Number of Questions</label>
+                    <input type="number" class="form-control" id="count" name="count" min="5" max="50" value="10" required>
+                    <div class="form-text">Choose between 5 and 50 questions.</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" style="background-color: #C28813; border-color: #C28813;">Start Exam</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
